@@ -2,6 +2,7 @@ import { useMemo, useRef } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 import { Color, Fog, type Points } from 'three'
 import { useExperienceStore } from '../store/experienceStore'
+import { HubVideoEnvironment } from './HubVideoEnvironment'
 
 export function Environment() {
   const scene = useThree((view) => view.scene)
@@ -51,6 +52,7 @@ export function Environment() {
     <>
       <color attach="background" args={['#07090a']} />
       <fog attach="fog" args={['#07090a', 5.5, 15]} />
+      <HubVideoEnvironment />
       <ambientLight intensity={0.48} color="#97a5a4" />
       <directionalLight position={[3, 5, 4]} intensity={2.4} color="#ffd3a0" />
       <pointLight position={[-3, 1, -2]} intensity={8} distance={8} color="#4a7a73" />

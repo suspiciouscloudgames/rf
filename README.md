@@ -20,7 +20,8 @@ npm run preview
 ## Implemented flow
 
 - HUB: procedural house, five persistent locate signals, touch/mouse orbit with
-  constrained pitch, inertia, and automatic-orbit resume
+  constrained pitch, inertia, automatic-orbit resume, and a three-layer curved
+  video environment with luminance-driven geometric depth
 - APPROACH: selected-signal camera framing, continuous surface texture morph,
   and an aperture-style transition into the house
 - OBSERVATION: signal-relative image/video/particle space, guided typewriter
