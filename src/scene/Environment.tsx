@@ -57,14 +57,6 @@ export function Environment() {
         </bufferGeometry>
         <pointsMaterial size={0.025} color="#d6ab68" transparent opacity={0.62} sizeAttenuation />
       </points>
-      <mesh position={[0, -1.08, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-        <circleGeometry args={[5, 64]} />
-        <meshStandardMaterial color="#090c0d" roughness={0.95} metalness={0.08} />
-      </mesh>
-      <mesh position={[0, -1.055, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-        <ringGeometry args={[2.2, 2.215, 96]} />
-        <meshBasicMaterial color="#74502e" transparent opacity={0.42} />
-      </mesh>
     </>
   )
 }

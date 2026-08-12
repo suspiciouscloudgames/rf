@@ -94,10 +94,10 @@ export function House() {
       roofMaterial.current.emissive.setRGB(0.025 * morph, 0.12 * morph, 0.14 * morph)
       roofMaterial.current.emissiveIntensity = 1.35
     }
-    if (wallSignalMaterial.current) wallSignalMaterial.current.opacity = morph * 0.26
-    if (roofSignalMaterial.current) roofSignalMaterial.current.opacity = morph * 0.2
+    if (wallSignalMaterial.current) wallSignalMaterial.current.opacity = morph * 0.12
+    if (roofSignalMaterial.current) roofSignalMaterial.current.opacity = morph * 0.1
     if (silhouetteMaterial.current) silhouetteMaterial.current.opacity = morph * 0.08
-    if (surfaceProjectionMaterial.current) surfaceProjectionMaterial.current.opacity = morph * 0.42
+    if (surfaceProjectionMaterial.current) surfaceProjectionMaterial.current.opacity = morph * 0.16
     if (surfaceLight.current) {
       const signal = getSignalConfig(useExperienceStore.getState().selectedSignalId)
       lightAnchor.current.set(...signal.anchor)
@@ -113,7 +113,7 @@ export function House() {
         <boxGeometry args={[2.72, 2.62, 1.57]} />
         <meshBasicMaterial ref={silhouetteMaterial} color="#79cabe" transparent opacity={0} depthWrite={false} wireframe />
       </mesh>
-      <mesh position={[0, -0.12, 0]} castShadow>
+      <mesh position={[0, -0.12, 0]}>
         <boxGeometry args={[2.5, 1.75, 1.35]} />
         <meshStandardMaterial
           ref={wallMaterial}
@@ -123,8 +123,8 @@ export function House() {
           roughness={0.92}
           metalness={0.08}
           transparent
-          opacity={dimmed ? 0.12 : 1}
-          depthWrite={!dimmed}
+          opacity={0.2}
+          depthWrite={false}
         />
       </mesh>
       <mesh position={[0, -0.12, 0.691]}>
@@ -144,8 +144,8 @@ export function House() {
           color={dimmed ? '#1a1e1d' : '#4a4b47'}
           roughness={0.95}
           transparent
-          opacity={dimmed ? 0.1 : 1}
-          depthWrite={!dimmed}
+          opacity={0.2}
+          depthWrite={false}
         />
       </mesh>
       <mesh position={[0, 1.05, 0]} rotation={[0, Math.PI / 4, 0]} scale={1.008}>
@@ -154,7 +154,7 @@ export function House() {
       </mesh>
       <mesh position={[0, -0.53, 0.69]}>
         <planeGeometry args={[0.35, 0.85]} />
-        <meshStandardMaterial color="#151818" roughness={0.9} />
+        <meshStandardMaterial color="#151818" roughness={0.9} transparent opacity={0.2} depthWrite={false} />
       </mesh>
       {windowPositions.map((position, index) => (
         <mesh key={index} position={position}>
@@ -163,13 +163,12 @@ export function House() {
             color={index === 6 ? '#f2a24d' : '#192425'}
             emissive={index === 6 ? '#d26c26' : '#071010'}
             emissiveIntensity={index === 6 ? 2.1 : 0.6}
+            transparent
+            opacity={0.2}
+            depthWrite={false}
           />
         </mesh>
       ))}
-      <mesh position={[0, -1.02, 0]}>
-        <cylinderGeometry args={[1.65, 1.82, 0.12, 6]} />
-        <meshStandardMaterial color="#272a29" roughness={1} />
-      </mesh>
       <ObservationSignals />
       <Suspense fallback={null}>
         <ObservationLayer />
