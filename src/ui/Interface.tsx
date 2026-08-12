@@ -3,19 +3,19 @@ import ja from '../locales/ja.json'
 import { useExperienceStore } from '../store/experienceStore'
 import { TypewriterText } from './TypewriterText'
 import { ExploreInterface } from './ExploreInterface'
+import { getFocusContent } from '../content/focusContent'
 
 export function Interface() {
   const stage = useExperienceStore((store) => store.stage)
   const transition = useExperienceStore((store) => store.transition)
   const language = useExperienceStore((store) => store.language)
   const progress = useExperienceStore((store) => store.sequenceProgress)
-  const isAudioEnabled = useExperienceStore((store) => store.isAudioEnabled)
   const effectActive = useExperienceStore((store) => store.effectActive)
   const observationMode = useExperienceStore((store) => store.observationMode)
+  const selectedSignalId = useExperienceStore((store) => store.selectedSignalId)
   const beginReturn = useExperienceStore((store) => store.beginReturn)
-  const setLanguage = useExperienceStore((store) => store.setLanguage)
-  const setAudioEnabled = useExperienceStore((store) => store.setAudioEnabled)
   const copy = language === 'en' ? en : ja
+  const focusCopy = getFocusContent(language, selectedSignalId)
 
   const stateLabel = stage === 'hub'
     ? copy.hubLabel
@@ -25,30 +25,8 @@ export function Interface() {
         ? copy.observationLabel
         : copy.returningLabel
 
-  const requestFullscreen = () => {
-    if (!document.fullscreenElement) void document.documentElement.requestFullscreen?.()
-  }
-
   return (
     <div className={`interface state-${stage} transition-${transition} ${effectActive ? 'effect-active' : ''}`}>
-      <header className="system-header">
-        <div className="identity">
-          <span className="archive-id">{copy.archive}</span>
-          <span className="project-title">{copy.title}</span>
-        </div>
-        <div className="system-controls">
-          <div className="language-switch" aria-label="Language">
-            <button className={language === 'en' ? 'active' : ''} onClick={() => setLanguage('en')}>EN</button>
-            <span>/</span>
-            <button className={language === 'ja' ? 'active' : ''} onClick={() => setLanguage('ja')}>日本語</button>
-          </div>
-          <button className="icon-control" onClick={() => setAudioEnabled(!isAudioEnabled)} aria-label={isAudioEnabled ? copy.soundOn : copy.soundOff}>
-            {isAudioEnabled ? '◉' : '○'}
-          </button>
-          <button className="icon-control fullscreen-control" onClick={requestFullscreen} aria-label={copy.fullscreen}>⌗</button>
-        </div>
-      </header>
-
       {stage !== 'loading' ? (
         <div className="telemetry" aria-live="polite">
           <span>{stateLabel}</span>
@@ -83,8 +61,8 @@ export function Interface() {
           {transition === 'none' && observationMode === 'guided' ? (
             <aside className="narration-panel" lang={language}>
               <span className="narration-index">TRANSMISSION / {String(Math.round(progress * 24)).padStart(2, '0')}:24</span>
-              <h1>{copy.narrationTitle}</h1>
-              <TypewriterText text={copy.narration} />
+              <h1>{focusCopy.title}</h1>
+              <TypewriterText text={focusCopy.narration} />
             </aside>
           ) : null}
           {transition === 'none' && observationMode === 'explore' ? <ExploreInterface /> : null}

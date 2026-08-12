@@ -24,18 +24,34 @@ const tempAnchor = new Vector3()
 const tempNormal = new Vector3()
 const tempPosition = new Vector3()
 const tempTarget = new Vector3()
+const tempFocus = new Vector3()
+const tempObservationPosition = new Vector3()
+const tempObservationOffset = new Vector3()
+const tempApproachLift = new Vector3(0, 0.16, 0)
 
 const resolveSignalFrame = () => {
   const selectedSignal = getSignalConfig(useExperienceStore.getState().selectedSignalId)
   const house = getHouseRoot()
   tempAnchor.set(...selectedSignal.anchor)
   tempNormal.set(...selectedSignal.normal).normalize()
+  tempFocus.set(...selectedSignal.focusPosition)
+  tempObservationPosition
+    .set(...selectedSignal.focusPosition)
+    .add(tempObservationOffset.set(...selectedSignal.observationOffset))
   if (house) {
     house.updateWorldMatrix(true, false)
     tempAnchor.applyMatrix4(house.matrixWorld)
     tempNormal.transformDirection(house.matrixWorld)
+    tempFocus.applyMatrix4(house.matrixWorld)
+    tempObservationPosition.applyMatrix4(house.matrixWorld)
   }
-  return { signal: selectedSignal, anchor: tempAnchor, normal: tempNormal }
+  return {
+    signal: selectedSignal,
+    anchor: tempAnchor,
+    normal: tempNormal,
+    focus: tempFocus,
+    observationPosition: tempObservationPosition,
+  }
 }
 
 export function CameraController() {
@@ -85,12 +101,11 @@ export function CameraController() {
       const control2 = hubPosition.clone().lerp(camera.position, 0.28).add(new Vector3(0, 0.42, 0))
       base.curve = new CubicBezierCurve3(camera.position.clone(), control1, control2, hubPosition.clone())
     } else if (transitionKind === 'approachToObservation') {
-      const { signal, anchor, normal } = resolveSignalFrame()
-      const endpoint = anchor.clone().addScaledVector(normal, -signal.observationDepth).add(new Vector3(0, 0.06, 0))
-      const control1 = camera.position.clone().lerp(anchor, 0.45).add(new Vector3(0, 0.16, 0))
-      const control2 = anchor.clone().addScaledVector(normal, 0.22)
-      base.curve = new CubicBezierCurve3(camera.position.clone(), control1, control2, endpoint)
-      base.endTarget = anchor.clone().addScaledVector(normal, -1.65)
+      const { anchor, focus, observationPosition } = resolveSignalFrame()
+      const control1 = camera.position.clone().lerp(anchor, 0.42).add(new Vector3(0, 0.18, 0))
+      const control2 = anchor.clone().lerp(observationPosition, 0.62).add(new Vector3(0, 0.08, 0))
+      base.curve = new CubicBezierCurve3(camera.position.clone(), control1, control2, observationPosition.clone())
+      base.endTarget = focus.clone()
     }
     transition.current = base
   }, [camera, hubPosition, transitionKind])
@@ -108,7 +123,7 @@ export function CameraController() {
 
     if (active.kind === 'hubToApproach') {
       const { signal, anchor, normal } = resolveSignalFrame()
-      tempPosition.copy(anchor).addScaledVector(normal, signal.approachDistance).add(new Vector3(0, 0.16, 0))
+      tempPosition.copy(anchor).addScaledVector(normal, signal.approachDistance).add(tempApproachLift)
       camera.position.lerpVectors(active.fromPosition, tempPosition, progress)
       target.current.lerpVectors(active.fromTarget, anchor, progress)
       camera.fov = MathUtils.lerp(active.fromFov, 33, progress)

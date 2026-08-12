@@ -12,7 +12,7 @@
       ],
       "exploreItems": [
         { "id": "trace-text", "type": "text" },
-        { "id": "trace-image", "type": "image", "asset": "/assets/observation-signal.jpg" },
+        { "id": "trace-detail", "type": "text" },
         { "id": "trace-video", "type": "video", "asset": "/assets/archive-signal.mp4" }
       ]
     }

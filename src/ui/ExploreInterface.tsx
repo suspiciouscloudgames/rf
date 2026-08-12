@@ -5,7 +5,7 @@ import { useExperienceStore } from '../store/experienceStore'
 
 const exploreItems = [
   { id: 'trace-text', label: 'traceText', title: 'traceTextTitle', body: 'traceTextBody', type: 'text' },
-  { id: 'trace-image', label: 'traceImage', title: 'traceImageTitle', body: 'traceImageBody', type: 'image' },
+  { id: 'trace-detail', label: 'traceImage', title: 'traceImageTitle', body: 'traceImageBody', type: 'detail' },
   { id: 'trace-video', label: 'traceVideo', title: 'traceVideoTitle', body: 'traceVideoBody', type: 'video' },
 ] as const
 
@@ -27,11 +27,13 @@ export function ExploreInterface() {
     }
   }, [selectedItem])
 
-  useEffect(() => () => {
+  useEffect(() => {
     const video = videoRef.current
+    return () => {
     if (!video) return
     video.pause()
     video.currentTime = 0
+    }
   }, [])
 
   return (
@@ -56,7 +58,6 @@ export function ExploreInterface() {
           <button type="button" className="explore-close" onClick={() => setSelectedItem(null)} aria-label={copy.closeTrace}>×</button>
           <span className="narration-index">TRACE / {selectedItem.id.slice(-5).toUpperCase()}</span>
           <h2>{copy[selectedItem.title]}</h2>
-          {selectedItem.type === 'image' ? <img src="/assets/observation-signal.jpg" alt="" /> : null}
           {selectedItem.type === 'video' ? (
             <video ref={videoRef} src="/assets/archive-signal.mp4" muted loop playsInline preload="auto" />
           ) : null}

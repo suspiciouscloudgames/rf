@@ -44,7 +44,7 @@ const resetExperience = {
 
 export const useExperienceStore = create<ExperienceStore>((set, get) => ({
   stage: 'loading',
-  language: 'en',
+  language: 'ja',
   isAudioEnabled: false,
   lastInteractionTime: Date.now(),
   ...resetExperience,

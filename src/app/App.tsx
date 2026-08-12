@@ -70,7 +70,7 @@ export function App() {
       {stage === 'loading' ? (
         <div className="loader" role="status">
           <span className="loader-mark" />
-          <span>CALIBRATING OBSERVATION FIELD</span>
+          <span>観測領域を調整しています</span>
         </div>
       ) : null}
     </main>
