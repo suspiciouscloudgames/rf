@@ -94,10 +94,10 @@ export function House() {
       roofMaterial.current.emissive.setRGB(0.025 * morph, 0.12 * morph, 0.14 * morph)
       roofMaterial.current.emissiveIntensity = 1.35
     }
-    if (wallSignalMaterial.current) wallSignalMaterial.current.opacity = morph * 0.12
-    if (roofSignalMaterial.current) roofSignalMaterial.current.opacity = morph * 0.1
-    if (silhouetteMaterial.current) silhouetteMaterial.current.opacity = morph * 0.08
-    if (surfaceProjectionMaterial.current) surfaceProjectionMaterial.current.opacity = morph * 0.16
+    if (wallSignalMaterial.current) wallSignalMaterial.current.opacity = 0
+    if (roofSignalMaterial.current) roofSignalMaterial.current.opacity = 0
+    if (silhouetteMaterial.current) silhouetteMaterial.current.opacity = 0
+    if (surfaceProjectionMaterial.current) surfaceProjectionMaterial.current.opacity = 0
     if (surfaceLight.current) {
       const signal = getSignalConfig(useExperienceStore.getState().selectedSignalId)
       lightAnchor.current.set(...signal.anchor)
@@ -123,7 +123,7 @@ export function House() {
           roughness={0.92}
           metalness={0.08}
           transparent
-          opacity={0.2}
+          opacity={0}
           depthWrite={false}
         />
       </mesh>
@@ -144,7 +144,7 @@ export function House() {
           color={dimmed ? '#1a1e1d' : '#4a4b47'}
           roughness={0.95}
           transparent
-          opacity={0.2}
+          opacity={0}
           depthWrite={false}
         />
       </mesh>
@@ -154,7 +154,7 @@ export function House() {
       </mesh>
       <mesh position={[0, -0.53, 0.69]}>
         <planeGeometry args={[0.35, 0.85]} />
-        <meshStandardMaterial color="#151818" roughness={0.9} transparent opacity={0.2} depthWrite={false} />
+        <meshStandardMaterial color="#151818" roughness={0.9} transparent opacity={0} depthWrite={false} />
       </mesh>
       {windowPositions.map((position, index) => (
         <mesh key={index} position={position}>
@@ -164,7 +164,7 @@ export function House() {
             emissive={index === 6 ? '#d26c26' : '#071010'}
             emissiveIntensity={index === 6 ? 2.1 : 0.6}
             transparent
-            opacity={0.2}
+            opacity={0}
             depthWrite={false}
           />
         </mesh>
