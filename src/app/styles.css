@@ -33,7 +33,50 @@ button:focus-visible {
   isolation: isolate;
 }
 
-.experience-shell canvas { display: block; }
+.experience-shell canvas {
+  position: relative;
+  z-index: 1;
+  display: block;
+}
+
+.hub-video-background {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 900ms ease;
+}
+
+.hub-video-background video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: saturate(.58) contrast(1.14) brightness(.5);
+}
+
+.hub-video-scrim {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 50% 48%, transparent 8%, rgba(4, 7, 8, .2) 52%, rgba(4, 7, 8, .66) 100%),
+    linear-gradient(180deg, rgba(5, 8, 9, .08), rgba(5, 8, 9, .28));
+}
+
+.experience-shell.state-hub.transition-none .hub-video-background {
+  opacity: .82;
+}
+
+.experience-shell.state-hub.transition-hubToApproach .hub-video-background {
+  opacity: 0;
+  transition-duration: 2.8s;
+}
+
+.experience-shell.transition-returnToHub .hub-video-background {
+  opacity: .82;
+  transition-duration: 4s;
+}
 .state-hub.transition-none { cursor: grab; }
 .state-hub.transition-none:active { cursor: grabbing; }
 .media-source { display: none; }
@@ -421,4 +464,5 @@ button:focus-visible {
 
 @media (prefers-reduced-motion: reduce) {
   .noise, .interface.effect-active, .scene-signal-button { animation: none; }
+  .hub-video-background { transition-duration: 100ms !important; }
 }

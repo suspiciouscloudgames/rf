@@ -1,8 +1,7 @@
 import { useMemo, useRef } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
-import { Color, Fog, type Points } from 'three'
+import { Fog, type Points } from 'three'
 import { useExperienceStore } from '../store/experienceStore'
-import { HubVideoEnvironment } from './HubVideoEnvironment'
 
 export function Environment() {
   const scene = useThree((view) => view.scene)
@@ -31,14 +30,12 @@ export function Environment() {
       : snapshot.stage === 'observation'
         ? snapshot.transition === 'returnToHub' ? 1 - progress : 1
         : 0
-    const background = scene.background as Color
-    background.setRGB(
+    const fog = scene.fog as Fog
+    fog.color.setRGB(
       0.027 + observationMorph * 0.015,
       0.035 + observationMorph * 0.002,
       0.039 + observationMorph * 0.045,
     )
-    const fog = scene.fog as Fog
-    fog.color.copy(background)
     fog.near = 5.5 - observationMorph * 4.2
     fog.far = 15 - observationMorph * 8
     if (points.current) {
@@ -50,9 +47,7 @@ export function Environment() {
 
   return (
     <>
-      <color attach="background" args={['#07090a']} />
       <fog attach="fog" args={['#07090a', 5.5, 15]} />
-      <HubVideoEnvironment />
       <ambientLight intensity={0.48} color="#97a5a4" />
       <directionalLight position={[3, 5, 4]} intensity={2.4} color="#ffd3a0" />
       <pointLight position={[-3, 1, -2]} intensity={8} distance={8} color="#4a7a73" />

@@ -1,6 +1,7 @@
 import { lazy, Suspense, useEffect, useRef } from 'react'
 import { SequenceController } from '../sequence/SequenceController'
 import { Interface } from '../ui/Interface'
+import { HubVideoBackground } from '../ui/HubVideoBackground'
 import { useExperienceStore } from '../store/experienceStore'
 
 const IDLE_TIMEOUT_MS = 90_000
@@ -57,7 +58,8 @@ export function App() {
   }, [registerInteraction])
 
   return (
-    <main className="experience-shell">
+    <main className={`experience-shell state-${stage} transition-${transition}`}>
+      <HubVideoBackground />
       <Suspense fallback={null}>
         <ExperienceCanvas />
       </Suspense>
