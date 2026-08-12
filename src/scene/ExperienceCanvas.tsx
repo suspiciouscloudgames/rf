@@ -1,6 +1,7 @@
 import { Canvas } from '@react-three/fiber'
 import { CameraController } from '../camera/CameraController'
 import { World } from './World'
+import { HubOrbitController } from '../interaction/HubOrbitController'
 
 export function ExperienceCanvas() {
   return (
@@ -11,6 +12,7 @@ export function ExperienceCanvas() {
       performance={{ min: 0.55 }}
     >
       <CameraController />
+      <HubOrbitController />
       <World />
     </Canvas>
   )

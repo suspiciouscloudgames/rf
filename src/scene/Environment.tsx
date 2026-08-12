@@ -1,8 +1,10 @@
 import { useMemo, useRef } from 'react'
-import { useFrame } from '@react-three/fiber'
-import type { Points } from 'three'
+import { useFrame, useThree } from '@react-three/fiber'
+import { Color, Fog, type Points } from 'three'
+import { useExperienceStore } from '../store/experienceStore'
 
 export function Environment() {
+  const scene = useThree((view) => view.scene)
   const points = useRef<Points>(null)
   const positions = useMemo(() => {
     const values = new Float32Array(420 * 3)
@@ -19,8 +21,30 @@ export function Environment() {
     return values
   }, [])
 
-  useFrame((_, delta) => {
+  useFrame(({ camera }, delta) => {
     if (points.current) points.current.rotation.y += delta * 0.002
+    const snapshot = useExperienceStore.getState()
+    const progress = Number(camera.userData.transitionProgress ?? 0)
+    const observationMorph = snapshot.transition === 'approachToObservation'
+      ? progress
+      : snapshot.stage === 'observation'
+        ? snapshot.transition === 'returnToHub' ? 1 - progress : 1
+        : 0
+    const background = scene.background as Color
+    background.setRGB(
+      0.027 + observationMorph * 0.015,
+      0.035 + observationMorph * 0.002,
+      0.039 + observationMorph * 0.045,
+    )
+    const fog = scene.fog as Fog
+    fog.color.copy(background)
+    fog.near = 5.5 - observationMorph * 4.2
+    fog.far = 15 - observationMorph * 8
+    if (points.current) {
+      const material = points.current.material
+      if (!Array.isArray(material)) material.opacity = 0.62 + observationMorph * 0.28
+      points.current.scale.z = 1 + observationMorph * 2.8
+    }
   })
 
   return (

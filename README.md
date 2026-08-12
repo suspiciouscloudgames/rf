@@ -19,11 +19,14 @@ npm run preview
 
 ## Implemented flow
 
-- HUB: procedural house, ambient movement, touch signal
-- APPROACH: scripted position/target/FOV camera interpolation
-- OBSERVATION: local image and H.264 video planes, typewriter narration,
-  sequence progress, glitch treatment
-- RETURNING: two-leg camera return and complete media/state reset
+- HUB: procedural house, five persistent locate signals, touch/mouse orbit with
+  constrained pitch, inertia, and automatic-orbit resume
+- APPROACH: selected-signal camera framing, continuous surface texture morph,
+  and an aperture-style transition into the house
+- OBSERVATION: signal-relative image/video/particle space, guided typewriter
+  sequence, then touch-driven text, image, and video exploration
+- RETURNING: single continuous camera curve to the hub with complete media and
+  interaction-state reset
 - English/Japanese switching without reload
 - 90-second inactivity return
 - landscape, safe-area, touch-target, reduced-motion support

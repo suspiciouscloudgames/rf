@@ -16,5 +16,16 @@
   "soundOff": "Enable media",
   "narrationTitle": "OBSERVATION 01 — THE LISTENING HOUSE",
   "narration": "The house does not remember in rooms. It remembers in interference: a warm window, a broken transmission, dust suspended between one image and the next. Move close enough and the surface stops being a wall. It becomes a record of everyone who paused to listen.",
+  "exploreHint": "Touch a trace to continue.",
+  "traceText": "Recorded voice",
+  "traceImage": "Recovered image",
+  "traceVideo": "Moving archive",
+  "traceTextTitle": "A voice behind the wall",
+  "traceTextBody": "Every repetition leaves a small difference. The house keeps those differences longer than it keeps names.",
+  "traceImageTitle": "Surface memory",
+  "traceImageBody": "A scanned fragment recovered from the inner layer.",
+  "traceVideoTitle": "Residual transmission",
+  "traceVideoBody": "A moving record loops where the original signal was interrupted.",
+  "closeTrace": "Close trace",
   "rotateDevice": "Please rotate the device to landscape orientation."
 }

@@ -1,4 +1,4 @@
-import type { ExperienceState } from '../store/experienceStore'
+import type { ExperienceStage } from '../store/experienceStore'
 
 export interface CameraPreset {
   position: [number, number, number]
@@ -7,7 +7,7 @@ export interface CameraPreset {
   duration: number
 }
 
-export const cameraPresets: Record<Exclude<ExperienceState, 'loading' | 'returning'>, CameraPreset> = {
+export const cameraPresets: Record<Exclude<ExperienceStage, 'loading'>, CameraPreset> = {
   hub: {
     position: [4.8, 2.45, 6.4],
     target: [0, 0.35, 0],

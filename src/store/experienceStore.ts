@@ -1,22 +1,30 @@
 import { create } from 'zustand'
 
-export type ExperienceState = 'loading' | 'hub' | 'approach' | 'observation' | 'returning'
+export type ExperienceStage = 'loading' | 'hub' | 'approach' | 'observation'
+export type TransitionKind = 'none' | 'hubToApproach' | 'approachToObservation' | 'returnToHub'
+export type ObservationMode = 'guided' | 'explore'
 export type Language = 'en' | 'ja'
+export type SignalId = 'signal-01' | 'signal-02' | 'signal-03' | 'signal-04' | 'signal-05'
 
 interface ExperienceStore {
-  state: ExperienceState
+  stage: ExperienceStage
+  transition: TransitionKind
+  selectedSignalId: SignalId | null
   currentObservationId: string | null
+  observationMode: ObservationMode
+  selectedExploreItemId: string | null
   language: Language
   sequenceProgress: number
-  isTransitioning: boolean
   isAudioEnabled: boolean
   effectActive: boolean
   lastInteractionTime: number
   enterHub: () => void
-  enterApproach: () => void
+  enterApproach: (signalId?: SignalId) => void
   enterObservation: () => void
   beginReturn: () => void
   finishTransition: () => void
+  setObservationMode: (mode: ObservationMode) => void
+  setSelectedExploreItem: (itemId: string | null) => void
   setLanguage: (language: Language) => void
   setProgress: (progress: number) => void
   setEffectActive: (active: boolean) => void
@@ -24,39 +32,57 @@ interface ExperienceStore {
   registerInteraction: () => void
 }
 
-const initialExperience = {
+const resetExperience = {
+  transition: 'none' as const,
+  selectedSignalId: null,
   currentObservationId: null,
+  observationMode: 'guided' as const,
+  selectedExploreItemId: null,
   sequenceProgress: 0,
-  isTransitioning: false,
   effectActive: false,
 }
 
 export const useExperienceStore = create<ExperienceStore>((set, get) => ({
-  state: 'loading',
+  stage: 'loading',
   language: 'en',
   isAudioEnabled: false,
   lastInteractionTime: Date.now(),
-  ...initialExperience,
-  enterHub: () => set({ state: 'hub', ...initialExperience, lastInteractionTime: Date.now() }),
-  enterApproach: () => {
-    if (get().state !== 'hub' || get().isTransitioning) return
+  ...resetExperience,
+  enterHub: () => set({ stage: 'hub', ...resetExperience, lastInteractionTime: Date.now() }),
+  enterApproach: (signalId = 'signal-01') => {
+    const { stage, transition } = get()
+    if (stage !== 'hub' || transition !== 'none') return
     set({
-      state: 'approach',
-      currentObservationId: 'observation-01',
-      isTransitioning: true,
+      transition: 'hubToApproach',
+      selectedSignalId: signalId,
+      currentObservationId: `observation-${signalId.slice(-2)}`,
       lastInteractionTime: Date.now(),
     })
   },
   enterObservation: () => {
-    if (get().state !== 'approach' || get().isTransitioning) return
-    set({ state: 'observation', isTransitioning: true, sequenceProgress: 0, lastInteractionTime: Date.now() })
+    const { stage, transition } = get()
+    if (stage !== 'approach' || transition !== 'none') return
+    set({ transition: 'approachToObservation', sequenceProgress: 0, lastInteractionTime: Date.now() })
   },
   beginReturn: () => {
-    const { state, isTransitioning } = get()
-    if (state === 'hub' || state === 'loading' || state === 'returning' || isTransitioning) return
-    set({ state: 'returning', isTransitioning: true, effectActive: false, lastInteractionTime: Date.now() })
+    const { stage, transition } = get()
+    if (stage === 'loading' || (stage === 'hub' && transition === 'none') || transition === 'returnToHub') return
+    set({
+      transition: 'returnToHub',
+      effectActive: false,
+      selectedExploreItemId: null,
+      lastInteractionTime: Date.now(),
+    })
+    window.dispatchEvent(new CustomEvent('experience-transition', { detail: 'returnToHub' }))
   },
-  finishTransition: () => set({ isTransitioning: false }),
+  finishTransition: () => {
+    const { transition } = get()
+    if (transition === 'hubToApproach') set({ stage: 'approach', transition: 'none' })
+    else if (transition === 'approachToObservation') set({ stage: 'observation', transition: 'none' })
+    else if (transition === 'returnToHub') set({ stage: 'hub', ...resetExperience, lastInteractionTime: Date.now() })
+  },
+  setObservationMode: (observationMode) => set({ observationMode }),
+  setSelectedExploreItem: (selectedExploreItemId) => set({ selectedExploreItemId, lastInteractionTime: Date.now() }),
   setLanguage: (language) => set({ language, lastInteractionTime: Date.now() }),
   setProgress: (sequenceProgress) => set({ sequenceProgress }),
   setEffectActive: (effectActive) => set({ effectActive }),

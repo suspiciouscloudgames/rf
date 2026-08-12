@@ -9,7 +9,8 @@ const ExperienceCanvas = lazy(() =>
 )
 
 export function App() {
-  const state = useExperienceStore((store) => store.state)
+  const stage = useExperienceStore((store) => store.stage)
+  const transition = useExperienceStore((store) => store.transition)
   const enterHub = useExperienceStore((store) => store.enterHub)
   const beginReturn = useExperienceStore((store) => store.beginReturn)
   const registerInteraction = useExperienceStore((store) => store.registerInteraction)
@@ -40,7 +41,7 @@ export function App() {
   useEffect(() => {
     const timer = window.setInterval(() => {
       const snapshot = useExperienceStore.getState()
-      if (snapshot.state !== 'hub' && snapshot.state !== 'loading' && Date.now() - snapshot.lastInteractionTime >= IDLE_TIMEOUT_MS) {
+      if ((snapshot.stage !== 'hub' || snapshot.transition !== 'none') && snapshot.stage !== 'loading' && Date.now() - snapshot.lastInteractionTime >= IDLE_TIMEOUT_MS) {
         beginReturn()
       }
     }, 1_000)
@@ -64,7 +65,7 @@ export function App() {
       <Interface />
       <div className="scanlines" aria-hidden="true" />
       <div className="noise" aria-hidden="true" />
-      {state === 'loading' ? (
+      {stage === 'loading' ? (
         <div className="loader" role="status">
           <span className="loader-mark" />
           <span>CALIBRATING OBSERVATION FIELD</span>

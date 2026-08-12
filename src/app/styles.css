@@ -34,6 +34,8 @@ button:focus-visible {
 }
 
 .experience-shell canvas { display: block; }
+.state-hub.transition-none { cursor: grab; }
+.state-hub.transition-none:active { cursor: grabbing; }
 .media-source { display: none; }
 
 .interface {
@@ -159,58 +161,43 @@ button:focus-visible {
 .hub-copy { left: 9%; bottom: 10%; }
 .approach-copy { left: 8%; top: 24%; }
 
-.signal-button {
-  position: absolute;
-  width: 96px;
-  height: 96px;
+.scene-signal-button {
+  position: relative;
+  width: 68px;
+  height: 68px;
   padding: 0;
   border: 0;
   border-radius: 50%;
-  color: #e9a050;
   background: transparent;
-  pointer-events: auto;
+  pointer-events: all;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
 }
 
-.signal-button:disabled { opacity: .2; pointer-events: none; }
-.hub-signal { left: 61%; top: 38%; }
-.approach-signal { left: 62%; top: 34%; }
-
-.signal-orbit, .signal-orbit::before, .signal-orbit::after {
+.scene-signal-button::before,
+.scene-signal-button::after {
   position: absolute;
-  inset: 16px;
-  border: 1px solid rgba(222, 145, 65, .66);
+  inset: 12px;
+  border: 1px solid rgba(222, 145, 65, .25);
   border-radius: 50%;
   content: '';
 }
 
-.signal-orbit { animation: orbit 8s linear infinite; }
-.signal-orbit::before { inset: -9px 9px; transform: rotate(53deg); opacity: .48; }
-.signal-orbit::after { inset: 9px -9px; transform: rotate(-38deg); opacity: .28; }
+.scene-signal-button::after { inset: 19px 7px; transform: rotate(48deg); opacity: .48; }
+.scene-signal-button.selected::before { border-color: rgba(240, 162, 81, .7); animation: orbit 7s linear infinite; }
+.scene-signal-button:disabled { cursor: default; }
 
-.signal-core {
-  position: absolute;
-  left: 43px;
-  top: 43px;
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: #f1ad5d;
-  box-shadow: 0 0 18px 7px rgba(229, 140, 57, .33);
-  animation: pulse 2.2s ease-in-out infinite;
-}
-
-.signal-label {
+.scene-signal-label {
   position: absolute;
   left: 50%;
-  top: calc(100% - 7px);
+  top: calc(100% - 5px);
   width: max-content;
   transform: translateX(-50%);
   color: rgba(241, 224, 198, .65);
   font-size: 9px;
   letter-spacing: .14em;
   text-transform: uppercase;
+  text-shadow: 0 1px 5px #060808;
 }
 
 .home-button {
@@ -296,6 +283,52 @@ button:focus-visible {
   transform-origin: left center;
   transition: transform 100ms linear;
 }
+
+.explore-interface { position: absolute; inset: 0; pointer-events: none; }
+.explore-hint {
+  position: absolute;
+  left: 50%;
+  bottom: 8%;
+  transform: translateX(-50%);
+  color: rgba(235,232,222,.68);
+  font-size: 10px;
+  letter-spacing: .13em;
+}
+.explore-trace {
+  position: absolute;
+  width: 118px;
+  min-height: 58px;
+  padding: 10px;
+  border: 1px solid rgba(225,153,72,.4);
+  color: rgba(239,231,215,.82);
+  background: rgba(5,8,10,.55);
+  backdrop-filter: blur(7px);
+  pointer-events: auto;
+  cursor: pointer;
+  font-size: 9px;
+  letter-spacing: .08em;
+}
+.explore-trace span { display: block; margin-bottom: 5px; color: #df9848; font-family: ui-monospace, monospace; }
+.explore-trace.active { border-color: #e6a45a; box-shadow: 0 0 24px rgba(222,145,63,.14); }
+.trace-1 { left: 22%; top: 32%; }
+.trace-2 { left: 42%; top: 62%; }
+.trace-3 { left: 58%; top: 30%; }
+.explore-panel {
+  position: absolute;
+  top: 18%;
+  right: 4.5%;
+  width: min(390px, 32vw);
+  padding: 22px;
+  border-left: 1px solid rgba(220,141,58,.55);
+  color: rgba(240,236,228,.78);
+  background: rgba(4,7,9,.82);
+  backdrop-filter: blur(11px);
+  pointer-events: auto;
+}
+.explore-panel h2 { margin: 14px 0; color: #f0ece4; font-size: 16px; font-weight: 500; }
+.explore-panel p { font-size: 13px; line-height: 1.7; }
+.explore-panel img, .explore-panel video { display: block; width: 100%; max-height: 220px; object-fit: cover; margin: 14px 0; filter: saturate(.65) contrast(1.15); }
+.explore-close { position: absolute; top: 10px; right: 10px; width: 44px; height: 44px; border: 0; color: #e9dfd0; background: transparent; cursor: pointer; font-size: 21px; }
 
 .return-message {
   position: absolute;
@@ -387,5 +420,5 @@ button:focus-visible {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .noise, .interface.effect-active, .signal-orbit, .signal-core { animation: none; }
+  .noise, .interface.effect-active, .scene-signal-button { animation: none; }
 }

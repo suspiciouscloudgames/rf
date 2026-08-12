@@ -9,6 +9,11 @@
         { "time": 5, "action": "playVideo" },
         { "time": 10, "action": "enableEffect" },
         { "time": 19, "action": "disableEffect" }
+      ],
+      "exploreItems": [
+        { "id": "trace-text", "type": "text" },
+        { "id": "trace-image", "type": "image", "asset": "/assets/observation-signal.jpg" },
+        { "id": "trace-video", "type": "video", "asset": "/assets/archive-signal.mp4" }
       ]
     }
   ]
