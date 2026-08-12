@@ -1,0 +1,20 @@
+{
+  "title": "LAYERS OF OBSERVATION",
+  "archive": "ARCHIVE / 01",
+  "loading": "CALIBRATING OBSERVATION FIELD",
+  "hubLabel": "EXTERIOR FIELD",
+  "hubHint": "A signal persists inside the structure.",
+  "hubAction": "Locate signal",
+  "approachLabel": "SURFACE TRACE",
+  "approachHint": "The surface is transmitting. Look closer.",
+  "approachAction": "Enter signal",
+  "observationLabel": "INNER LAYER",
+  "returningLabel": "RESTORING DISTANCE",
+  "home": "Return home",
+  "fullscreen": "Fullscreen",
+  "soundOn": "Media enabled",
+  "soundOff": "Enable media",
+  "narrationTitle": "OBSERVATION 01 — THE LISTENING HOUSE",
+  "narration": "The house does not remember in rooms. It remembers in interference: a warm window, a broken transmission, dust suspended between one image and the next. Move close enough and the surface stops being a wall. It becomes a record of everyone who paused to listen.",
+  "rotateDevice": "Please rotate the device to landscape orientation."
+}

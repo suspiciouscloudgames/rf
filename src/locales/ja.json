@@ -1,0 +1,20 @@
+{
+  "title": "観測の層",
+  "archive": "アーカイブ / 01",
+  "loading": "観測領域を調整しています",
+  "hubLabel": "外部領域",
+  "hubHint": "建物の内側で、微かな信号が続いている。",
+  "hubAction": "信号を探す",
+  "approachLabel": "表面の痕跡",
+  "approachHint": "表面が何かを送っている。さらに近づく。",
+  "approachAction": "信号に入る",
+  "observationLabel": "内側の層",
+  "returningLabel": "距離を復元中",
+  "home": "最初の場所へ戻る",
+  "fullscreen": "全画面",
+  "soundOn": "メディア有効",
+  "soundOff": "メディアを有効化",
+  "narrationTitle": "観測 01 — 聴く家",
+  "narration": "この家は部屋の中で記憶するのではない。温かな窓、途切れた通信、一枚の映像と次の映像の間に漂う埃。その干渉の中で記憶している。十分に近づくと、表面は壁であることをやめる。それは、立ち止まり耳を澄ませた人々の記録になる。",
+  "rotateDevice": "端末を横向きにしてください。"
+}

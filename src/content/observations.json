@@ -1,0 +1,15 @@
+{
+  "observations": [
+    {
+      "id": "observation-01",
+      "duration": 24,
+      "events": [
+        { "time": 0, "action": "startNarration" },
+        { "time": 2, "action": "showObject" },
+        { "time": 5, "action": "playVideo" },
+        { "time": 10, "action": "enableEffect" },
+        { "time": 19, "action": "disableEffect" }
+      ]
+    }
+  ]
+}
