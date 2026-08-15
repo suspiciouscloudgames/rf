@@ -1,4 +1,5 @@
 import type { SignalId } from '../store/experienceStore'
+import { constructionSpacePortal, type DepthPortalConfig } from '../scene/depth-portal/depthPortalConfig'
 
 export interface ObservationSignalConfig {
   id: SignalId
@@ -11,6 +12,7 @@ export interface ObservationSignalConfig {
   observationOffset: [number, number, number]
   accent: string
   phase: number
+  depthPortal?: DepthPortalConfig
 }
 
 export const observationSignals: ObservationSignalConfig[] = [
@@ -69,12 +71,19 @@ export const observationSignals: ObservationSignalConfig[] = [
     normal: [0, 0, 1],
     approachDistance: 3.5,
     observationDepth: 0.86,
-    focusPosition: [0.78, 0.38, -1.08],
-    observationOffset: [-0.15, 0.16, 1.42],
+    focusPosition: [0.78, 0.28, -1.08],
+    observationOffset: [-0.08, 0.14, 1.52],
     accent: '#809fb0',
     phase: 4.6,
+    depthPortal: constructionSpacePortal,
   },
 ]
 
 export const getSignalConfig = (signalId: SignalId | null) =>
   observationSignals.find((signal) => signal.id === signalId) ?? observationSignals[0]
+
+export const getDepthPortalConfig = (signalId: SignalId | null) =>
+  getSignalConfig(signalId).depthPortal ?? null
+
+export const hasDepthPortal = (signalId: SignalId | null) =>
+  getDepthPortalConfig(signalId) !== null

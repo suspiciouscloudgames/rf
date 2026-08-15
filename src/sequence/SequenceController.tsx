@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import observations from '../content/observations.json'
 import { useExperienceStore } from '../store/experienceStore'
+import { hasDepthPortal } from '../signals/signalData'
 
 const sequenceDuration = observations.observations[0].duration
 
@@ -10,26 +11,35 @@ export function SequenceController() {
   const setProgress = useExperienceStore((store) => store.setProgress)
   const setEffectActive = useExperienceStore((store) => store.setEffectActive)
   const setObservationMode = useExperienceStore((store) => store.setObservationMode)
+  const selectedSignalId = useExperienceStore((store) => store.selectedSignalId)
+  const visualStatus = useExperienceStore((store) => store.observationVisualStatus)
 
   useEffect(() => {
     if (stage !== 'observation' || transition !== 'none') return
-    const startedAt = performance.now()
-    const timer = window.setInterval(() => {
-      const elapsed = (performance.now() - startedAt) / 1000
-      const progress = Math.min(elapsed / sequenceDuration, 1)
-      setProgress(progress)
-      setEffectActive(elapsed >= 10 && elapsed < 19)
-      if (progress >= 1) {
-        setObservationMode('explore')
-        window.clearInterval(timer)
-      }
-    }, 100)
+    const portalRequired = hasDepthPortal(selectedSignalId)
+    if (portalRequired && visualStatus !== 'ready' && visualStatus !== 'fallback') return
+    let timer: number | null = null
+    const delay = 0
+    const kickoff = window.setTimeout(() => {
+      const startedAt = performance.now()
+      timer = window.setInterval(() => {
+        const elapsed = (performance.now() - startedAt) / 1000
+        const progress = Math.min(elapsed / sequenceDuration, 1)
+        setProgress(progress)
+        setEffectActive(!portalRequired && elapsed >= 10 && elapsed < 19)
+        if (progress >= 1) {
+          setObservationMode('explore')
+          if (timer !== null) window.clearInterval(timer)
+        }
+      }, 100)
+    }, delay)
 
     return () => {
-      window.clearInterval(timer)
+      window.clearTimeout(kickoff)
+      if (timer !== null) window.clearInterval(timer)
       setEffectActive(false)
     }
-  }, [setEffectActive, setObservationMode, setProgress, stage, transition])
+  }, [selectedSignalId, setEffectActive, setObservationMode, setProgress, stage, transition, visualStatus])
 
   return null
 }

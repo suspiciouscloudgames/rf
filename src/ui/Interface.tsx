@@ -4,6 +4,11 @@ import { useExperienceStore } from '../store/experienceStore'
 import { TypewriterText } from './TypewriterText'
 import { ExploreInterface } from './ExploreInterface'
 import { getFocusContent } from '../content/focusContent'
+import observations from '../content/observations.json'
+import { hasDepthPortal } from '../signals/signalData'
+import { ObservationSubtitles } from './ObservationSubtitles'
+
+const sequenceDuration = observations.observations[0].duration
 
 export function Interface() {
   const stage = useExperienceStore((store) => store.stage)
@@ -16,6 +21,7 @@ export function Interface() {
   const beginReturn = useExperienceStore((store) => store.beginReturn)
   const copy = language === 'en' ? en : ja
   const focusCopy = getFocusContent(language, selectedSignalId)
+  const portalObservation = hasDepthPortal(selectedSignalId)
 
   const stateLabel = stage === 'hub'
     ? copy.hubLabel
@@ -58,13 +64,14 @@ export function Interface() {
 
       {stage === 'observation' ? (
         <>
-          {transition === 'none' && observationMode === 'guided' ? (
+          {transition === 'none' && observationMode === 'guided' && !portalObservation ? (
             <aside className="narration-panel" lang={language}>
-              <span className="narration-index">TRANSMISSION / {String(Math.round(progress * 24)).padStart(2, '0')}:24</span>
+              <span className="narration-index">TRANSMISSION / {String(Math.round(progress * sequenceDuration)).padStart(2, '0')}:{sequenceDuration}</span>
               <h1>{focusCopy.title}</h1>
               <TypewriterText text={focusCopy.narration} />
             </aside>
           ) : null}
+          {transition === 'none' && observationMode === 'guided' && portalObservation ? <ObservationSubtitles /> : null}
           {transition === 'none' && observationMode === 'explore' ? <ExploreInterface /> : null}
         </>
       ) : null}

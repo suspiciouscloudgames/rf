@@ -5,6 +5,7 @@ export type TransitionKind = 'none' | 'hubToApproach' | 'approachToObservation' 
 export type ObservationMode = 'guided' | 'explore'
 export type Language = 'en' | 'ja'
 export type SignalId = 'signal-01' | 'signal-02' | 'signal-03' | 'signal-04' | 'signal-05'
+export type ObservationVisualStatus = 'idle' | 'loading' | 'ready' | 'fallback'
 
 interface ExperienceStore {
   stage: ExperienceStage
@@ -17,6 +18,7 @@ interface ExperienceStore {
   sequenceProgress: number
   isAudioEnabled: boolean
   effectActive: boolean
+  observationVisualStatus: ObservationVisualStatus
   lastInteractionTime: number
   enterHub: () => void
   enterApproach: (signalId?: SignalId) => void
@@ -28,6 +30,7 @@ interface ExperienceStore {
   setLanguage: (language: Language) => void
   setProgress: (progress: number) => void
   setEffectActive: (active: boolean) => void
+  setObservationVisualStatus: (status: ObservationVisualStatus) => void
   setAudioEnabled: (enabled: boolean) => void
   registerInteraction: () => void
 }
@@ -40,6 +43,7 @@ const resetExperience = {
   selectedExploreItemId: null,
   sequenceProgress: 0,
   effectActive: false,
+  observationVisualStatus: 'idle' as const,
 }
 
 export const useExperienceStore = create<ExperienceStore>((set, get) => ({
@@ -56,6 +60,7 @@ export const useExperienceStore = create<ExperienceStore>((set, get) => ({
       transition: 'hubToApproach',
       selectedSignalId: signalId,
       currentObservationId: `observation-${signalId.slice(-2)}`,
+      observationVisualStatus: 'loading',
       lastInteractionTime: Date.now(),
     })
   },
@@ -86,6 +91,7 @@ export const useExperienceStore = create<ExperienceStore>((set, get) => ({
   setLanguage: (language) => set({ language, lastInteractionTime: Date.now() }),
   setProgress: (sequenceProgress) => set({ sequenceProgress }),
   setEffectActive: (effectActive) => set({ effectActive }),
+  setObservationVisualStatus: (observationVisualStatus) => set({ observationVisualStatus }),
   setAudioEnabled: (isAudioEnabled) => set({ isAudioEnabled }),
   registerInteraction: () => set({ lastInteractionTime: Date.now() }),
 }))

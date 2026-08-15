@@ -2,7 +2,7 @@
   "observations": [
     {
       "id": "observation-01",
-      "duration": 24,
+      "duration": 30,
       "events": [
         { "time": 0, "action": "startNarration" },
         { "time": 2, "action": "showObject" },

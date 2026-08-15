@@ -2,7 +2,8 @@ import { useEffect, useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { Color, Material, MathUtils, Vector3, type Group, type PointLight } from 'three'
 import { useExperienceStore, type SignalId } from '../store/experienceStore'
-import { getSignalConfig } from '../signals/signalData'
+import { getSignalConfig, hasDepthPortal } from '../signals/signalData'
+import { resolvePortalDarkness } from './depth-portal/depthPortalProgress'
 
 const framePositions = [-1.2, -0.72, -0.24, 0.24, 0.72, 1.2]
 const frameColors = ['#9c684e', '#687b78', '#b69a69', '#704f48', '#607b85', '#a77955']
@@ -23,6 +24,7 @@ export function ObservationLayer() {
   const focusGroups = useRef<Partial<Record<SignalId, Group | null>>>({})
   const interiorMaterials = useRef<Material[]>([])
   const focusLight = useRef<PointLight>(null)
+  const roomLight = useRef<PointLight>(null)
   const focusPosition = useRef(new Vector3())
   const color = useRef(new Color())
 
@@ -41,6 +43,10 @@ export function ObservationLayer() {
   useFrame(({ camera, clock, gl }, delta) => {
     if (!room.current) return
     const progress = Number(camera.userData.transitionProgress ?? 0)
+    const observationElapsed = Number(camera.userData.observationElapsed ?? 0)
+    const darkness = hasDepthPortal(selectedSignalId)
+      ? resolvePortalDarkness(stage, transition, progress, observationElapsed)
+      : 0
     const reveal = transition === 'returnToHub'
       ? (stage === 'observation' ? 1 : 0.58) * (1 - progress)
       : transition === 'hubToApproach'
@@ -51,11 +57,12 @@ export function ObservationLayer() {
           ? 1
           : 0
 
-    room.current.visible = reveal > 0.002
+    const surroundingVisibility = 1 - darkness
+    room.current.visible = reveal * surroundingVisibility > 0.002
     room.current.scale.setScalar(MathUtils.lerp(0.92, 1, reveal))
     interiorMaterials.current.forEach((material) => {
       const baseOpacity = Number(material.userData.baseOpacity ?? 1)
-      material.opacity = reveal * baseOpacity
+      material.opacity = reveal * baseOpacity * surroundingVisibility
     })
 
     Object.entries(focusGroups.current).forEach(([signalId, object]) => {
@@ -71,11 +78,13 @@ export function ObservationLayer() {
     const signal = getSignalConfig(selectedSignalId)
     if (focusLight.current) {
       focusLight.current.position.set(...signal.focusPosition)
-      focusLight.current.intensity = reveal * (stage === 'observation' ? 4.8 : 2.2)
+      focusLight.current.intensity = reveal * surroundingVisibility * (stage === 'observation' ? 4.8 : 2.2)
       focusLight.current.color.copy(color.current.set(signal.accent))
     }
+    if (roomLight.current) roomLight.current.intensity = 2.8 * surroundingVisibility
     gl.domElement.dataset.interiorReveal = reveal.toFixed(3)
     gl.domElement.dataset.interiorFocus = signal.id
+    gl.domElement.dataset.sceneDarkness = darkness.toFixed(3)
   })
 
   return (
@@ -199,7 +208,7 @@ export function ObservationLayer() {
       ))}
 
       <pointLight ref={focusLight} intensity={0} distance={3.2} decay={1.7} />
-      <pointLight position={[-0.35, 0.9, 0.35]} intensity={2.8} distance={4} color="#d5aa72" />
+      <pointLight ref={roomLight} position={[-0.35, 0.9, 0.35]} intensity={2.8} distance={4} color="#d5aa72" />
     </group>
   )
 }
