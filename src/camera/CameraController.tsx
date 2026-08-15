@@ -5,7 +5,10 @@ import { cameraPresets } from './cameraPresets'
 import { useExperienceStore } from '../store/experienceStore'
 import { getSignalConfig } from '../signals/signalData'
 import { getHouseRoot } from '../scene/sceneRegistry'
-import { smootherStep } from '../sequence/observationTiming'
+import {
+  DEPTH_PORTAL_ENTRY_TRANSITION_SECONDS,
+  smootherStep,
+} from '../sequence/observationTiming'
 
 interface ActiveTransition {
   kind: 'hubToApproach' | 'approachToObservation' | 'returnToHub'
@@ -76,6 +79,9 @@ export function CameraController() {
 
   useEffect(() => {
     const observationActive = stage === 'observation' && transitionKind === 'none'
+    if (transitionKind === 'none') {
+      camera.userData.transitionProgress = 0
+    }
     if (observationActive && !observationWasActive.current) {
       observationElapsed.current = 0
       camera.userData.observationElapsed = 0
@@ -116,7 +122,11 @@ export function CameraController() {
       fromTarget: target.current.clone(),
       fromFov: camera.fov,
       elapsed: 0,
-      duration: transitionKind === 'hubToApproach' ? 3.2 : transitionKind === 'approachToObservation' ? 3.5 : 4.3,
+      duration: transitionKind === 'hubToApproach'
+        ? 3.2
+        : transitionKind === 'approachToObservation'
+          ? DEPTH_PORTAL_ENTRY_TRANSITION_SECONDS
+          : 4.3,
     } as ActiveTransition
 
     if (transitionKind === 'returnToHub') {
@@ -191,7 +201,8 @@ export function CameraController() {
 
     if (rawProgress < 1) return
     transition.current = null
-    camera.userData.transitionProgress = 0
+    // Preserve the completed frame until React commits the next stage.
+    // Resetting here makes dependent layers replay progress 0 for one frame.
     finishTransition()
   }, -2)
 

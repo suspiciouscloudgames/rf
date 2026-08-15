@@ -2,7 +2,10 @@ import { useEffect, useState } from 'react'
 import observations from '../content/observations.json'
 import { depthPortalSubtitles, type ObservationSubtitleCue } from '../content/observationSubtitles'
 import { useExperienceStore } from '../store/experienceStore'
-import { DEPTH_PORTAL_SUBTITLE_START_SECONDS } from '../sequence/observationTiming'
+import {
+  DEPTH_PORTAL_ENTRY_TRANSITION_SECONDS,
+  DEPTH_PORTAL_SUBTITLE_START_SECONDS,
+} from '../sequence/observationTiming'
 
 const sequenceDuration = observations.observations[0].duration
 
@@ -39,7 +42,7 @@ function SlowSubtitleLine({ cue }: { cue: ObservationSubtitleCue }) {
 export function ObservationSubtitles() {
   const language = useExperienceStore((store) => store.language)
   const progress = useExperienceStore((store) => store.sequenceProgress)
-  const elapsed = progress * sequenceDuration
+  const elapsed = progress * sequenceDuration + DEPTH_PORTAL_ENTRY_TRANSITION_SECONDS
   if (elapsed < DEPTH_PORTAL_SUBTITLE_START_SECONDS) return null
 
   const cues = depthPortalSubtitles[language]
