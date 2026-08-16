@@ -2,12 +2,14 @@ import { lazy, Suspense, useEffect, useRef } from 'react'
 import { SequenceController } from '../sequence/SequenceController'
 import { Interface } from '../ui/Interface'
 import { HubVideoBackground } from '../ui/HubVideoBackground'
+import { TuningPanel } from '../ui/TuningPanel'
 import { useExperienceStore } from '../store/experienceStore'
 
 const IDLE_TIMEOUT_MS = 90_000
 const ExperienceCanvas = lazy(() =>
   import('../scene/ExperienceCanvas').then((module) => ({ default: module.ExperienceCanvas })),
 )
+const tuningPanelEnabled = import.meta.env.VITE_SHOW_TUNING_PANEL !== 'false'
 
 export function App() {
   const stage = useExperienceStore((store) => store.stage)
@@ -65,6 +67,7 @@ export function App() {
       </Suspense>
       <SequenceController />
       <Interface />
+      {tuningPanelEnabled ? <TuningPanel /> : null}
       <div className="scanlines" aria-hidden="true" />
       <div className="noise" aria-hidden="true" />
       {stage === 'loading' ? (

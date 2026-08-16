@@ -4,6 +4,7 @@ import { Color, Material, MathUtils, Vector3, type Group, type PointLight } from
 import { useExperienceStore, type SignalId } from '../store/experienceStore'
 import { getSignalConfig, hasDepthPortal } from '../signals/signalData'
 import { resolvePortalDarkness } from './depth-portal/depthPortalProgress'
+import { useTuningStore } from '../store/tuningStore'
 
 const framePositions = [-1.2, -0.72, -0.24, 0.24, 0.72, 1.2]
 const frameColors = ['#9c684e', '#687b78', '#b69a69', '#704f48', '#607b85', '#a77955']
@@ -20,6 +21,8 @@ export function ObservationLayer() {
   const transition = useExperienceStore((store) => store.transition)
   const selectedSignalId = useExperienceStore((store) => store.selectedSignalId)
   const sequenceProgress = useExperienceStore((store) => store.sequenceProgress)
+  const approachToObservationSeconds = useTuningStore((store) => store.approachToObservationSeconds)
+  const darkenSeconds = useTuningStore((store) => store.darkenSeconds)
   const room = useRef<Group>(null)
   const focusGroups = useRef<Partial<Record<SignalId, Group | null>>>({})
   const interiorMaterials = useRef<Material[]>([])
@@ -45,7 +48,14 @@ export function ObservationLayer() {
     const progress = Number(camera.userData.transitionProgress ?? 0)
     const observationElapsed = Number(camera.userData.observationElapsed ?? 0)
     const darkness = hasDepthPortal(selectedSignalId)
-      ? resolvePortalDarkness(stage, transition, progress, observationElapsed)
+      ? resolvePortalDarkness(
+        stage,
+        transition,
+        progress,
+        observationElapsed,
+        approachToObservationSeconds,
+        darkenSeconds,
+      )
       : 0
     const reveal = transition === 'returnToHub'
       ? (stage === 'observation' ? 1 : 0.58) * (1 - progress)

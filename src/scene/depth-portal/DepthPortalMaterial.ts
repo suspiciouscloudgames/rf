@@ -9,6 +9,8 @@ export interface DepthPortalFrameState {
   parallax: number
   opacity: number
   viewOffset: Vector2
+  depthScale: number
+  maxParallax: number
 }
 
 export const createDepthPortalMaterial = (
@@ -43,5 +45,7 @@ export const updateDepthPortalMaterial = (
   material.uniforms.uReveal.value = frame.reveal
   material.uniforms.uParallax.value = frame.parallax
   material.uniforms.uOpacity.value = frame.opacity
+  material.uniforms.uDepthScale.value = frame.depthScale
+  material.uniforms.uMaxUvOffset.value = frame.maxParallax
   ;(material.uniforms.uViewOffset.value as Vector2).copy(frame.viewOffset)
 }

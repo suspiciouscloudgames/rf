@@ -185,15 +185,18 @@ World
 ### 7.3 Approach → Observation
 
 - 길이: 3.5초
-- Cubic Bézier 카메라 경로
-- `signal-05`는 일반 카메라 종점이 아니라 `Far Observation Frame`으로 이동
+- 최대 이동 거리: `1.4m`
+- 곡선 강도: `0.18`; 직선에 가까운 Cubic Bézier 경로
+- 도착 FOV: `37°`
+- 시선 회전은 전환 진행률 `25%` 이후 시작
+- `World Depth`는 진행 방향의 기준점이며 실제 이동량은 `Entry Travel Distance`로 제한
 
 ### 7.4 `signal-05` Observation Dolly
 
 | 속성 | 현재값 |
 |---|---:|
-| 원경 오프셋 | `[-0.35, 0.7, 6.2]` |
-| 원경 FOV | `44°` |
+| Guided 시작 위치 | Observation Entry의 실제 도착점 |
+| Guided 시작 FOV | `37°` |
 | 근경 오프셋 | `[-0.08, 0.14, 1.52]` |
 | 근경 FOV | `25.5°` |
 | 이동 시간 | 30초 |
@@ -227,13 +230,13 @@ World
 
 | 렌더 순서 | 레이어 | 로컬 Z | 역할 |
 |---:|---|---:|---|
-| 5 | Black Matte | `-0.025` | 주변 암전 |
+| 5 | Screen-space Blackout | 해당 없음 | 카메라와 독립된 화면 전체 암전 |
 | 10 | Base Depth Mesh | `0` | 컬러 + Depth Map 본체 |
 | 20 | Midground Card | `0.1` | 중경 분리 레이어 |
 | 30 | Foreground Card | `0.22` | 전경 분리 레이어 |
 | 40 | Interaction Plane | `0.29` | 터치 핫스폿 |
 
-Black Matte는 `depthTest=false`, `fog=false`이므로 환경 안개에 물들지 않고 블랙으로 합성된다.
+Screen-space Blackout은 카메라 행렬을 사용하지 않고 clip-space에 직접 그려진다. `depthTest=false`, `fog=false`이며 Portal visuals보다 먼저 렌더링되므로 카메라 이동 중에도 화면 전체를 안정적으로 덮는다.
 
 ### 8.3 2.5D 에셋
 
@@ -414,7 +417,10 @@ Signal HUD
 |---|---|
 | 앱 합성 순서 | `src/app/App.tsx` |
 | 전역 상태 머신 | `src/store/experienceStore.ts` |
+| 전시 튜닝 상태 | `src/store/tuningStore.ts` |
+| 전시 튜닝 패널 | `src/ui/TuningPanel.tsx` |
 | 카메라 및 전환 | `src/camera/CameraController.tsx` |
+| Screen-space 암전 | `src/scene/depth-portal/DepthPortalBlackout.tsx` |
 | Hub 오빗 | `src/interaction/HubOrbitController.tsx` |
 | 신호 설정 | `src/signals/signalData.ts` |
 | 신호 버튼 및 마커 | `src/signals/ObservationSignals.tsx` |

@@ -7,6 +7,8 @@ export interface DepthPortalCardsFrame {
   reveal: number
   parallax: number
   viewOffset: Vector2
+  layerDepth: number
+  maxParallax: number
 }
 
 export interface DepthPortalCardsHandle {
@@ -26,21 +28,23 @@ export const DepthPortalCards = forwardRef<DepthPortalCardsHandle, DepthPortalCa
     const foregroundMaterial = useRef<MeshBasicMaterial>(null)
 
     useImperativeHandle(ref, () => ({
-      update: ({ reveal, parallax, viewOffset }) => {
-        const horizontalShift = config.size[0] * config.maxParallax * viewOffset.x * parallax
-        const verticalShift = config.size[1] * config.maxParallax * viewOffset.y * parallax
+      update: ({ reveal, parallax, viewOffset, layerDepth, maxParallax }) => {
+        const horizontalShift = config.size[0] * maxParallax * viewOffset.x * parallax
+        const verticalShift = config.size[1] * maxParallax * viewOffset.y * parallax
         if (midground.current) {
+          midground.current.position.z = layerDepth * 0.45
           midground.current.position.x = horizontalShift * 0.42
           midground.current.position.y = verticalShift * 0.14
         }
         if (foreground.current) {
+          foreground.current.position.z = layerDepth
           foreground.current.position.x = horizontalShift * 1.15
           foreground.current.position.y = verticalShift * 0.42
         }
         if (midgroundMaterial.current) midgroundMaterial.current.opacity = reveal
         if (foregroundMaterial.current) foregroundMaterial.current.opacity = reveal
       },
-    }), [config.maxParallax, config.size])
+    }), [config.size])
 
     return (
       <>

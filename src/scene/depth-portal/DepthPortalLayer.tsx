@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
-import { MathUtils, Vector2, type Group, type MeshBasicMaterial } from 'three'
+import { MathUtils, Vector2, type Group } from 'three'
 import { useExperienceStore } from '../../store/experienceStore'
 import { getDepthPortalConfig } from '../../signals/signalData'
 import { useDepthPortalTextures } from './DepthPortalAssets'
@@ -12,6 +12,8 @@ import { DepthPortalHotspots } from './DepthPortalHotspots'
 import { useDepthPortalCapabilities } from './depthPortalCapabilities'
 import { DepthPortalFallback } from './DepthPortalFallback'
 import { resolvePortalDarkness, resolvePortalProgress } from './depthPortalProgress'
+import { useTuningStore } from '../../store/tuningStore'
+import { DepthPortalBlackout, type DepthPortalBlackoutHandle } from './DepthPortalBlackout'
 
 interface ActiveDepthPortalProps {
   config: DepthPortalConfig
@@ -23,12 +25,19 @@ function ActiveDepthPortal({ config, reducedMotion }: ActiveDepthPortalProps) {
   const transition = useExperienceStore((store) => store.transition)
   const observationMode = useExperienceStore((store) => store.observationMode)
   const selectedExploreItemId = useExperienceStore((store) => store.selectedExploreItemId)
+  const observationEntrySeconds = useTuningStore((store) => store.observationEntrySeconds)
+  const approachToObservationSeconds = useTuningStore((store) => store.approachToObservationSeconds)
+  const darkenSeconds = useTuningStore((store) => store.darkenSeconds)
+  const perceivedDepth = useTuningStore((store) => store.perceivedDepth)
+  const layerDepth = useTuningStore((store) => store.layerDepth)
+  const parallaxStrength = useTuningStore((store) => store.parallaxStrength)
   const setVisualStatus = useExperienceStore((store) => store.setObservationVisualStatus)
   const canvas = useThree((state) => state.gl.domElement)
   const textures = useDepthPortalTextures(config.assetId)
   const portal = useRef<Group>(null)
+  const portalVisuals = useRef<Group>(null)
   const cards = useRef<DepthPortalCardsHandle>(null)
-  const matte = useRef<MeshBasicMaterial>(null)
+  const blackout = useRef<DepthPortalBlackoutHandle>(null)
   const viewOffset = useRef(new Vector2())
   const targetOffset = useRef(new Vector2())
   const material = useMemo(
@@ -53,13 +62,30 @@ function ActiveDepthPortal({ config, reducedMotion }: ActiveDepthPortalProps) {
     delete canvas.dataset.depthPortalReveal
     delete canvas.dataset.depthPortalParallax
     delete canvas.dataset.depthPortalView
+    delete canvas.dataset.blackoutLayerVisible
+    delete canvas.dataset.blackoutMode
+    delete canvas.dataset.blackoutOpacity
   }, [canvas])
 
   useFrame(({ camera, clock, gl, pointer }, delta) => {
     const transitionProgress = Number(camera.userData.transitionProgress ?? 0)
     const observationElapsed = Number(camera.userData.observationElapsed ?? 0)
-    const frame = resolvePortalProgress(stage, transition, transitionProgress, observationElapsed)
-    const darkness = resolvePortalDarkness(stage, transition, transitionProgress, observationElapsed)
+    const frame = resolvePortalProgress(
+      stage,
+      transition,
+      transitionProgress,
+      observationElapsed,
+      observationEntrySeconds,
+      approachToObservationSeconds,
+    )
+    const darkness = resolvePortalDarkness(
+      stage,
+      transition,
+      transitionProgress,
+      observationElapsed,
+      approachToObservationSeconds,
+      darkenSeconds,
+    )
     const canExplore = stage === 'observation'
       && transition === 'none'
       && observationMode === 'explore'
@@ -83,16 +109,26 @@ function ActiveDepthPortal({ config, reducedMotion }: ActiveDepthPortalProps) {
     }
     viewOffset.current.x = MathUtils.damp(viewOffset.current.x, targetOffset.current.x, 5, delta)
     viewOffset.current.y = MathUtils.damp(viewOffset.current.y, targetOffset.current.y, 5, delta)
-    if (portal.current) portal.current.visible = frame.reveal > 0.001
-    if (matte.current) matte.current.opacity = darkness
+    const layerVisible = frame.reveal > 0.001 || darkness > 0.001
+    if (portal.current) portal.current.visible = layerVisible
+    if (portalVisuals.current) portalVisuals.current.visible = frame.reveal > 0.001
+    blackout.current?.updateOpacity(darkness)
     const effectiveParallax = reducedMotion ? 0 : frame.parallax
     updateDepthPortalMaterial(material, {
       reveal: frame.reveal,
       parallax: effectiveParallax,
       opacity: frame.reveal,
       viewOffset: viewOffset.current,
+      depthScale: perceivedDepth,
+      maxParallax: parallaxStrength,
     })
-    cards.current?.update({ reveal: frame.reveal, parallax: effectiveParallax, viewOffset: viewOffset.current })
+    cards.current?.update({
+      reveal: frame.reveal,
+      parallax: effectiveParallax,
+      viewOffset: viewOffset.current,
+      layerDepth,
+      maxParallax: parallaxStrength,
+    })
     gl.domElement.dataset.depthPortalState = frame.reveal <= 0.001
       ? 'hidden'
       : frame.reveal < 0.999
@@ -102,6 +138,9 @@ function ActiveDepthPortal({ config, reducedMotion }: ActiveDepthPortalProps) {
     gl.domElement.dataset.depthPortalParallax = effectiveParallax.toFixed(3)
     gl.domElement.dataset.depthPortalView = `${viewOffset.current.x.toFixed(3)},${viewOffset.current.y.toFixed(3)}`
     gl.domElement.dataset.sceneDarkness = darkness.toFixed(3)
+    gl.domElement.dataset.blackoutLayerVisible = String(layerVisible)
+    gl.domElement.dataset.blackoutMode = 'screen-space'
+    gl.domElement.dataset.blackoutOpacity = darkness.toFixed(3)
   })
 
   return (
@@ -112,25 +151,15 @@ function ActiveDepthPortal({ config, reducedMotion }: ActiveDepthPortalProps) {
       rotation={config.rotation}
       visible={false}
     >
-      <mesh name="depth-portal-matte" position={[0, 0, -0.025]} renderOrder={5}>
-        <planeGeometry args={[14, 8]} />
-        <meshBasicMaterial
-          ref={matte}
-          color="#000000"
-          transparent
-          opacity={0}
-          depthTest={false}
-          depthWrite={false}
-          fog={false}
-          toneMapped={false}
+      <DepthPortalBlackout ref={blackout} />
+      <group ref={portalVisuals} name="depth-portal-visuals" visible={false}>
+        <DepthPortalMesh config={config} material={material} />
+        <DepthPortalCards ref={cards} config={config} textures={textures} />
+        <DepthPortalHotspots
+          config={config}
+          interactive={stage === 'observation' && transition === 'none' && observationMode === 'explore'}
         />
-      </mesh>
-      <DepthPortalMesh config={config} material={material} />
-      <DepthPortalCards ref={cards} config={config} textures={textures} />
-      <DepthPortalHotspots
-        config={config}
-        interactive={stage === 'observation' && transition === 'none' && observationMode === 'explore'}
-      />
+      </group>
     </group>
   )
 }

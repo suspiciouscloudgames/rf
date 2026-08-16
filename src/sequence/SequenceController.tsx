@@ -1,9 +1,7 @@
 import { useEffect } from 'react'
-import observations from '../content/observations.json'
 import { useExperienceStore } from '../store/experienceStore'
 import { hasDepthPortal } from '../signals/signalData'
-
-const sequenceDuration = observations.observations[0].duration
+import { useTuningStore } from '../store/tuningStore'
 
 export function SequenceController() {
   const stage = useExperienceStore((store) => store.stage)
@@ -18,6 +16,7 @@ export function SequenceController() {
     if (stage !== 'observation' || transition !== 'none') return
     const portalRequired = hasDepthPortal(selectedSignalId)
     if (portalRequired && visualStatus !== 'ready' && visualStatus !== 'fallback') return
+    const sequenceDuration = useTuningStore.getState().guidedObservationSeconds
     let timer: number | null = null
     const delay = 0
     const kickoff = window.setTimeout(() => {

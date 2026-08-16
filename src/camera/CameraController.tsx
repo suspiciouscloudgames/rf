@@ -5,10 +5,8 @@ import { cameraPresets } from './cameraPresets'
 import { useExperienceStore } from '../store/experienceStore'
 import { getSignalConfig } from '../signals/signalData'
 import { getHouseRoot } from '../scene/sceneRegistry'
-import {
-  DEPTH_PORTAL_ENTRY_TRANSITION_SECONDS,
-  smootherStep,
-} from '../sequence/observationTiming'
+import { smootherStep } from '../sequence/observationTiming'
+import { useTuningStore } from '../store/tuningStore'
 
 interface ActiveTransition {
   kind: 'hubToApproach' | 'approachToObservation' | 'returnToHub'
@@ -20,6 +18,7 @@ interface ActiveTransition {
   curve?: CubicBezierCurve3
   endTarget?: Vector3
   endFov?: number
+  targetRotationDelay?: number
 }
 
 const easeInOutCubic = (value: number) =>
@@ -35,7 +34,7 @@ const tempFarObservationPosition = new Vector3()
 const tempObservationOffset = new Vector3()
 const tempApproachLift = new Vector3(0, 0.16, 0)
 
-const resolveSignalFrame = () => {
+const resolveSignalFrame = (worldDepth = useTuningStore.getState().worldDepth) => {
   const selectedSignal = getSignalConfig(useExperienceStore.getState().selectedSignalId)
   const house = getHouseRoot()
   tempAnchor.set(...selectedSignal.anchor)
@@ -47,6 +46,9 @@ const resolveSignalFrame = () => {
   tempFarObservationPosition
     .set(...selectedSignal.focusPosition)
     .add(tempObservationOffset.set(...(selectedSignal.depthPortal?.farObservationOffset ?? selectedSignal.observationOffset)))
+  if (selectedSignal.depthPortal) {
+    tempFarObservationPosition.z = selectedSignal.focusPosition[2] + worldDepth
+  }
   if (house) {
     house.updateWorldMatrix(true, false)
     tempAnchor.applyMatrix4(house.matrixWorld)
@@ -73,6 +75,9 @@ export function CameraController() {
   const target = useRef(new Vector3(...cameraPresets.hub.target))
   const transition = useRef<ActiveTransition | null>(null)
   const observationElapsed = useRef(0)
+  const guidedObservationDuration = useRef(useTuningStore.getState().guidedObservationSeconds)
+  const guidedStartPosition = useRef(camera.position.clone())
+  const guidedStartFov = useRef(camera.fov)
   const observationWasActive = useRef(false)
   const hubPosition = useMemo(() => new Vector3(...cameraPresets.hub.position), [])
   const hubTarget = useMemo(() => new Vector3(...cameraPresets.hub.target), [])
@@ -84,6 +89,7 @@ export function CameraController() {
     }
     if (observationActive && !observationWasActive.current) {
       observationElapsed.current = 0
+      guidedObservationDuration.current = useTuningStore.getState().guidedObservationSeconds
       camera.userData.observationElapsed = 0
     }
     if (stage === 'hub' && transitionKind === 'none') {
@@ -116,6 +122,7 @@ export function CameraController() {
 
   useEffect(() => {
     if (transitionKind === 'none') return
+    const tuning = useTuningStore.getState()
     const base = {
       kind: transitionKind,
       fromPosition: camera.position.clone(),
@@ -123,9 +130,9 @@ export function CameraController() {
       fromFov: camera.fov,
       elapsed: 0,
       duration: transitionKind === 'hubToApproach'
-        ? 3.2
+        ? tuning.hubToApproachSeconds
         : transitionKind === 'approachToObservation'
-          ? DEPTH_PORTAL_ENTRY_TRANSITION_SECONDS
+          ? tuning.approachToObservationSeconds
           : 4.3,
     } as ActiveTransition
 
@@ -135,13 +142,27 @@ export function CameraController() {
       const control2 = hubPosition.clone().lerp(camera.position, 0.28).add(new Vector3(0, 0.42, 0))
       base.curve = new CubicBezierCurve3(camera.position.clone(), control1, control2, hubPosition.clone())
     } else if (transitionKind === 'approachToObservation') {
-      const { signal, anchor, focus, nearObservationPosition, farObservationPosition } = resolveSignalFrame()
-      const observationPosition = signal.depthPortal ? farObservationPosition : nearObservationPosition
-      const control1 = camera.position.clone().lerp(anchor, 0.42).add(new Vector3(0, 0.18, 0))
-      const control2 = anchor.clone().lerp(observationPosition, 0.62).add(new Vector3(0, 0.08, 0))
-      base.curve = new CubicBezierCurve3(camera.position.clone(), control1, control2, observationPosition.clone())
+      const { signal, anchor, focus, nearObservationPosition, farObservationPosition } = resolveSignalFrame(
+        tuning.worldDepth,
+      )
+      const desiredPosition = signal.depthPortal ? farObservationPosition : nearObservationPosition
+      const startPosition = camera.position.clone()
+      const entryDirection = desiredPosition.clone().sub(startPosition)
+      const entryDistance = Math.min(tuning.entryTravelDistance, entryDirection.length())
+      const observationPosition = startPosition.clone().add(entryDirection.normalize().multiplyScalar(entryDistance))
+      const midpoint = startPosition.clone().lerp(observationPosition, 0.5)
+      const pathDirection = observationPosition.clone().sub(startPosition).normalize()
+      const curveOffset = anchor.clone().sub(midpoint)
+      curveOffset.addScaledVector(pathDirection, -curveOffset.dot(pathDirection))
+      curveOffset.clampLength(0, entryDistance * 0.28).multiplyScalar(tuning.entryCurveStrength)
+      const control1 = startPosition.clone().lerp(observationPosition, 0.33).add(curveOffset)
+      const control2 = startPosition.clone().lerp(observationPosition, 0.67).add(curveOffset)
+      base.curve = new CubicBezierCurve3(startPosition, control1, control2, observationPosition.clone())
       base.endTarget = focus.clone()
-      base.endFov = signal.depthPortal?.farFov ?? 25.5
+      base.endFov = tuning.entryFov
+      base.targetRotationDelay = tuning.targetRotationDelay / 100
+      guidedStartPosition.current.copy(observationPosition)
+      guidedStartFov.current = tuning.entryFov
     }
     transition.current = base
   }, [camera, hubPosition, transitionKind])
@@ -150,23 +171,24 @@ export function CameraController() {
     const active = transition.current
     if (!active) {
       if (stage === 'observation' && transitionKind === 'none') {
-        const { signal, focus, nearObservationPosition, farObservationPosition } = resolveSignalFrame()
+        const { signal, focus, nearObservationPosition } = resolveSignalFrame()
         if (signal.depthPortal) {
           observationElapsed.current = Math.min(
             observationElapsed.current + delta,
-            signal.depthPortal.dollyDuration,
+            guidedObservationDuration.current,
           )
-          const rawDollyProgress = observationElapsed.current / signal.depthPortal.dollyDuration
+          const rawDollyProgress = observationElapsed.current / guidedObservationDuration.current
           const dollyProgress = smootherStep(rawDollyProgress)
-          camera.position.lerpVectors(farObservationPosition, nearObservationPosition, dollyProgress)
+          camera.position.lerpVectors(guidedStartPosition.current, nearObservationPosition, dollyProgress)
           target.current.copy(focus)
-          camera.fov = MathUtils.lerp(signal.depthPortal.farFov, signal.depthPortal.nearFov, dollyProgress)
+          camera.fov = MathUtils.lerp(guidedStartFov.current, signal.depthPortal.nearFov, dollyProgress)
           camera.updateProjectionMatrix()
           camera.userData.observationElapsed = observationElapsed.current
           gl.domElement.dataset.observationElapsed = observationElapsed.current.toFixed(2)
           gl.domElement.dataset.cameraDollyProgress = rawDollyProgress.toFixed(3)
           gl.domElement.dataset.cameraPosition = camera.position.toArray().map((value) => value.toFixed(2)).join(',')
           gl.domElement.dataset.cameraTarget = target.current.toArray().map((value) => value.toFixed(2)).join(',')
+          gl.domElement.dataset.cameraFov = camera.fov.toFixed(2)
         }
       }
       camera.lookAt(target.current)
@@ -185,7 +207,9 @@ export function CameraController() {
       camera.fov = MathUtils.lerp(active.fromFov, 33, progress)
     } else if (active.kind === 'approachToObservation' && active.curve && active.endTarget) {
       active.curve.getPoint(progress, camera.position)
-      target.current.lerpVectors(active.fromTarget, active.endTarget, progress)
+      const targetDelay = active.targetRotationDelay ?? 0
+      const targetRawProgress = MathUtils.clamp((rawProgress - targetDelay) / Math.max(1 - targetDelay, 0.001), 0, 1)
+      target.current.lerpVectors(active.fromTarget, active.endTarget, easeInOutCubic(targetRawProgress))
       camera.fov = MathUtils.lerp(active.fromFov, active.endFov ?? 25.5, progress)
     } else if (active.curve) {
       active.curve.getPoint(progress, camera.position)
@@ -198,6 +222,7 @@ export function CameraController() {
     camera.userData.transitionProgress = rawProgress
     gl.domElement.dataset.cameraPosition = camera.position.toArray().map((value) => value.toFixed(2)).join(',')
     gl.domElement.dataset.cameraTarget = target.current.toArray().map((value) => value.toFixed(2)).join(',')
+    gl.domElement.dataset.cameraFov = camera.fov.toFixed(2)
 
     if (rawProgress < 1) return
     transition.current = null

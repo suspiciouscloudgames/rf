@@ -4,11 +4,9 @@ import { useExperienceStore } from '../store/experienceStore'
 import { TypewriterText } from './TypewriterText'
 import { ExploreInterface } from './ExploreInterface'
 import { getFocusContent } from '../content/focusContent'
-import observations from '../content/observations.json'
 import { hasDepthPortal } from '../signals/signalData'
 import { ObservationSubtitles } from './ObservationSubtitles'
-
-const sequenceDuration = observations.observations[0].duration
+import { useTuningStore } from '../store/tuningStore'
 
 export function Interface() {
   const stage = useExperienceStore((store) => store.stage)
@@ -19,6 +17,7 @@ export function Interface() {
   const observationMode = useExperienceStore((store) => store.observationMode)
   const selectedSignalId = useExperienceStore((store) => store.selectedSignalId)
   const beginReturn = useExperienceStore((store) => store.beginReturn)
+  const sequenceDuration = useTuningStore((store) => store.guidedObservationSeconds)
   const copy = language === 'en' ? en : ja
   const focusCopy = getFocusContent(language, selectedSignalId)
   const portalObservation = hasDepthPortal(selectedSignalId)
