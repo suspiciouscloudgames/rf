@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { MathUtils, type Group } from 'three'
 import { useExperienceStore } from '../store/experienceStore'
@@ -7,13 +7,7 @@ import { setHouseRoot } from './sceneRegistry'
 import { FloorplanHouse } from './FloorplanHouse'
 import { DepthPortalBoundary, DepthPortalPreloader } from './depth-portal/DepthPortalBoundary'
 import { DepthPortalLayer } from './depth-portal/DepthPortalLayer'
-import { getSignalConfig, hasDepthPortal } from '../signals/signalData'
-
-const ObservationModelLayer = lazy(() =>
-  import('./ObservationModelLayer').then((module) => ({
-    default: module.ObservationModelLayer,
-  })),
-)
+import { hasDepthPortal } from '../signals/signalData'
 
 export function House() {
   const group = useRef<Group>(null)
@@ -26,9 +20,6 @@ export function House() {
     || transition === 'hubToApproach'
     || transition === 'approachToObservation'
     || transition === 'returnToHub'
-  const hasFocusedObservationModel = Boolean(
-    getSignalConfig(selectedSignalId).observationModel,
-  )
 
   useEffect(() => {
     setHouseRoot(group.current)
@@ -59,11 +50,6 @@ export function House() {
     <group ref={group} position={[0, 0, 0]}>
       <DepthPortalPreloader />
       {showFloorplan ? <FloorplanHouse /> : null}
-      {hasFocusedObservationModel ? (
-        <Suspense fallback={null}>
-          <ObservationModelLayer />
-        </Suspense>
-      ) : null}
       <DepthPortalBoundary>
         <DepthPortalLayer />
       </DepthPortalBoundary>
