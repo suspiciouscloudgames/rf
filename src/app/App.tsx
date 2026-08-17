@@ -4,6 +4,8 @@ import { Interface } from '../ui/Interface'
 import { HubVideoBackground } from '../ui/HubVideoBackground'
 import { TuningPanel } from '../ui/TuningPanel'
 import { useExperienceStore } from '../store/experienceStore'
+import { useRoomVisualModeStore } from '../store/roomVisualModeStore'
+import { MorphFilmOverlay } from '../ui/MorphFilmOverlay'
 
 const IDLE_TIMEOUT_MS = 90_000
 const ExperienceCanvas = lazy(() =>
@@ -19,6 +21,13 @@ export function App() {
   const registerInteraction = useExperienceStore((store) => store.registerInteraction)
   const setAudioEnabled = useExperienceStore((store) => store.setAudioEnabled)
   const mediaUnlocked = useRef(false)
+  const roomVisualMode = useRoomVisualModeStore((store) => store.mode)
+  const syncRoomVisualMode = useRoomVisualModeStore((store) => store.syncFromLocation)
+
+  useEffect(() => {
+    window.addEventListener('popstate', syncRoomVisualMode)
+    return () => window.removeEventListener('popstate', syncRoomVisualMode)
+  }, [syncRoomVisualMode])
 
   useEffect(() => {
     const timer = window.setTimeout(enterHub, 850)
@@ -60,11 +69,15 @@ export function App() {
   }, [registerInteraction])
 
   return (
-    <main className={`experience-shell state-${stage} transition-${transition}`}>
+    <main
+      className={`experience-shell state-${stage} transition-${transition}`}
+      data-room-visual-mode={roomVisualMode}
+    >
       <HubVideoBackground />
       <Suspense fallback={null}>
         <ExperienceCanvas />
       </Suspense>
+      <MorphFilmOverlay />
       <SequenceController />
       <Interface />
       {tuningPanelEnabled ? <TuningPanel /> : null}

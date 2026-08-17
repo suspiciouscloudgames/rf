@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import type { ExperienceTuning, HubPersistenceMode } from '../store/tuningStore'
 import { useTuningStore } from '../store/tuningStore'
+import { useRoomVisualModeStore, type RoomVisualMode } from '../store/roomVisualModeStore'
 
 type NumericTuningKey = {
   [Key in keyof ExperienceTuning]: ExperienceTuning[Key] extends number ? Key : never
@@ -16,6 +17,13 @@ interface ControlDefinition {
   unit: string
   digits: number
 }
+
+type MorphColorKey = 'morphBaseColor' | 'morphHighlightColor' | 'morphShadowColor'
+
+const roomModeOptions: Array<{ value: RoomVisualMode; label: string; hint: string }> = [
+  { value: 'classic', label: 'Classic', hint: '기존 2step 비주얼' },
+  { value: 'morph', label: 'Morph', hint: '실험적 표면 몰핑 룸' },
+]
 
 const persistenceOptions: Array<{ value: HubPersistenceMode; label: string; hint: string }> = [
   { value: 'particles', label: 'Particles Only', hint: '모든 단계와 암전 위에 파티클만 유지' },
@@ -39,6 +47,31 @@ const depthControls: ControlDefinition[] = [
   { key: 'worldDepth', label: 'World Depth', hint: '3step 진행 방향의 월드 기준점', min: 2, max: 14, step: 0.1, unit: 'm', digits: 1 },
   { key: 'layerDepth', label: 'Layer Depth', hint: '전경·중경 카드 간격', min: 0, max: 0.6, step: 0.01, unit: 'm', digits: 2 },
   { key: 'parallaxStrength', label: 'Parallax', hint: '관찰 중 시차 강도', min: 0, max: 0.1, step: 0.002, unit: '', digits: 3 },
+]
+
+const morphAppearanceControls: ControlDefinition[] = [
+  { key: 'morphMonochromeMix', label: 'Monochrome Mix', hint: '지정 색상을 흑백 필름 톤과 혼합', min: 0, max: 1, step: 0.01, unit: '', digits: 2 },
+  { key: 'morphRoomOpacity', label: 'Room Opacity', hint: '바닥과 외벽의 투명도', min: 0.02, max: 1, step: 0.01, unit: '', digits: 2 },
+  { key: 'morphPropOpacity', label: 'Prop Opacity', hint: '돌출 집기와 연결부 투명도', min: 0.05, max: 1, step: 0.01, unit: '', digits: 2 },
+]
+
+const morphMotionControls: ControlDefinition[] = [
+  { key: 'morphWaverAmount', label: 'Waver Amount', hint: '표면 변위 강도', min: 0, max: 0.12, step: 0.002, unit: '', digits: 3 },
+  { key: 'morphWaverScale', label: 'Waver Scale', hint: '일렁임의 크기와 밀도', min: 0.5, max: 10, step: 0.1, unit: '', digits: 1 },
+  { key: 'morphWaverSpeed', label: 'Waver Speed', hint: '표면이 움직이는 속도', min: 0, max: 1.5, step: 0.01, unit: '', digits: 2 },
+  { key: 'morphRippleAmount', label: 'Ripple Amount', hint: '터치 파동의 변위 강도', min: 0, max: 0.15, step: 0.002, unit: '', digits: 3 },
+  { key: 'morphRippleRadius', label: 'Ripple Radius', hint: '터치 파동의 확산 범위', min: 0.2, max: 3, step: 0.05, unit: 'm', digits: 2 },
+]
+
+const morphFilmControls: ControlDefinition[] = [
+  { key: 'morphFilmFlicker', label: 'Film Flicker', hint: '12fps 명암 흔들림', min: 0, max: 0.15, step: 0.005, unit: '', digits: 3 },
+  { key: 'morphFilmGrain', label: 'Film Grain', hint: '16mm 입자와 스크래치 강도', min: 0, max: 0.5, step: 0.01, unit: '', digits: 2 },
+]
+
+const morphColorControls: Array<{ key: MorphColorKey; label: string; hint: string }> = [
+  { key: 'morphBaseColor', label: 'Base Color', hint: '몰프룸의 중간 톤' },
+  { key: 'morphHighlightColor', label: 'Highlight Color', hint: '돌출부와 광원 방향의 밝은 톤' },
+  { key: 'morphShadowColor', label: 'Shadow Color', hint: '함몰부와 벽·바닥의 어두운 톤' },
 ]
 
 function TuningControl({ definition }: { definition: ControlDefinition }) {
@@ -87,10 +120,56 @@ function PersistenceSelector() {
   )
 }
 
+function RoomModeSelector() {
+  const mode = useRoomVisualModeStore((store) => store.mode)
+  const setMode = useRoomVisualModeStore((store) => store.setMode)
+
+  return (
+    <div className="persistence-selector" role="radiogroup" aria-label="Approach room visual mode">
+      {roomModeOptions.map((option) => (
+        <button
+          key={option.value}
+          type="button"
+          role="radio"
+          aria-checked={mode === option.value}
+          className={mode === option.value ? 'is-active' : ''}
+          onClick={() => setMode(option.value)}
+        >
+          <span>{option.label}</span>
+          <small>{option.hint}</small>
+        </button>
+      ))}
+    </div>
+  )
+}
+
+function MorphColorControl({ definition }: { definition: (typeof morphColorControls)[number] }) {
+  const value = useTuningStore((store) => store[definition.key])
+  const setTuningValue = useTuningStore((store) => store.setTuningValue)
+
+  return (
+    <label className="tuning-color-control">
+      <span>
+        <strong>{definition.label}</strong>
+        <small>{definition.hint}</small>
+      </span>
+      <input
+        type="color"
+        value={value}
+        aria-label={definition.label}
+        onChange={(event) => setTuningValue(definition.key, event.currentTarget.value)}
+      />
+      <output>{value.toUpperCase()}</output>
+    </label>
+  )
+}
+
 export function TuningPanel() {
   const panelOpen = useTuningStore((store) => store.panelOpen)
   const togglePanel = useTuningStore((store) => store.togglePanel)
   const resetTuning = useTuningStore((store) => store.resetTuning)
+  const resetMorphVisuals = useTuningStore((store) => store.resetMorphVisuals)
+  const roomVisualMode = useRoomVisualModeStore((store) => store.mode)
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
@@ -122,6 +201,11 @@ export function TuningPanel() {
           </header>
 
           <section>
+            <h3>Approach Room Mode</h3>
+            <RoomModeSelector />
+          </section>
+
+          <section>
             <h3>Hub Persistence</h3>
             <PersistenceSelector />
           </section>
@@ -135,6 +219,27 @@ export function TuningPanel() {
             <h3>2.5D Depth</h3>
             {depthControls.map((control) => <TuningControl key={control.key} definition={control} />)}
           </section>
+
+          {roomVisualMode !== 'classic' ? (
+            <>
+              <section>
+                <div className="tuning-section-heading">
+                  <h3>Morph Appearance</h3>
+                  <button type="button" onClick={resetMorphVisuals}>RESET MORPH</button>
+                </div>
+                {morphColorControls.map((control) => <MorphColorControl key={control.key} definition={control} />)}
+                {morphAppearanceControls.map((control) => <TuningControl key={control.key} definition={control} />)}
+              </section>
+              <section>
+                <h3>Morph Surface Motion</h3>
+                {morphMotionControls.map((control) => <TuningControl key={control.key} definition={control} />)}
+              </section>
+              <section>
+                <h3>Morph Film Tone</h3>
+                {morphFilmControls.map((control) => <TuningControl key={control.key} definition={control} />)}
+              </section>
+            </>
+          ) : null}
 
           <footer>
             <span>Shift + T</span>

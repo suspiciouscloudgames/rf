@@ -7,6 +7,7 @@ import { getSignalConfig } from '../signals/signalData'
 import { getHouseRoot } from '../scene/sceneRegistry'
 import { smootherStep } from '../sequence/observationTiming'
 import { useTuningStore } from '../store/tuningStore'
+import { useRoomVisualModeStore } from '../store/roomVisualModeStore'
 
 interface ActiveTransition {
   kind: 'hubToApproach' | 'approachToObservation' | 'returnToHub'
@@ -33,6 +34,8 @@ const tempNearObservationPosition = new Vector3()
 const tempFarObservationPosition = new Vector3()
 const tempObservationOffset = new Vector3()
 const tempApproachLift = new Vector3(0, 0.16, 0)
+const tempMorphApproachPosition = new Vector3(4.2, 2.75, 5.15)
+const tempMorphApproachTarget = new Vector3(0, -0.08, 0)
 
 const resolveSignalFrame = (worldDepth = useTuningStore.getState().worldDepth) => {
   const selectedSignal = getSignalConfig(useExperienceStore.getState().selectedSignalId)
@@ -200,11 +203,26 @@ export function CameraController() {
     const progress = easeInOutCubic(rawProgress)
 
     if (active.kind === 'hubToApproach') {
-      const { signal, anchor, normal } = resolveSignalFrame()
-      tempPosition.copy(anchor).addScaledVector(normal, signal.approachDistance).add(tempApproachLift)
-      camera.position.lerpVectors(active.fromPosition, tempPosition, progress)
-      target.current.lerpVectors(active.fromTarget, anchor, progress)
-      camera.fov = MathUtils.lerp(active.fromFov, 33, progress)
+      const morphRoomActive = useRoomVisualModeStore.getState().mode === 'morph'
+      if (morphRoomActive) {
+        const house = getHouseRoot()
+        tempPosition.copy(tempMorphApproachPosition)
+        tempTarget.copy(tempMorphApproachTarget)
+        if (house) {
+          house.updateWorldMatrix(true, false)
+          tempPosition.applyMatrix4(house.matrixWorld)
+          tempTarget.applyMatrix4(house.matrixWorld)
+        }
+        camera.position.lerpVectors(active.fromPosition, tempPosition, progress)
+        target.current.lerpVectors(active.fromTarget, tempTarget, progress)
+        camera.fov = MathUtils.lerp(active.fromFov, 40, progress)
+      } else {
+        const { signal, anchor, normal } = resolveSignalFrame()
+        tempPosition.copy(anchor).addScaledVector(normal, signal.approachDistance).add(tempApproachLift)
+        camera.position.lerpVectors(active.fromPosition, tempPosition, progress)
+        target.current.lerpVectors(active.fromTarget, anchor, progress)
+        camera.fov = MathUtils.lerp(active.fromFov, 33, progress)
+      }
     } else if (active.kind === 'approachToObservation' && active.curve && active.endTarget) {
       active.curve.getPoint(progress, camera.position)
       const targetDelay = active.targetRotationDelay ?? 0

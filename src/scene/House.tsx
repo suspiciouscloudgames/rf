@@ -8,6 +8,7 @@ import { ObservationLayer } from './ObservationLayer'
 import { DepthPortalBoundary, DepthPortalPreloader } from './depth-portal/DepthPortalBoundary'
 import { DepthPortalLayer } from './depth-portal/DepthPortalLayer'
 import { getSignalConfig, hasDepthPortal } from '../signals/signalData'
+import { ApproachRoomSwitcher } from './ApproachRoomSwitcher'
 
 const ObservationModelLayer = lazy(() =>
   import('./ObservationModelLayer').then((module) => ({
@@ -41,6 +42,7 @@ export function House() {
   return (
     <group ref={group} position={[0, 0, 0]}>
       <DepthPortalPreloader />
+      <ApproachRoomSwitcher />
       <ObservationLayer />
       {hasFocusedObservationModel ? (
         <Suspense fallback={null}>
