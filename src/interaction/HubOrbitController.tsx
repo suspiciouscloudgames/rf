@@ -4,9 +4,9 @@ import { MathUtils, PerspectiveCamera, Spherical, Vector3 } from 'three'
 import { useExperienceStore } from '../store/experienceStore'
 import { suppressSignalTap } from './orbitGesture'
 
-const DEFAULT_ORBIT_TARGET = new Vector3(0, -0.05, 0)
-const MIN_POLAR = MathUtils.degToRad(42)
-const MAX_POLAR = MathUtils.degToRad(72)
+const DEFAULT_ORBIT_TARGET = new Vector3(0, 0.35, 0)
+const MIN_POLAR = MathUtils.degToRad(58)
+const MAX_POLAR = MathUtils.degToRad(98)
 const APPROACH_MIN_POLAR = MathUtils.degToRad(18)
 const APPROACH_MAX_POLAR = MathUtils.degToRad(89)
 const DRAG_THRESHOLD = 8
@@ -104,13 +104,17 @@ export function HubOrbitController() {
     }
 
     if (!activeLastFrame.current) {
-      const cameraTarget = gl.domElement.dataset.cameraTarget
-        ?.split(',')
-        .map(Number)
-      if (cameraTarget?.length === 3 && cameraTarget.every(Number.isFinite)) {
-        orbitTarget.current.set(cameraTarget[0], cameraTarget[1], cameraTarget[2])
-      } else {
+      if (stage === 'hub') {
         orbitTarget.current.copy(DEFAULT_ORBIT_TARGET)
+      } else {
+        const cameraTarget = gl.domElement.dataset.cameraTarget
+          ?.split(',')
+          .map(Number)
+        if (cameraTarget?.length === 3 && cameraTarget.every(Number.isFinite)) {
+          orbitTarget.current.set(cameraTarget[0], cameraTarget[1], cameraTarget[2])
+        } else {
+          orbitTarget.current.copy(DEFAULT_ORBIT_TARGET)
+        }
       }
       spherical.current.setFromVector3(orbitOffset.current.copy(camera.position).sub(orbitTarget.current))
       if (stage === 'hub') spherical.current.phi = MathUtils.clamp(spherical.current.phi, MIN_POLAR, MAX_POLAR)
