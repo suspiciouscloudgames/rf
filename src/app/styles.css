@@ -203,6 +203,54 @@ button:focus-visible {
   font-size: 17px;
 }
 
+.hub-fullscreen-controls {
+  position: absolute;
+  top: max(22px, env(safe-area-inset-top));
+  right: max(26px, env(safe-area-inset-right));
+  z-index: 2;
+  align-items: flex-end;
+  flex-direction: column;
+}
+
+.fullscreen-control {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  gap: 9px;
+  padding: 0 14px;
+  border: 1px solid rgba(232, 230, 221, .24);
+  color: rgba(236, 232, 223, .7);
+  background: rgba(5, 7, 8, .52);
+  backdrop-filter: blur(9px);
+  cursor: pointer;
+  font-size: 9px;
+  letter-spacing: .12em;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.fullscreen-control:hover,
+.fullscreen-control:focus-visible,
+.fullscreen-control.is-active {
+  border-color: rgba(240, 162, 81, .55);
+  color: #f1aa56;
+}
+
+.fullscreen-control-icon {
+  font-size: 17px;
+  line-height: 1;
+}
+
+.fullscreen-install-hint {
+  width: min(290px, 70vw);
+  margin: 0;
+  padding: 10px 12px;
+  border: 1px solid rgba(232, 230, 221, .18);
+  color: rgba(236, 232, 223, .72);
+  background: rgba(5, 7, 8, .82);
+  font-size: 10px;
+  line-height: 1.55;
+}
+
 .telemetry {
   position: absolute;
   left: max(26px, env(safe-area-inset-left));
@@ -745,7 +793,8 @@ button:focus-visible {
 
 @media (max-width: 820px) and (orientation: landscape) {
   .interface { padding: 14px 18px; }
-  .project-title, .fullscreen-control { display: none; }
+  .project-title { display: none; }
+  .hub-fullscreen-controls { top: max(12px, env(safe-area-inset-top)); right: max(14px, env(safe-area-inset-right)); }
   .narration-panel { top: 18%; right: 3%; width: 36vw; }
   .hub-copy { bottom: 13%; }
   .home-button { left: 18px; bottom: 18px; }
