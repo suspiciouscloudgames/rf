@@ -31,6 +31,10 @@ const sdfFeaturePresets: SdfFeaturePose[][] = [
   ],
 ]
 
+// Finish the physical retraction before the Approach → Observation transition
+// ends, leaving the room surface visible briefly after its features submerge.
+const observationEntryRetractPortion = 0.72
+
 export function SdfMorphApproachRoom() {
   const stage = useExperienceStore((store) => store.stage)
   const transition = useExperienceStore((store) => store.transition)
@@ -83,7 +87,23 @@ export function SdfMorphApproachRoom() {
     const featureRotations = material.uniforms.uFeatureRotation.value as number[]
     let morphState = 'stable'
     let morphActivation = 1
-    if (animation) {
+    const observationEntryActive = transition === 'approachToObservation'
+    if (observationEntryActive) {
+      // Observation Entry always takes precedence over an in-progress touch
+      // morph so the clicked transition starts retracting on its first frame.
+      morphAnimation.current = null
+      morphActivation = 1 - MathUtils.smoothstep(
+        transitionProgress,
+        0,
+        observationEntryRetractPortion,
+      )
+      morphState = morphActivation > 0.001 ? 'observation-retracting' : 'submerged'
+      sdfFeaturePresets[currentPreset.current].forEach((pose, index) => {
+        featurePositions[index].set(...pose.position)
+        featureActivations[index] = morphActivation
+        featureRotations[index] = pose.rotationY
+      })
+    } else if (animation) {
       const elapsed = now - animation.startedAt
       const retractSeconds = 1
       const holdSeconds = 0.2
@@ -114,6 +134,14 @@ export function SdfMorphApproachRoom() {
         morphState = 'stable'
         morphActivation = 1
       }
+    } else {
+      // Restore a fully emerged stable preset when Morph Room is entered again
+      // after a completed Observation/return cycle.
+      sdfFeaturePresets[currentPreset.current].forEach((pose, index) => {
+        featurePositions[index].set(...pose.position)
+        featureActivations[index] = 1
+        featureRotations[index] = pose.rotationY
+      })
     }
     material.uniforms.uCameraLocal.value.copy(cameraLocal.current)
     material.uniforms.uBaseColor.value.set(tuning.morphBaseColor)
