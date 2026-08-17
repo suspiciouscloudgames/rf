@@ -31,6 +31,7 @@ const tempNearObservationPosition = new Vector3()
 const tempFarObservationPosition = new Vector3()
 const tempObservationOffset = new Vector3()
 const tempApproachLift = new Vector3(0, 0.16, 0)
+const MODEL_SCALE = 0.48
 
 const resolveSignalFrame = () => {
   const selectedSignal = getSignalConfig(useExperienceStore.getState().selectedSignalId)
@@ -44,6 +45,10 @@ const resolveSignalFrame = () => {
   tempFarObservationPosition
     .set(...selectedSignal.focusPosition)
     .add(tempObservationOffset.set(...(selectedSignal.depthPortal?.farObservationOffset ?? selectedSignal.observationOffset)))
+  tempAnchor.multiplyScalar(MODEL_SCALE)
+  tempFocus.multiplyScalar(MODEL_SCALE)
+  tempNearObservationPosition.multiplyScalar(MODEL_SCALE)
+  tempFarObservationPosition.multiplyScalar(MODEL_SCALE)
   if (house) {
     house.updateWorldMatrix(true, false)
     tempAnchor.applyMatrix4(house.matrixWorld)
@@ -106,7 +111,7 @@ export function CameraController() {
     }
     window.addEventListener('experience-transition', onTransition)
     return () => window.removeEventListener('experience-transition', onTransition)
-  }, [camera, hubPosition])
+  }, [camera, hubPosition, hubTarget])
 
   useEffect(() => {
     if (transitionKind === 'none') return
@@ -134,7 +139,7 @@ export function CameraController() {
       base.endFov = signal.depthPortal?.farFov ?? 25.5
     }
     transition.current = base
-  }, [camera, hubPosition, transitionKind])
+  }, [camera, hubPosition, hubTarget, transitionKind])
 
   useFrame(({ gl }, delta) => {
     const active = transition.current

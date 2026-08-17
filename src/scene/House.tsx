@@ -1,42 +1,61 @@
 import { useEffect, useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
-import { type Group } from 'three'
+import { MathUtils, type Group } from 'three'
 import { useExperienceStore } from '../store/experienceStore'
 import { ObservationSignals } from '../signals/ObservationSignals'
 import { setHouseRoot } from './sceneRegistry'
-import { ObservationLayer } from './ObservationLayer'
+import { FloorplanHouse } from './FloorplanHouse'
 import { DepthPortalBoundary, DepthPortalPreloader } from './depth-portal/DepthPortalBoundary'
 import { DepthPortalLayer } from './depth-portal/DepthPortalLayer'
 import { hasDepthPortal } from '../signals/signalData'
 
 export function House() {
   const group = useRef<Group>(null)
+  const signalGroup = useRef<Group>(null)
   const stage = useExperienceStore((store) => store.stage)
   const transition = useExperienceStore((store) => store.transition)
   const selectedSignalId = useExperienceStore((store) => store.selectedSignalId)
+  const showFloorplan = stage === 'approach'
+    || stage === 'observation'
+    || transition === 'hubToApproach'
+    || transition === 'approachToObservation'
+    || transition === 'returnToHub'
 
   useEffect(() => {
     setHouseRoot(group.current)
     return () => setHouseRoot(null)
   }, [])
 
-  useFrame((_, delta) => {
+  useFrame(({ camera }, delta) => {
     if (!group.current) return
     const portalFocused = hasDepthPortal(selectedSignalId)
       && (stage === 'observation' || transition === 'approachToObservation' || transition === 'returnToHub')
-    const speed = portalFocused ? 0 : stage === 'hub' ? 0.012 : stage === 'approach' ? 0.005 : 0.003
+    const speed = portalFocused ? 0 : 0
     group.current.rotation.y += delta * speed
-    group.current.position.y = Math.sin(performance.now() * 0.00015) * 0.018
+    group.current.position.y = 0
+
+    group.current.scale.setScalar(1)
+
+    if (signalGroup.current) {
+      const progress = Number(camera.userData.transitionProgress ?? 0)
+      let signalScale = 0.48
+      if (stage === 'loading' || (stage === 'hub' && transition === 'none')) signalScale = 1
+      else if (transition === 'hubToApproach') signalScale = MathUtils.lerp(1, 0.48, progress)
+      else if (transition === 'returnToHub') signalScale = MathUtils.lerp(0.48, 1, progress)
+      signalGroup.current.scale.setScalar(signalScale)
+    }
   })
 
   return (
     <group ref={group} position={[0, 0, 0]}>
       <DepthPortalPreloader />
-      <ObservationLayer />
+      {showFloorplan ? <FloorplanHouse /> : null}
       <DepthPortalBoundary>
         <DepthPortalLayer />
       </DepthPortalBoundary>
-      <ObservationSignals />
+      <group ref={signalGroup}>
+        <ObservationSignals />
+      </group>
     </group>
   )
 }

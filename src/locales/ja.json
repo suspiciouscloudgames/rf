@@ -1,5 +1,5 @@
 {
-  "title": "観測の層",
+  "title": "ENTRIES FROM HERE",
   "archive": "アーカイブ / 01",
   "loading": "観測領域を調整しています",
   "hubLabel": "外部領域",
@@ -27,5 +27,19 @@
   "traceVideoTitle": "残留する通信",
   "traceVideoBody": "元の信号が途切れた場所で、動く記録が繰り返されている。",
   "closeTrace": "痕跡を閉じる",
-  "rotateDevice": "端末を横向きにしてください。"
+  "rotateDevice": "端末を横向きにしてください。",
+  "location": "位置 35.6812° N / 139.7671° E",
+  "transmission": "送信",
+  "trace": "痕跡",
+  "sequenceProgress": "シーケンス進行状況",
+  "researchArchive": "感応場研究記録",
+  "openResearchArchive": "研究映像を開く",
+  "closeResearchArchive": "研究映像を閉じる",
+  "referenceText": "関連資料",
+  "welcomeMessageButton": "ここを訪れた方へのメッセージ",
+  "welcomeMessageTitle": "ここを訪れた方へ",
+  "welcomeMessageParagraphs": [
+    "こんにちは。私は少し前までここに住んでいました。以前の住人たちが残した記録と、私がここで観察したことをまとめて、このページをつくりました。まだ気づかれていないもののための、小さな案内書とも言えるかもしれません。",
+    "私はもう、ここへ戻ってくることはできないと思います。検出器をお持ちでしたら、窓辺にいる伴侶体を探してみてください。見つけたら、どのように過ごしているのか、ここに残していただけるとうれしいです。検出器をお持ちでなければ、ただ、そこでよい感情を感じられますように。"
+  ]
 }

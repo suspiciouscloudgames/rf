@@ -1,5 +1,6 @@
-import en from '../locales/en.json'
-import ja from '../locales/ja.json'
+import { useEffect, useState } from 'react'
+import { localeCopy } from '../locales'
+import type { Language } from '../store/experienceStore'
 import { useExperienceStore } from '../store/experienceStore'
 import { TypewriterText } from './TypewriterText'
 import { ExploreInterface } from './ExploreInterface'
@@ -7,10 +8,12 @@ import { getFocusContent } from '../content/focusContent'
 import observations from '../content/observations.json'
 import { hasDepthPortal } from '../signals/signalData'
 import { ObservationSubtitles } from './ObservationSubtitles'
+import { ResearchDrawer } from './ResearchDrawer'
 
 const sequenceDuration = observations.observations[0].duration
 
 export function Interface() {
+  const [isWelcomeOpen, setIsWelcomeOpen] = useState(false)
   const stage = useExperienceStore((store) => store.stage)
   const transition = useExperienceStore((store) => store.transition)
   const language = useExperienceStore((store) => store.language)
@@ -19,34 +22,67 @@ export function Interface() {
   const observationMode = useExperienceStore((store) => store.observationMode)
   const selectedSignalId = useExperienceStore((store) => store.selectedSignalId)
   const beginReturn = useExperienceStore((store) => store.beginReturn)
-  const copy = language === 'en' ? en : ja
+  const setLanguage = useExperienceStore((store) => store.setLanguage)
+  const copy = localeCopy[language]
   const focusCopy = getFocusContent(language, selectedSignalId)
   const portalObservation = hasDepthPortal(selectedSignalId)
 
-  const stateLabel = stage === 'hub'
-    ? copy.hubLabel
-    : stage === 'approach'
-      ? copy.approachLabel
-      : stage === 'observation'
-        ? copy.observationLabel
-        : copy.returningLabel
+  useEffect(() => {
+    document.documentElement.lang = language
+  }, [language])
+
+  useEffect(() => {
+    if (!isWelcomeOpen) return
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setIsWelcomeOpen(false)
+    }
+    window.addEventListener('keydown', closeOnEscape)
+    return () => window.removeEventListener('keydown', closeOnEscape)
+  }, [isWelcomeOpen])
 
   return (
     <div className={`interface state-${stage} transition-${transition} ${effectActive ? 'effect-active' : ''}`}>
-      {stage !== 'loading' ? (
-        <div className="telemetry" aria-live="polite">
-          <span>{stateLabel}</span>
-          <span className="telemetry-line" />
-          <span>{String(Math.round(progress * 100)).padStart(3, '0')} / 100</span>
-        </div>
-      ) : null}
-
       {stage === 'hub' && transition === 'none' ? (
         <>
+          <ResearchDrawer />
+          <div className="hub-controls">
+            <div className="language-switch" role="group" aria-label="Language">
+              {(['ja', 'ko', 'en'] as Language[]).map((option) => (
+                <button
+                  key={option}
+                  type="button"
+                  className={language === option ? 'active' : ''}
+                  aria-pressed={language === option}
+                  onClick={() => setLanguage(option)}
+                >
+                  {option.toUpperCase()}
+                </button>
+              ))}
+            </div>
+            <button className="welcome-message-button" type="button" onClick={() => setIsWelcomeOpen(true)}>
+              <span aria-hidden="true">＋</span>{copy.welcomeMessageButton}
+            </button>
+          </div>
           <div className="stage-copy hub-copy">
             <p>{copy.hubHint}</p>
-            <span>FIELD 35.6812° N / 139.7671° E</span>
+            <span>{copy.location}</span>
           </div>
+          {isWelcomeOpen ? (
+            <div
+              className="welcome-modal-backdrop"
+              onPointerDown={(event) => {
+                if (event.target === event.currentTarget) setIsWelcomeOpen(false)
+              }}
+            >
+              <section className="welcome-modal" role="dialog" aria-modal="true" aria-labelledby="welcome-message-title" lang={language}>
+                <button className="welcome-modal-close" type="button" aria-label={copy.closeTrace} onClick={() => setIsWelcomeOpen(false)}>×</button>
+                <h1 id="welcome-message-title">{copy.welcomeMessageTitle}</h1>
+                <div className="welcome-modal-copy">
+                  {copy.welcomeMessageParagraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
+                </div>
+              </section>
+            </div>
+          ) : null}
         </>
       ) : null}
 
@@ -66,7 +102,7 @@ export function Interface() {
         <>
           {transition === 'none' && observationMode === 'guided' && !portalObservation ? (
             <aside className="narration-panel" lang={language}>
-              <span className="narration-index">TRANSMISSION / {String(Math.round(progress * sequenceDuration)).padStart(2, '0')}:{sequenceDuration}</span>
+              <span className="narration-index">{copy.transmission} / {String(Math.round(progress * sequenceDuration)).padStart(2, '0')}:{sequenceDuration}</span>
               <h1>{focusCopy.title}</h1>
               <TypewriterText text={focusCopy.narration} />
             </aside>
@@ -79,7 +115,7 @@ export function Interface() {
       {transition === 'returnToHub' ? <div className="return-message">{copy.returningLabel}<span>•••</span></div> : null}
 
       {stage === 'observation' && observationMode === 'guided' ? (
-        <div className="progress-track" aria-label="Sequence progress" aria-valuenow={Math.round(progress * 100)} role="progressbar">
+        <div className="progress-track" aria-label={copy.sequenceProgress} aria-valuenow={Math.round(progress * 100)} role="progressbar">
           <span style={{ transform: `scaleX(${progress})` }} />
         </div>
       ) : null}

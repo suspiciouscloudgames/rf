@@ -9,9 +9,9 @@ export interface CameraPreset {
 
 export const cameraPresets: Record<Exclude<ExperienceStage, 'loading'>, CameraPreset> = {
   hub: {
-    position: [4.8, 2.45, 6.4],
-    target: [0, 0.35, 0],
-    fov: 38,
+    position: [5.6, 5.1, 6.7],
+    target: [0, -0.05, 0],
+    fov: 36,
     duration: 0,
   },
   approach: {

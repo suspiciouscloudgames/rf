@@ -3,6 +3,7 @@ import { SequenceController } from '../sequence/SequenceController'
 import { Interface } from '../ui/Interface'
 import { HubVideoBackground } from '../ui/HubVideoBackground'
 import { useExperienceStore } from '../store/experienceStore'
+import { localeCopy } from '../locales'
 
 const IDLE_TIMEOUT_MS = 90_000
 const ExperienceCanvas = lazy(() =>
@@ -11,6 +12,7 @@ const ExperienceCanvas = lazy(() =>
 
 export function App() {
   const stage = useExperienceStore((store) => store.stage)
+  const language = useExperienceStore((store) => store.language)
   const transition = useExperienceStore((store) => store.transition)
   const enterHub = useExperienceStore((store) => store.enterHub)
   const beginReturn = useExperienceStore((store) => store.beginReturn)
@@ -60,6 +62,7 @@ export function App() {
   return (
     <main className={`experience-shell state-${stage} transition-${transition}`}>
       <HubVideoBackground />
+      <div className="model-haze" aria-hidden="true" />
       <Suspense fallback={null}>
         <ExperienceCanvas />
       </Suspense>
@@ -70,7 +73,7 @@ export function App() {
       {stage === 'loading' ? (
         <div className="loader" role="status">
           <span className="loader-mark" />
-          <span>観測領域を調整しています</span>
+          <span>{localeCopy[language].loading}</span>
         </div>
       ) : null}
     </main>
