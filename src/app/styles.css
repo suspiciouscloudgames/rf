@@ -49,8 +49,6 @@ button:focus-visible {
   position: relative;
   z-index: 1;
   display: block;
-  opacity: .9;
-  filter: blur(1.55px) grayscale(1) saturate(0) contrast(.62) brightness(1.08);
 }
 
 .model-haze {
