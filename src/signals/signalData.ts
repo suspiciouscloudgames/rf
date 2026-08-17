@@ -13,6 +13,14 @@ export interface ObservationSignalConfig {
   accent: string
   phase: number
   depthPortal?: DepthPortalConfig
+  observationModel?: ObservationModelConfig
+}
+
+export interface ObservationModelConfig {
+  assetUrl: string
+  position: [number, number, number]
+  rotation: [number, number, number]
+  maxSize: number
 }
 
 export const observationSignals: ObservationSignalConfig[] = [
@@ -63,6 +71,12 @@ export const observationSignals: ObservationSignalConfig[] = [
     observationOffset: [0.15, 0.16, 1.42],
     accent: '#d4b76d',
     phase: 3.45,
+    observationModel: {
+      assetUrl: '/assets/models/observations/observation-04/feed-projection-01.glb',
+      position: [-0.78, 0.38, -0.92],
+      rotation: [0, 0, 0],
+      maxSize: 0.26,
+    },
   },
   {
     id: 'signal-05',

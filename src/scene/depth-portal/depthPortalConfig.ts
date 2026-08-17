@@ -24,8 +24,8 @@ export const constructionSpacePortal: DepthPortalConfig = {
   depthGamma: 1.05,
   maxParallax: 0.032,
   edgeFade: 0.018,
-  farObservationOffset: [-0.06, 0.3, 3.25],
-  farFov: 35,
+  farObservationOffset: [-0.35, 0.7, 6.2],
+  farFov: 44,
   nearFov: 25.5,
   dollyDuration: DEPTH_PORTAL_DOLLY_SECONDS,
 }

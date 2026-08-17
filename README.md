@@ -35,3 +35,8 @@ npm run preview
 
 Runtime media is stored in `public/assets/`; the interior itself uses no
 reference-image planes.
+
+## Project guides
+
+- Current implementation and shared vocabulary: `docs/current_implementation_structure_and_vocabulary.md`
+- Content asset hierarchy and replacement workflow: `docs/content_asset_hierarchy_and_workflow.md`

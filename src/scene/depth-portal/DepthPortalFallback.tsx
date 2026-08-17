@@ -61,7 +61,16 @@ export function DepthPortalFallback({ config }: DepthPortalFallbackProps) {
     >
       <mesh position={[0, 0, -0.025]} renderOrder={5}>
         <planeGeometry args={[14, 8]} />
-        <meshBasicMaterial ref={matte} color="#000000" transparent opacity={0} depthWrite={false} toneMapped={false} />
+        <meshBasicMaterial
+          ref={matte}
+          color="#000000"
+          transparent
+          opacity={0}
+          depthTest={false}
+          depthWrite={false}
+          fog={false}
+          toneMapped={false}
+        />
       </mesh>
       <mesh renderOrder={10}>
         <planeGeometry args={config.size} />

@@ -2,6 +2,7 @@ import { MathUtils } from 'three'
 import type { ExperienceStage, TransitionKind } from '../../store/experienceStore'
 import {
   DEPTH_PORTAL_DARKEN_SECONDS,
+  DEPTH_PORTAL_ENTRY_TRANSITION_SECONDS,
   DEPTH_PORTAL_PARALLAX_START_SECONDS,
 } from '../../sequence/observationTiming'
 
@@ -51,7 +52,15 @@ export const resolvePortalDarkness = (
   progress: number,
   observationElapsed = 0,
 ) => {
+  if (transition === 'approachToObservation') {
+    const entryElapsed = progress * DEPTH_PORTAL_ENTRY_TRANSITION_SECONDS
+    return MathUtils.smoothstep(entryElapsed, 0, DEPTH_PORTAL_DARKEN_SECONDS)
+  }
   if (stage !== 'observation') return 0
-  const darkness = MathUtils.smoothstep(observationElapsed, 0, DEPTH_PORTAL_DARKEN_SECONDS)
+  const darkness = MathUtils.smoothstep(
+    observationElapsed + DEPTH_PORTAL_ENTRY_TRANSITION_SECONDS,
+    0,
+    DEPTH_PORTAL_DARKEN_SECONDS,
+  )
   return transition === 'returnToHub' ? darkness * (1 - progress) : darkness
 }

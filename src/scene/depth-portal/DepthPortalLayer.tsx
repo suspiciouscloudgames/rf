@@ -114,7 +114,16 @@ function ActiveDepthPortal({ config, reducedMotion }: ActiveDepthPortalProps) {
     >
       <mesh name="depth-portal-matte" position={[0, 0, -0.025]} renderOrder={5}>
         <planeGeometry args={[14, 8]} />
-        <meshBasicMaterial ref={matte} color="#000000" transparent opacity={0} depthWrite={false} toneMapped={false} />
+        <meshBasicMaterial
+          ref={matte}
+          color="#000000"
+          transparent
+          opacity={0}
+          depthTest={false}
+          depthWrite={false}
+          fog={false}
+          toneMapped={false}
+        />
       </mesh>
       <DepthPortalMesh config={config} material={material} />
       <DepthPortalCards ref={cards} config={config} textures={textures} />
