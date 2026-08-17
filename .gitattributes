@@ -14,3 +14,4 @@ artwork/depth-portal/**/source/*.png filter=lfs diff=lfs merge=lfs -text
 artwork/depth-portal/**/working/*.png filter=lfs diff=lfs merge=lfs -text
 artwork/depth-portal/**/working/*.psd filter=lfs diff=lfs merge=lfs -text
 artwork/depth-portal/**/working/*.exr filter=lfs diff=lfs merge=lfs -text
+references/*.png filter=lfs diff=lfs merge=lfs -text

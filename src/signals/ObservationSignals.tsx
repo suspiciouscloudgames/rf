@@ -7,6 +7,7 @@ import ja from '../locales/ja.json'
 import { useExperienceStore } from '../store/experienceStore'
 import { observationSignals, type ObservationSignalConfig } from './signalData'
 import { consumeSignalTapSuppression } from '../interaction/orbitGesture'
+import { useTuningStore } from '../store/tuningStore'
 
 const forward = new Vector3(0, 0, 1)
 
@@ -17,6 +18,7 @@ function ObservationSignal({ signal }: { signal: ObservationSignalConfig }) {
   const language = useExperienceStore((store) => store.language)
   const enterApproach = useExperienceStore((store) => store.enterApproach)
   const enterObservation = useExperienceStore((store) => store.enterObservation)
+  const preserveFullHub = useTuningStore((store) => store.hubPersistenceMode === 'fullHub')
   const group = useRef<Group>(null)
   const ring = useRef<Mesh>(null)
   const core = useRef<Mesh>(null)
@@ -30,7 +32,7 @@ function ObservationSignal({ signal }: { signal: ObservationSignalConfig }) {
   const inHub = stage === 'hub'
   const inApproach = stage === 'approach'
   const isActionable = transition === 'none' && (inHub || (inApproach && isSelected))
-  const visuallyActive = inHub || isSelected
+  const visuallyActive = inHub || preserveFullHub || isSelected
   const copy = language === 'en' ? en : ja
   const actionLabel = inApproach ? copy.approachAction : copy.hubAction
 

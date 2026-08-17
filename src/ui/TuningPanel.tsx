@@ -1,9 +1,13 @@
 import { useEffect } from 'react'
-import type { ExperienceTuning } from '../store/tuningStore'
+import type { ExperienceTuning, HubPersistenceMode } from '../store/tuningStore'
 import { useTuningStore } from '../store/tuningStore'
 
+type NumericTuningKey = {
+  [Key in keyof ExperienceTuning]: ExperienceTuning[Key] extends number ? Key : never
+}[keyof ExperienceTuning]
+
 interface ControlDefinition {
-  key: keyof ExperienceTuning
+  key: NumericTuningKey
   label: string
   hint: string
   min: number
@@ -12,6 +16,11 @@ interface ControlDefinition {
   unit: string
   digits: number
 }
+
+const persistenceOptions: Array<{ value: HubPersistenceMode; label: string; hint: string }> = [
+  { value: 'particles', label: 'Particles Only', hint: '모든 단계와 암전 위에 파티클만 유지' },
+  { value: 'fullHub', label: 'Full Hub', hint: '허브 배경·환경·비선택 신호까지 유지' },
+]
 
 const timingControls: ControlDefinition[] = [
   { key: 'hubToApproachSeconds', label: 'Hub → Approach', hint: '다음 전환부터 적용', min: 0.5, max: 15, step: 0.1, unit: 's', digits: 1 },
@@ -55,6 +64,29 @@ function TuningControl({ definition }: { definition: ControlDefinition }) {
   )
 }
 
+function PersistenceSelector() {
+  const mode = useTuningStore((store) => store.hubPersistenceMode)
+  const setTuningValue = useTuningStore((store) => store.setTuningValue)
+
+  return (
+    <div className="persistence-selector" role="radiogroup" aria-label="Hub persistence mode">
+      {persistenceOptions.map((option) => (
+        <button
+          key={option.value}
+          type="button"
+          role="radio"
+          aria-checked={mode === option.value}
+          className={mode === option.value ? 'is-active' : ''}
+          onClick={() => setTuningValue('hubPersistenceMode', option.value)}
+        >
+          <span>{option.label}</span>
+          <small>{option.hint}</small>
+        </button>
+      ))}
+    </div>
+  )
+}
+
 export function TuningPanel() {
   const panelOpen = useTuningStore((store) => store.panelOpen)
   const togglePanel = useTuningStore((store) => store.togglePanel)
@@ -88,6 +120,11 @@ export function TuningPanel() {
             </div>
             <button type="button" onClick={resetTuning}>RESET</button>
           </header>
+
+          <section>
+            <h3>Hub Persistence</h3>
+            <PersistenceSelector />
+          </section>
 
           <section>
             <h3>Timeline</h3>

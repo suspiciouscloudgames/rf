@@ -2,6 +2,8 @@ node_modules/
 dist/
 output/
 .playwright-cli/
+.cache/
+.venv-depth/
 .DS_Store
 *.local
 *.log

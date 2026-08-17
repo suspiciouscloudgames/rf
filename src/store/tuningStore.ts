@@ -1,6 +1,9 @@
 import { create } from 'zustand'
 
+export type HubPersistenceMode = 'particles' | 'fullHub'
+
 export interface ExperienceTuning {
+  hubPersistenceMode: HubPersistenceMode
   hubToApproachSeconds: number
   approachToObservationSeconds: number
   observationEntrySeconds: number
@@ -25,6 +28,7 @@ interface TuningStore extends ExperienceTuning {
 }
 
 export const DEFAULT_EXPERIENCE_TUNING: ExperienceTuning = {
+  hubPersistenceMode: 'particles',
   hubToApproachSeconds: 3.2,
   approachToObservationSeconds: 3.5,
   observationEntrySeconds: 3.5,
@@ -61,6 +65,7 @@ const saveTuning = (tuning: ExperienceTuning) => {
 }
 
 const selectTuning = (store: TuningStore): ExperienceTuning => ({
+  hubPersistenceMode: store.hubPersistenceMode,
   hubToApproachSeconds: store.hubToApproachSeconds,
   approachToObservationSeconds: store.approachToObservationSeconds,
   observationEntrySeconds: store.observationEntrySeconds,

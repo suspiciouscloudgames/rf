@@ -145,13 +145,24 @@ World
    │  ├─ Square column
    │  └─ Six wall frames
    ├─ Depth Portal
-   │  ├─ Black Matte
+   │  ├─ Screen-space Blackout
    │  ├─ Base Depth Mesh
    │  ├─ Midground Card
    │  ├─ Foreground Card
    │  └─ Interaction Plane
    └─ Five Signal Markers
 ```
+
+### 5.1 Hub Persistence 모드
+
+튜닝 패널의 `Hub Persistence`에서 두 렌더 유지 범위를 선택한다.
+
+| 모드 | 유지 범위 |
+|---|---|
+| `Particles Only` | 모든 단계와 완전 암전 위에 Hub Particle Points만 유지 |
+| `Full Hub` | 파티클에 더해 Hub Video, Hub 환경 Fog 상태, 비선택 Signal visuals를 계속 유지 |
+
+`Particles Only`가 기본값이다. 파티클은 Screen-space Blackout보다 높은 렌더 순서를 사용하고 Portal visuals보다 낮게 합성된다.
 
 ## 6. 집 내부와 신호 연결
 
@@ -325,6 +336,7 @@ fallback.webp
 - 허브 복귀 및 상태 초기화
 - WebGL 폴백
 - PWA 빌드와 로컬 에셋 프리캐시
+- Hub Particle 전 단계 지속 및 `Particles Only` / `Full Hub` 튜닝 선택
 
 ### 11.2 부분 구현 또는 기술 부채
 

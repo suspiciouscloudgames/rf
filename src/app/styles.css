@@ -89,6 +89,15 @@ button:focus-visible {
   opacity: .82;
   transition-duration: 4s;
 }
+
+.hub-video-background.is-persistent {
+  opacity: .82;
+  transition-duration: 900ms;
+}
+
+.experience-shell.state-hub.transition-hubToApproach .hub-video-background.is-persistent {
+  opacity: .82;
+}
 .state-hub.transition-none { cursor: grab; }
 .state-hub.transition-none:active { cursor: grabbing; }
 .media-source { display: none; }
@@ -563,6 +572,43 @@ button:focus-visible {
 .tuning-panel section { padding: 13px 17px 2px; }
 .tuning-panel section + section { border-top: 1px solid rgba(234, 229, 218, .1); }
 .tuning-panel h3 { margin: 0 0 14px; }
+
+.persistence-selector {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 13px;
+}
+
+.persistence-selector button {
+  min-height: 72px;
+  padding: 11px;
+  border: 1px solid rgba(236, 232, 223, .16);
+  color: rgba(236, 232, 223, .56);
+  background: rgba(255, 255, 255, .015);
+  cursor: pointer;
+  text-align: left;
+}
+
+.persistence-selector button.is-active {
+  border-color: rgba(225, 153, 72, .62);
+  color: #efaa5b;
+  background: rgba(216, 145, 63, .08);
+}
+
+.persistence-selector span {
+  display: block;
+  font-size: 9px;
+  letter-spacing: .06em;
+}
+
+.persistence-selector small {
+  display: block;
+  margin-top: 7px;
+  color: rgba(236, 232, 223, .34);
+  font-size: 8px;
+  line-height: 1.45;
+}
 
 .tuning-control {
   display: block;
