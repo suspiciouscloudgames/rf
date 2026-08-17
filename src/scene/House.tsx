@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
-import { MathUtils, type Group } from 'three'
+import { type Group } from 'three'
 import { useExperienceStore } from '../store/experienceStore'
 import { ObservationSignals } from '../signals/ObservationSignals'
 import { setHouseRoot } from './sceneRegistry'
@@ -11,7 +11,6 @@ import { hasDepthPortal } from '../signals/signalData'
 
 export function House() {
   const group = useRef<Group>(null)
-  const signalGroup = useRef<Group>(null)
   const stage = useExperienceStore((store) => store.stage)
   const transition = useExperienceStore((store) => store.transition)
   const selectedSignalId = useExperienceStore((store) => store.selectedSignalId)
@@ -26,7 +25,7 @@ export function House() {
     return () => setHouseRoot(null)
   }, [])
 
-  useFrame(({ camera }, delta) => {
+  useFrame((_, delta) => {
     if (!group.current) return
     const portalFocused = hasDepthPortal(selectedSignalId)
       && (stage === 'observation' || transition === 'approachToObservation' || transition === 'returnToHub')
@@ -35,15 +34,6 @@ export function House() {
     group.current.position.y = 0
 
     group.current.scale.setScalar(1)
-
-    if (signalGroup.current) {
-      const progress = Number(camera.userData.transitionProgress ?? 0)
-      let signalScale = 0.48
-      if (stage === 'loading' || (stage === 'hub' && transition === 'none')) signalScale = 1
-      else if (transition === 'hubToApproach') signalScale = MathUtils.lerp(1, 0.48, progress)
-      else if (transition === 'returnToHub') signalScale = MathUtils.lerp(0.48, 1, progress)
-      signalGroup.current.scale.setScalar(signalScale)
-    }
   })
 
   return (
@@ -53,9 +43,7 @@ export function House() {
       <DepthPortalBoundary>
         <DepthPortalLayer />
       </DepthPortalBoundary>
-      <group ref={signalGroup}>
-        <ObservationSignals />
-      </group>
+      <ObservationSignals />
     </group>
   )
 }
