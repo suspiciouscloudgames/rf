@@ -51,6 +51,16 @@ button:focus-visible {
   display: block;
 }
 
+/* Keep Hoyoun's hub signals crisp, then restore Youngju's spectral treatment
+   only while the floorplan house is being revealed or observed. */
+.experience-shell.transition-hubToApproach canvas,
+.experience-shell.state-approach canvas,
+.experience-shell.state-observation canvas,
+.experience-shell.transition-returnToHub canvas {
+  opacity: .9;
+  filter: blur(1.55px) grayscale(1) saturate(0) contrast(.62) brightness(1.08);
+}
+
 .model-haze {
   position: absolute;
   inset: 7% 10% 5%;
