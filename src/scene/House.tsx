@@ -9,6 +9,7 @@ import { DepthPortalBoundary, DepthPortalPreloader } from './depth-portal/DepthP
 import { DepthPortalLayer } from './depth-portal/DepthPortalLayer'
 import { getSignalConfig, hasDepthPortal } from '../signals/signalData'
 import { ApproachRoomSwitcher } from './ApproachRoomSwitcher'
+import { useRoomVisualModeStore } from '../store/roomVisualModeStore'
 
 const ObservationModelLayer = lazy(() =>
   import('./ObservationModelLayer').then((module) => ({
@@ -21,6 +22,7 @@ export function House() {
   const stage = useExperienceStore((store) => store.stage)
   const transition = useExperienceStore((store) => store.transition)
   const selectedSignalId = useExperienceStore((store) => store.selectedSignalId)
+  const roomVisualMode = useRoomVisualModeStore((store) => store.mode)
   const hasFocusedObservationModel = Boolean(
     getSignalConfig(selectedSignalId).observationModel,
   )
@@ -34,7 +36,11 @@ export function House() {
     if (!group.current) return
     const portalFocused = hasDepthPortal(selectedSignalId)
       && (stage === 'observation' || transition === 'approachToObservation' || transition === 'returnToHub')
-    const speed = portalFocused ? 0 : stage === 'hub' ? 0.012 : stage === 'approach' ? 0.005 : 0.003
+    const planRoomOwnsRotation = roomVisualMode === 'morph-plan'
+      && (stage === 'approach' || transition === 'hubToApproach')
+    const speed = portalFocused || planRoomOwnsRotation
+      ? 0
+      : stage === 'hub' ? 0.012 : stage === 'approach' ? 0.005 : 0.003
     group.current.rotation.y += delta * speed
     group.current.position.y = Math.sin(performance.now() * 0.00015) * 0.018
   })

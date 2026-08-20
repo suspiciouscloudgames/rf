@@ -41,6 +41,7 @@ const fragmentShader = /* glsl */ `
   uniform float uReveal;
   uniform float uFilmFlicker;
   uniform float uFilmGrain;
+  uniform float uFilmTemporalEnabled;
   uniform float uTime;
 
   varying vec3 vWorldNormal;
@@ -60,7 +61,7 @@ const fragmentShader = /* glsl */ `
     float luminance = dot(color, vec3(0.299, 0.587, 0.114));
     color = mix(color, vec3(luminance), uMonochromeMix);
 
-    float frameTime = floor(uTime * 12.0) / 12.0;
+    float frameTime = floor(uTime * 12.0) / 12.0 * uFilmTemporalEnabled;
     float grain = random(gl_FragCoord.xy + frameTime * 173.0) - 0.5;
     float flicker = (random(vec2(frameTime, 4.17)) - 0.5) * uFilmFlicker;
     color += grain * uFilmGrain + flicker;
@@ -90,6 +91,7 @@ export class MorphRoomMaterial extends ShaderMaterial {
         uRippleOrigin: { value: new Vector2() },
         uFilmFlicker: { value: 0 },
         uFilmGrain: { value: 0 },
+        uFilmTemporalEnabled: { value: 1 },
       },
       vertexShader,
       fragmentShader,

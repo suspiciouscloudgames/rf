@@ -23,6 +23,7 @@ const fragmentShader = /* glsl */ `
   uniform float uTime;
   uniform float uFilmGrain;
   uniform float uFilmFlicker;
+  uniform float uFilmTemporalEnabled;
   uniform vec3 uFeaturePositions[4];
   uniform float uFeatureActivation[4];
   uniform float uFeatureRotation[4];
@@ -215,7 +216,7 @@ const fragmentShader = /* glsl */ `
     float luminance = dot(color, vec3(0.299, 0.587, 0.114));
     color = mix(color, vec3(luminance), uMonochromeMix);
 
-    float frameTime = floor(uTime * 12.0) / 12.0;
+    float frameTime = floor(uTime * 12.0) / 12.0 * uFilmTemporalEnabled;
     float grain = random(gl_FragCoord.xy + frameTime * 149.0) - 0.5;
     float flicker = (random(vec2(frameTime, 7.31)) - 0.5) * uFilmFlicker;
     color += grain * uFilmGrain + flicker;
@@ -246,6 +247,7 @@ export class SdfMorphMaterial extends ShaderMaterial {
         uTime: { value: 0 },
         uFilmGrain: { value: 0.04 },
         uFilmFlicker: { value: 0 },
+        uFilmTemporalEnabled: { value: 1 },
         uFeaturePositions: {
           value: [
             new Vector3(-0.58, -1.04, 0.06),

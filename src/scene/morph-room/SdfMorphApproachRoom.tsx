@@ -153,7 +153,9 @@ export function SdfMorphApproachRoom() {
     material.uniforms.uReveal.value = reveal
     material.uniforms.uTime.value = clock.elapsedTime
     material.uniforms.uFilmGrain.value = tuning.morphFilmGrain * 0.35
-    material.uniforms.uFilmFlicker.value = reducedMotion.current ? 0 : tuning.morphFilmFlicker
+    const temporalFilmEnabled = tuning.morphTemporalFlickerEnabled && !reducedMotion.current
+    material.uniforms.uFilmFlicker.value = temporalFilmEnabled ? tuning.morphFilmFlicker : 0
+    material.uniforms.uFilmTemporalEnabled.value = temporalFilmEnabled ? 1 : 0
     material.uniforms.uWaverAmount.value = reducedMotion.current ? 0 : tuning.morphWaverAmount
     material.uniforms.uWaverScale.value = tuning.morphWaverScale
     material.uniforms.uWaverSpeed.value = reducedMotion.current ? 0 : tuning.morphWaverSpeed

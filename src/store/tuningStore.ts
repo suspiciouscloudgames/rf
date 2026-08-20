@@ -4,6 +4,10 @@ export type HubPersistenceMode = 'particles' | 'fullHub'
 
 export interface ExperienceTuning {
   hubPersistenceMode: HubPersistenceMode
+  hubVideoBrightness: number
+  hubVideoScrimOpacity: number
+  hubVideoOpacity: number
+  hubVideoFadeOutSeconds: number
   hubToApproachSeconds: number
   approachToObservationSeconds: number
   observationEntrySeconds: number
@@ -23,11 +27,15 @@ export interface ExperienceTuning {
   morphMonochromeMix: number
   morphRoomOpacity: number
   morphPropOpacity: number
+  morphRotationPeriod: number
+  morphFrontWallOpacity: number
+  morphFrontWallFadeAngle: number
   morphWaverAmount: number
   morphWaverScale: number
   morphWaverSpeed: number
   morphRippleAmount: number
   morphRippleRadius: number
+  morphTemporalFlickerEnabled: boolean
   morphFilmFlicker: number
   morphFilmGrain: number
 }
@@ -48,17 +56,25 @@ export const DEFAULT_MORPH_VISUAL_TUNING = {
   morphMonochromeMix: 0.04,
   morphRoomOpacity: 0.2,
   morphPropOpacity: 0.66,
+  morphRotationPeriod: 210,
+  morphFrontWallOpacity: 0.12,
+  morphFrontWallFadeAngle: 58,
   morphWaverAmount: 0.018,
   morphWaverScale: 3.4,
   morphWaverSpeed: 0.18,
   morphRippleAmount: 0.04,
   morphRippleRadius: 1.25,
+  morphTemporalFlickerEnabled: true,
   morphFilmFlicker: 0.025,
   morphFilmGrain: 0.12,
 } as const
 
 export const DEFAULT_EXPERIENCE_TUNING: ExperienceTuning = {
   hubPersistenceMode: 'particles',
+  hubVideoBrightness: 0.5,
+  hubVideoScrimOpacity: 1,
+  hubVideoOpacity: 0.82,
+  hubVideoFadeOutSeconds: 5,
   hubToApproachSeconds: 3.2,
   approachToObservationSeconds: 3.5,
   observationEntrySeconds: 3.5,
@@ -112,6 +128,10 @@ const saveTuning = (tuning: ExperienceTuning) => {
 
 const selectTuning = (store: TuningStore): ExperienceTuning => ({
   hubPersistenceMode: store.hubPersistenceMode,
+  hubVideoBrightness: store.hubVideoBrightness,
+  hubVideoScrimOpacity: store.hubVideoScrimOpacity,
+  hubVideoOpacity: store.hubVideoOpacity,
+  hubVideoFadeOutSeconds: store.hubVideoFadeOutSeconds,
   hubToApproachSeconds: store.hubToApproachSeconds,
   approachToObservationSeconds: store.approachToObservationSeconds,
   observationEntrySeconds: store.observationEntrySeconds,
@@ -131,11 +151,15 @@ const selectTuning = (store: TuningStore): ExperienceTuning => ({
   morphMonochromeMix: store.morphMonochromeMix,
   morphRoomOpacity: store.morphRoomOpacity,
   morphPropOpacity: store.morphPropOpacity,
+  morphRotationPeriod: store.morphRotationPeriod,
+  morphFrontWallOpacity: store.morphFrontWallOpacity,
+  morphFrontWallFadeAngle: store.morphFrontWallFadeAngle,
   morphWaverAmount: store.morphWaverAmount,
   morphWaverScale: store.morphWaverScale,
   morphWaverSpeed: store.morphWaverSpeed,
   morphRippleAmount: store.morphRippleAmount,
   morphRippleRadius: store.morphRippleRadius,
+  morphTemporalFlickerEnabled: store.morphTemporalFlickerEnabled,
   morphFilmFlicker: store.morphFilmFlicker,
   morphFilmGrain: store.morphFilmGrain,
 })

@@ -191,6 +191,7 @@ export function MorphApproachRoom() {
       })
     }
     const rippleAge = now - rippleStartedAt.current
+    const temporalFilmEnabled = tuning.morphTemporalFlickerEnabled && !reducedMotion.current
     ;[surfaceMaterial, propMaterial].forEach((material) => {
       material.uniforms.uReveal.value = reveal
       material.uniforms.uBaseColor.value.set(tuning.morphBaseColor)
@@ -205,8 +206,9 @@ export function MorphApproachRoom() {
       material.uniforms.uRippleRadius.value = tuning.morphRippleRadius
       material.uniforms.uRippleAge.value = rippleAge
       material.uniforms.uRippleOrigin.value.set(rippleOrigin.current.x, rippleOrigin.current.z)
-      material.uniforms.uFilmFlicker.value = reducedMotion.current ? 0 : tuning.morphFilmFlicker
+      material.uniforms.uFilmFlicker.value = temporalFilmEnabled ? tuning.morphFilmFlicker : 0
       material.uniforms.uFilmGrain.value = tuning.morphFilmGrain
+      material.uniforms.uFilmTemporalEnabled.value = temporalFilmEnabled ? 1 : 0
     })
     surfaceMaterial.uniforms.uOpacity.value = tuning.morphRoomOpacity
     propMaterial.uniforms.uOpacity.value = tuning.morphPropOpacity

@@ -1,0 +1,561 @@
+import { Color, DoubleSide, GLSL3, ShaderMaterial, Vector2, Vector3 } from 'three'
+
+const vertexShader = /* glsl */ `
+  varying vec3 vLocalPosition;
+
+  void main() {
+    vLocalPosition = position;
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+  }
+`
+
+const fragmentShader = /* glsl */ `
+  uniform mat4 projectionMatrix;
+  uniform mat4 modelViewMatrix;
+  uniform vec3 uCameraLocal;
+  uniform vec3 uBaseColor;
+  uniform vec3 uHighlightColor;
+  uniform vec3 uShadowColor;
+  uniform float uMonochromeMix;
+  uniform float uRoomOpacity;
+  uniform float uPropOpacity;
+  uniform float uFrontWallOpacity;
+  uniform float uFrontWallThreshold;
+  uniform float uArchitectureActivation;
+  uniform float uReveal;
+  uniform float uTime;
+  uniform float uFilmGrain;
+  uniform float uFilmFlicker;
+  uniform float uFilmTemporalEnabled;
+  uniform float uStabilityVariant;
+  uniform float uStabilityDebugView;
+  uniform float uWaverAmount;
+  uniform float uWaverScale;
+  uniform float uWaverSpeed;
+  uniform float uRippleAmount;
+  uniform float uRippleRadius;
+  uniform float uRippleAge;
+  uniform vec2 uRippleOrigin;
+
+  varying vec3 vLocalPosition;
+  out vec4 fragColor;
+
+  const float ROOM_WIDTH = 4.128;
+  const float ROOM_DEPTH = 2.832;
+  const float ROOM_HEIGHT = 2.640;
+  const float HALF_WIDTH = ROOM_WIDTH * 0.5;
+  const float HALF_DEPTH = ROOM_DEPTH * 0.5;
+  const float HALF_HEIGHT = ROOM_HEIGHT * 0.5;
+  const float WALL_HALF = 0.072;
+  const float FLOOR_Y = -HALF_HEIGHT;
+  const float EXTENSION_START_X = -0.360;
+  const float EXTENSION_DEPTH = 1.141;
+  const float EXTENSION_END_Z = HALF_DEPTH + EXTENSION_DEPTH;
+  const float CLOSET_DIVIDER_X = 0.568;
+
+  float sdBox(vec3 point, vec3 halfSize) {
+    vec3 distanceToEdge = abs(point) - halfSize;
+    return length(max(distanceToEdge, 0.0)) + min(max(distanceToEdge.x, max(distanceToEdge.y, distanceToEdge.z)), 0.0);
+  }
+
+  float sdRoundBox(vec3 point, vec3 halfSize, float radius) {
+    vec3 distanceToEdge = abs(point) - halfSize + radius;
+    return min(max(distanceToEdge.x, max(distanceToEdge.y, distanceToEdge.z)), 0.0)
+      + length(max(distanceToEdge, 0.0)) - radius;
+  }
+
+  float sdEllipsoid(vec3 point, vec3 radius) {
+    float firstLength = length(point / radius);
+    float secondLength = length(point / (radius * radius));
+    return firstLength * (firstLength - 1.0) / max(secondLength, 0.0001);
+  }
+
+  float sdCapsule(vec3 point, vec3 start, vec3 end, float radius) {
+    vec3 pointOffset = point - start;
+    vec3 segment = end - start;
+    float projection = clamp(dot(pointOffset, segment) / dot(segment, segment), 0.0, 1.0);
+    return length(pointOffset - segment * projection) - radius;
+  }
+
+  float smoothUnion(float firstDistance, float secondDistance, float blendRadius) {
+    float blend = clamp(0.5 + 0.5 * (secondDistance - firstDistance) / blendRadius, 0.0, 1.0);
+    return mix(secondDistance, firstDistance, blend) - blendRadius * blend * (1.0 - blend);
+  }
+
+  float horizontalWall(vec3 point, float centerX, float halfX, float centerY, float halfY, float centerZ) {
+    return sdRoundBox(
+      point - vec3(centerX, centerY, centerZ),
+      vec3(max(halfX, 0.001), max(halfY, 0.001), WALL_HALF),
+      0.035
+    );
+  }
+
+  float verticalWall(vec3 point, float centerZ, float halfZ, float centerY, float halfY, float centerX) {
+    return sdRoundBox(
+      point - vec3(centerX, centerY, centerZ),
+      vec3(WALL_HALF, max(halfY, 0.001), max(halfZ, 0.001)),
+      0.035
+    );
+  }
+
+  float buildingFloorField(vec3 point) {
+    float mainFloor = sdRoundBox(
+      point - vec3(0.0, FLOOR_Y - WALL_HALF, 0.0),
+      vec3(HALF_WIDTH, WALL_HALF, HALF_DEPTH),
+      0.045
+    );
+    float extensionHalfWidth = (HALF_WIDTH - EXTENSION_START_X) * 0.5;
+    float extensionCenterX = (HALF_WIDTH + EXTENSION_START_X) * 0.5;
+    float extensionFloor = sdRoundBox(
+      point - vec3(extensionCenterX, FLOOR_Y - WALL_HALF, HALF_DEPTH + EXTENSION_DEPTH * 0.5),
+      vec3(extensionHalfWidth, WALL_HALF, EXTENSION_DEPTH * 0.5),
+      0.045
+    );
+    return smoothUnion(mainFloor, extensionFloor, 0.055);
+  }
+
+  float buildingWallField(vec3 point) {
+    const float windowOneCenter = -1.234;
+    const float windowOneHalfWidth = ROOM_WIDTH / 6.0;
+    const float windowTwoCenter = -0.425;
+    const float windowTwoHalfWidth = ROOM_DEPTH / 6.0;
+    const float windowHalfHeight = ROOM_HEIGHT / 6.0;
+    const float doorCenter = 1.459;
+    const float doorHalfWidth = 0.338;
+    const float doorTop = 0.700;
+
+    float distance = 99.0;
+
+    float backLeftEnd = windowOneCenter - windowOneHalfWidth;
+    float backRightStart = windowOneCenter + windowOneHalfWidth;
+    distance = min(distance, horizontalWall(point, (-HALF_WIDTH + backLeftEnd) * 0.5, (backLeftEnd + HALF_WIDTH) * 0.5, 0.0, HALF_HEIGHT, -HALF_DEPTH));
+    distance = min(distance, horizontalWall(point, (backRightStart + HALF_WIDTH) * 0.5, (HALF_WIDTH - backRightStart) * 0.5, 0.0, HALF_HEIGHT, -HALF_DEPTH));
+    distance = min(distance, horizontalWall(point, windowOneCenter, windowOneHalfWidth, (-HALF_HEIGHT - windowHalfHeight) * 0.5, (HALF_HEIGHT - windowHalfHeight) * 0.5, -HALF_DEPTH));
+    distance = min(distance, horizontalWall(point, windowOneCenter, windowOneHalfWidth, (HALF_HEIGHT + windowHalfHeight) * 0.5, (HALF_HEIGHT - windowHalfHeight) * 0.5, -HALF_DEPTH));
+
+    float leftBackEnd = windowTwoCenter - windowTwoHalfWidth;
+    float leftFrontStart = windowTwoCenter + windowTwoHalfWidth;
+    distance = min(distance, verticalWall(point, (-HALF_DEPTH + leftBackEnd) * 0.5, (leftBackEnd + HALF_DEPTH) * 0.5, 0.0, HALF_HEIGHT, -HALF_WIDTH));
+    distance = min(distance, verticalWall(point, (leftFrontStart + HALF_DEPTH) * 0.5, (HALF_DEPTH - leftFrontStart) * 0.5, 0.0, HALF_HEIGHT, -HALF_WIDTH));
+    distance = min(distance, verticalWall(point, windowTwoCenter, windowTwoHalfWidth, (-HALF_HEIGHT - windowHalfHeight) * 0.5, (HALF_HEIGHT - windowHalfHeight) * 0.5, -HALF_WIDTH));
+    distance = min(distance, verticalWall(point, windowTwoCenter, windowTwoHalfWidth, (HALF_HEIGHT + windowHalfHeight) * 0.5, (HALF_HEIGHT - windowHalfHeight) * 0.5, -HALF_WIDTH));
+
+    distance = min(distance, verticalWall(point, (-HALF_DEPTH + EXTENSION_END_Z) * 0.5, (EXTENSION_END_Z + HALF_DEPTH) * 0.5, 0.0, HALF_HEIGHT, HALF_WIDTH));
+    distance = min(distance, horizontalWall(point, (-HALF_WIDTH + EXTENSION_START_X) * 0.5, (EXTENSION_START_X + HALF_WIDTH) * 0.5, 0.0, HALF_HEIGHT, HALF_DEPTH));
+    distance = min(distance, verticalWall(point, (HALF_DEPTH + EXTENSION_END_Z) * 0.5, EXTENSION_DEPTH * 0.5, 0.0, HALF_HEIGHT, EXTENSION_START_X));
+    distance = min(distance, verticalWall(point, (HALF_DEPTH + EXTENSION_END_Z) * 0.5, EXTENSION_DEPTH * 0.5, 0.0, HALF_HEIGHT, CLOSET_DIVIDER_X));
+
+    float doorLeftEnd = doorCenter - doorHalfWidth;
+    float doorRightStart = doorCenter + doorHalfWidth;
+    distance = min(distance, horizontalWall(point, (EXTENSION_START_X + doorLeftEnd) * 0.5, (doorLeftEnd - EXTENSION_START_X) * 0.5, 0.0, HALF_HEIGHT, EXTENSION_END_Z));
+    distance = min(distance, horizontalWall(point, (doorRightStart + HALF_WIDTH) * 0.5, (HALF_WIDTH - doorRightStart) * 0.5, 0.0, HALF_HEIGHT, EXTENSION_END_Z));
+    distance = min(distance, horizontalWall(point, doorCenter, doorHalfWidth, (doorTop + HALF_HEIGHT) * 0.5, (HALF_HEIGHT - doorTop) * 0.5, EXTENSION_END_Z));
+    return distance;
+  }
+
+  float openingFrameField(vec3 point) {
+    float activation = uArchitectureActivation;
+    float frameThickness = mix(0.025, 0.085, activation);
+    float frameDepth = mix(WALL_HALF, 0.155, activation);
+    float retreat = (1.0 - activation) * 0.16;
+    const float windowHalfHeight = ROOM_HEIGHT / 6.0;
+
+    const float windowOneCenter = -1.234;
+    const float windowOneHalfWidth = ROOM_WIDTH / 6.0;
+    float windowOneZ = -HALF_DEPTH + 0.045 * activation;
+    float frame = sdRoundBox(point - vec3(windowOneCenter - windowOneHalfWidth, 0.0, windowOneZ), vec3(frameThickness, windowHalfHeight + frameThickness, frameDepth), 0.055);
+    frame = smoothUnion(frame, sdRoundBox(point - vec3(windowOneCenter + windowOneHalfWidth, 0.0, windowOneZ), vec3(frameThickness, windowHalfHeight + frameThickness, frameDepth), 0.055), 0.045);
+    frame = smoothUnion(frame, sdRoundBox(point - vec3(windowOneCenter, -windowHalfHeight, windowOneZ), vec3(windowOneHalfWidth, frameThickness, frameDepth), 0.055), 0.045);
+    frame = smoothUnion(frame, sdRoundBox(point - vec3(windowOneCenter, windowHalfHeight, windowOneZ), vec3(windowOneHalfWidth, frameThickness, frameDepth), 0.055), 0.045);
+
+    const float windowTwoCenter = -0.425;
+    const float windowTwoHalfWidth = ROOM_DEPTH / 6.0;
+    float windowTwoX = -HALF_WIDTH + 0.045 * activation;
+    float secondFrame = sdRoundBox(point - vec3(windowTwoX, 0.0, windowTwoCenter - windowTwoHalfWidth), vec3(frameDepth, windowHalfHeight + frameThickness, frameThickness), 0.055);
+    secondFrame = smoothUnion(secondFrame, sdRoundBox(point - vec3(windowTwoX, 0.0, windowTwoCenter + windowTwoHalfWidth), vec3(frameDepth, windowHalfHeight + frameThickness, frameThickness), 0.055), 0.045);
+    secondFrame = smoothUnion(secondFrame, sdRoundBox(point - vec3(windowTwoX, -windowHalfHeight, windowTwoCenter), vec3(frameDepth, frameThickness, windowTwoHalfWidth), 0.055), 0.045);
+    secondFrame = smoothUnion(secondFrame, sdRoundBox(point - vec3(windowTwoX, windowHalfHeight, windowTwoCenter), vec3(frameDepth, frameThickness, windowTwoHalfWidth), 0.055), 0.045);
+    frame = min(frame, secondFrame);
+
+    const float doorCenter = 1.459;
+    const float doorHalfWidth = 0.338;
+    const float doorTop = 0.700;
+    float doorZ = EXTENSION_END_Z - 0.045 * activation;
+    float doorCenterY = (FLOOR_Y + doorTop) * 0.5;
+    float doorHalfHeight = (doorTop - FLOOR_Y) * 0.5;
+    float doorFrame = sdRoundBox(point - vec3(doorCenter - doorHalfWidth, doorCenterY, doorZ), vec3(frameThickness, doorHalfHeight + frameThickness, frameDepth), 0.05);
+    doorFrame = smoothUnion(doorFrame, sdRoundBox(point - vec3(doorCenter + doorHalfWidth, doorCenterY, doorZ), vec3(frameThickness, doorHalfHeight + frameThickness, frameDepth), 0.05), 0.04);
+    doorFrame = smoothUnion(doorFrame, sdRoundBox(point - vec3(doorCenter, doorTop, doorZ), vec3(doorHalfWidth, frameThickness, frameDepth), 0.05), 0.04);
+    frame = min(frame, doorFrame);
+    return frame + retreat;
+  }
+
+  float detachedTreeField(vec3 point) {
+    float activation = uArchitectureActivation;
+    vec3 localPoint = point - vec3(-1.100, FLOOR_Y, 1.990);
+    float trunkRadius = mix(0.035, 0.145, activation);
+    float trunkHeight = mix(0.08, 0.96, activation);
+    float tree = sdCapsule(localPoint, vec3(0.0, 0.0, 0.0), vec3(0.03, trunkHeight, -0.02), trunkRadius);
+    float rootRadius = mix(0.018, 0.085, activation);
+    tree = smoothUnion(tree, sdCapsule(localPoint, vec3(0.0, 0.03, 0.0), vec3(0.48 * activation, 0.015, 0.16 * activation), rootRadius), 0.08);
+    tree = smoothUnion(tree, sdCapsule(localPoint, vec3(0.0, 0.03, 0.0), vec3(-0.42 * activation, 0.01, 0.22 * activation), rootRadius), 0.08);
+    tree = smoothUnion(tree, sdCapsule(localPoint, vec3(0.0, 0.03, 0.0), vec3(0.10 * activation, 0.01, -0.44 * activation), rootRadius), 0.08);
+    vec3 canopyRadius = mix(vec3(0.08), vec3(0.62, 0.48, 0.58), activation);
+    float canopy = sdEllipsoid(localPoint - vec3(0.02, trunkHeight + 0.22 * activation, 0.0), canopyRadius);
+    tree = smoothUnion(tree, canopy, 0.18 * activation + 0.01);
+    return tree + (1.0 - activation) * 0.28;
+  }
+
+  vec3 evaluateSceneField(vec3 point, float cutawayNearWalls) {
+    float floorDistance = buildingFloorField(point);
+    float wallDistance = buildingWallField(point);
+    float frameDistance = openingFrameField(point);
+    float treeDistance = detachedTreeField(point);
+    if (cutawayNearWalls > 0.5) {
+      vec2 cameraDirection = normalize(uCameraLocal.xz + vec2(0.0001, 0.0));
+      float nearWallCoordinate = dot(point.xz, cameraDirection);
+      if (nearWallCoordinate > 0.12) wallDistance = 99.0;
+    }
+    float buildingDistance = smoothUnion(floorDistance, wallDistance, 0.075);
+    buildingDistance = smoothUnion(buildingDistance, frameDistance, 0.055);
+    float signedDistance = min(buildingDistance, treeDistance);
+
+    float nearestNonWall = min(floorDistance, min(frameDistance, treeDistance));
+    float wallInfluence = 1.0 - smoothstep(-0.025, 0.085, wallDistance - nearestNonWall);
+    float featureInfluence = 1.0 - smoothstep(-0.025, 0.10, min(frameDistance, treeDistance) - min(floorDistance, wallDistance));
+
+    float waveTime = uTime * uWaverSpeed;
+    float fieldWave = sin((point.x + point.z * 0.67) * uWaverScale + waveTime)
+      * cos((point.y - point.z * 0.38) * uWaverScale * 0.73 - waveTime * 0.71);
+    signedDistance += fieldWave * uWaverAmount;
+    float rippleDistance = distance(point.xz, uRippleOrigin);
+    float rippleFront = abs(rippleDistance - uRippleAge * 1.35);
+    float rippleEnvelope = smoothstep(uRippleRadius, 0.0, rippleFront) * exp(-uRippleAge * 0.55);
+    signedDistance -= sin(rippleDistance * 17.0 - uRippleAge * 10.0) * rippleEnvelope * uRippleAmount;
+    return vec3(signedDistance, wallInfluence, featureInfluence);
+  }
+
+  vec3 sceneField(vec3 point) {
+    return evaluateSceneField(point, 0.0);
+  }
+
+  vec3 sceneInteriorField(vec3 point) {
+    return evaluateSceneField(point, 1.0);
+  }
+
+  vec3 estimateNormal(vec3 point) {
+    const float epsilon = 0.004;
+    const vec2 direction = vec2(1.0, -1.0) * 0.5773 * epsilon;
+    return normalize(
+      direction.xyy * sceneField(point + direction.xyy).x
+      + direction.yyx * sceneField(point + direction.yyx).x
+      + direction.yxy * sceneField(point + direction.yxy).x
+      + direction.xxx * sceneField(point + direction.xxx).x
+    );
+  }
+
+  vec3 estimateStableWallNormal(vec3 point, vec3 fallbackNormal) {
+    const float epsilon = 0.006;
+    const vec2 direction = vec2(1.0, -1.0) * 0.5773 * epsilon;
+    vec3 wallGradient =
+      direction.xyy * buildingWallField(point + direction.xyy)
+      + direction.yyx * buildingWallField(point + direction.yyx)
+      + direction.yxy * buildingWallField(point + direction.yxy)
+      + direction.xxx * buildingWallField(point + direction.xxx);
+    float gradientLength = length(wallGradient);
+    return gradientLength > 0.0001 ? wallGradient / gradientLength : fallbackNormal;
+  }
+
+  float ambientOcclusion(vec3 point, vec3 normal) {
+    float occlusion = 0.0;
+    float weight = 1.0;
+    for (int sampleIndex = 1; sampleIndex <= 3; sampleIndex += 1) {
+      float distanceAlongNormal = 0.05 * float(sampleIndex);
+      float sampledDistance = sceneField(point + normal * distanceAlongNormal).x;
+      occlusion += max(distanceAlongNormal - sampledDistance, 0.0) * weight;
+      weight *= 0.52;
+    }
+    return clamp(1.0 - occlusion * 2.15, 0.30, 1.0);
+  }
+
+  float random(vec2 value) {
+    return fract(sin(dot(value, vec2(12.9898, 78.233))) * 43758.5453);
+  }
+
+  vec3 shadeSurface(vec3 point, vec3 normal, float wallInfluence) {
+    float occlusion = ambientOcclusion(point, normal);
+    float diffuse = dot(normal, normalize(vec3(-0.45, 0.82, 0.38))) * 0.5 + 0.5;
+    float stableWallVisibility = 0.0;
+    if (uStabilityVariant > 0.5 && wallInfluence > 0.015) {
+      vec3 surfaceToCamera = normalize(uCameraLocal - point);
+      float viewFacing = abs(dot(normal, surfaceToCamera));
+      float stableWallFill = mix(0.30, 0.46, viewFacing) * wallInfluence;
+      diffuse = max(diffuse, stableWallFill);
+      stableWallVisibility = smoothstep(0.015, 0.35, wallInfluence);
+    }
+    vec3 color = mix(uShadowColor, uBaseColor, smoothstep(0.08, 0.72, diffuse));
+    color = mix(color, uHighlightColor, smoothstep(0.70, 1.0, diffuse) * 0.65);
+    color *= mix(0.58, 1.0, occlusion);
+    if (uStabilityVariant > 0.5 && stableWallVisibility > 0.0) {
+      vec3 stableWallColorFloor = mix(uShadowColor, uBaseColor, 0.42);
+      color = max(color, stableWallColorFloor * stableWallVisibility);
+    }
+    float luminance = dot(color, vec3(0.299, 0.587, 0.114));
+    color = mix(color, vec3(luminance), uMonochromeMix);
+    float frameTime = floor(uTime * 12.0) / 12.0 * uFilmTemporalEnabled;
+    float grain = random(gl_FragCoord.xy + frameTime * 149.0) - 0.5;
+    float flicker = (random(vec2(frameTime, 7.31)) - 0.5) * uFilmFlicker;
+    return max(color + grain * uFilmGrain + flicker, 0.0);
+  }
+
+  float resolveFrontWall(vec3 point, vec3 normal, float wallInfluence) {
+    vec3 horizontalNormal = vec3(normal.x, 0.0, normal.z);
+    vec3 viewDirection = vec3(uCameraLocal.x - point.x, 0.0, uCameraLocal.z - point.z);
+    float verticalSurface = smoothstep(0.45, 0.88, length(horizontalNormal));
+    float cameraFacing = dot(normalize(horizontalNormal + vec3(0.0001, 0.0, 0.0)), normalize(viewDirection + vec3(0.0001, 0.0, 0.0)));
+    if (uStabilityVariant > 0.5) {
+      vec2 roomCenter = vec2(0.0, 0.30);
+      vec2 cameraPlanarDirection = normalize(uCameraLocal.xz - roomCenter + vec2(0.0001, 0.0));
+      float nearWallCoordinate = dot(point.xz - roomCenter, cameraPlanarDirection);
+      cameraFacing = smoothstep(-0.55, 0.15, nearWallCoordinate);
+    }
+    return wallInfluence * verticalSurface * smoothstep(uFrontWallThreshold, 0.98, cameraFacing);
+  }
+
+  bool insideBounds(vec3 point) {
+    return point.x > -2.40 && point.x < 2.40
+      && point.y > -1.58 && point.y < 1.58
+      && point.z > -1.70 && point.z < 2.82;
+  }
+
+  vec3 edgeCandidateDebugColor(float edgeRisk) {
+    vec3 candidateColor = mix(
+      vec3(1.0, 0.72, 0.04),
+      vec3(1.0, 0.08, 0.025),
+      smoothstep(0.42, 0.82, edgeRisk)
+    );
+    return edgeRisk > 0.12 ? candidateColor : vec3(0.004, 0.007, 0.008);
+  }
+
+  void main() {
+    vec3 rayDirection = normalize(vLocalPosition - uCameraLocal);
+    vec3 point = vLocalPosition + rayDirection * 0.002;
+    bool firstHit = false;
+    bool debugEdgeCandidates = uStabilityVariant > 0.5 && uStabilityDebugView > 0.5;
+    bool debugFrontWallRisk = uStabilityVariant > 0.5 && uStabilityDebugView > 1.5;
+    debugEdgeCandidates = debugEdgeCandidates && !debugFrontWallRisk;
+    float rayAngularFootprint = 0.0;
+    float closestDistance = 999.0;
+    vec3 closestPoint = point;
+
+    if (debugEdgeCandidates) {
+      rayAngularFootprint = max(length(dFdx(rayDirection)), length(dFdy(rayDirection)));
+    }
+
+    for (int stepIndex = 0; stepIndex < 64; stepIndex += 1) {
+      float distanceToSurface = sceneField(point).x;
+      if (debugEdgeCandidates && abs(distanceToSurface) < closestDistance) {
+        closestDistance = abs(distanceToSurface);
+        closestPoint = point;
+      }
+      if (distanceToSurface < 0.0045) {
+        firstHit = true;
+        break;
+      }
+      point += rayDirection * max(distanceToSurface * 0.86, 0.002);
+      if (!insideBounds(point)) break;
+    }
+
+    float revealFade = uReveal * uReveal * (3.0 - 2.0 * uReveal);
+
+    if (!firstHit) {
+      if (debugEdgeCandidates) {
+        float closestRayDepth = length(closestPoint - uCameraLocal);
+        float worldPixelFootprint = max(closestRayDepth * rayAngularFootprint, 0.0001);
+        float edgeScore = closestDistance / worldPixelFootprint;
+        float edgeRisk = 1.0 - smoothstep(0.75, 2.0, edgeScore);
+        if (edgeRisk > 0.02) {
+          vec4 debugClipPosition = projectionMatrix * modelViewMatrix * vec4(closestPoint, 1.0);
+          gl_FragDepth = debugClipPosition.z / debugClipPosition.w * 0.5 + 0.5;
+          fragColor = vec4(edgeCandidateDebugColor(edgeRisk), 0.92 * revealFade);
+          return;
+        }
+      }
+      discard;
+    }
+
+    vec3 firstPoint = point;
+    vec3 firstField = sceneField(firstPoint);
+    vec3 firstNormal = estimateNormal(firstPoint);
+
+    if (debugEdgeCandidates) {
+      float closestRayDepth = length(closestPoint - uCameraLocal);
+      float worldPixelFootprint = max(closestRayDepth * rayAngularFootprint, 0.0001);
+      float edgeScore = closestDistance / worldPixelFootprint;
+      float proximityRisk = 1.0 - smoothstep(0.45, 1.40, edgeScore);
+      float grazingRisk = 1.0 - smoothstep(
+        0.06,
+        0.28,
+        abs(dot(firstNormal, -rayDirection))
+      );
+      float edgeRisk = grazingRisk * mix(0.55, 1.0, proximityRisk);
+      vec4 debugClipPosition = projectionMatrix * modelViewMatrix * vec4(firstPoint, 1.0);
+      gl_FragDepth = debugClipPosition.z / debugClipPosition.w * 0.5 + 0.5;
+      fragColor = vec4(
+        edgeCandidateDebugColor(edgeRisk),
+        mix(0.78, 0.95, edgeRisk) * revealFade
+      );
+      return;
+    }
+
+    bool useStabilizedFrontWall = uStabilityVariant > 0.5;
+    float firstWallInfluence = firstField.y;
+    if (useStabilizedFrontWall) {
+      float firstWallProximity = 1.0 - smoothstep(
+        0.012,
+        0.110,
+        abs(buildingWallField(firstPoint))
+      );
+      firstWallInfluence = max(firstWallInfluence, firstWallProximity);
+    }
+    vec3 firstColor = shadeSurface(firstPoint, firstNormal, firstWallInfluence);
+    float tunedFirstOpacity = mix(uRoomOpacity, uPropOpacity, firstField.z);
+    float baseFirstOpacity = mix(0.44, 0.96, tunedFirstOpacity);
+    vec3 frontWallNormal = firstNormal;
+
+    if (useStabilizedFrontWall && firstWallInfluence > 0.015) {
+      vec3 stableWallNormal = estimateStableWallNormal(firstPoint, firstNormal);
+      vec3 blendedWallNormal = mix(firstNormal, stableWallNormal, clamp(firstWallInfluence, 0.0, 1.0));
+      float blendedNormalLength = length(blendedWallNormal);
+      frontWallNormal = blendedNormalLength > 0.0001
+        ? blendedWallNormal / blendedNormalLength
+        : stableWallNormal;
+    }
+
+    float frontWall = resolveFrontWall(firstPoint, frontWallNormal, firstWallInfluence);
+    float frontWallFadedOpacity = mix(baseFirstOpacity, uFrontWallOpacity, frontWall);
+    float firstOpacity = frontWallFadedOpacity;
+
+    vec3 compositedColor = firstColor;
+    float compositedOpacity = firstOpacity;
+    float secondaryWeight = 1.0;
+    bool traceSecondarySurface = frontWall > 0.015;
+    bool secondarySurfaceHit = false;
+
+    if (useStabilizedFrontWall) {
+      secondaryWeight = smoothstep(0.02, 0.20, frontWall);
+      traceSecondarySurface = secondaryWeight > 0.001;
+    }
+
+    if (traceSecondarySurface) {
+      vec3 secondPoint = firstPoint + rayDirection * (useStabilizedFrontWall ? 0.028 : 0.018);
+      bool exitedFirstSurface = useStabilizedFrontWall;
+      if (!useStabilizedFrontWall) {
+        for (int exitIndex = 0; exitIndex < 24; exitIndex += 1) {
+          float exitDistance = sceneField(secondPoint).x;
+          if (exitDistance > 0.009) {
+            exitedFirstSurface = true;
+            break;
+          }
+          secondPoint += rayDirection * 0.022;
+        }
+      }
+
+      bool secondHit = false;
+      if (exitedFirstSurface) {
+        for (int secondIndex = 0; secondIndex < 48; secondIndex += 1) {
+          if (!useStabilizedFrontWall && secondIndex >= 44) break;
+          float secondDistance = useStabilizedFrontWall
+            ? sceneInteriorField(secondPoint).x
+            : sceneField(secondPoint).x;
+          if (secondDistance < 0.0045) {
+            secondHit = true;
+            break;
+          }
+          secondPoint += rayDirection * max(secondDistance * 0.84, 0.002);
+          if (!insideBounds(secondPoint)) break;
+        }
+      }
+
+      if (secondHit) {
+        secondarySurfaceHit = true;
+        vec3 secondField = sceneField(secondPoint);
+        vec3 secondNormal = estimateNormal(secondPoint);
+        vec3 secondColor = shadeSurface(secondPoint, secondNormal, secondField.y);
+        float secondOpacity = mix(0.44, 0.96, mix(uRoomOpacity, uPropOpacity, secondField.z));
+
+        if (useStabilizedFrontWall) {
+          float secondaryContribution = secondOpacity * (1.0 - firstOpacity) * secondaryWeight;
+          float combinedOpacity = firstOpacity + secondaryContribution;
+          compositedColor = (
+            firstColor * firstOpacity
+            + secondColor * secondaryContribution
+          ) / max(combinedOpacity, 0.001);
+          compositedOpacity = combinedOpacity;
+        } else {
+          float combinedOpacity = firstOpacity + secondOpacity * (1.0 - firstOpacity);
+          compositedColor = (
+            firstColor * firstOpacity
+            + secondColor * secondOpacity * (1.0 - firstOpacity)
+          ) / max(combinedOpacity, 0.001);
+          compositedOpacity = combinedOpacity;
+        }
+      }
+    }
+
+    if (debugFrontWallRisk) {
+      float safeFrontWall = frontWall * (secondarySurfaceHit ? 1.0 : 0.0);
+      float riskyFrontWall = frontWall * (secondarySurfaceHit ? 0.0 : 1.0);
+      vec3 debugColor = vec3(riskyFrontWall, safeFrontWall * 0.82, 0.015);
+      vec4 debugClipPosition = projectionMatrix * modelViewMatrix * vec4(firstPoint, 1.0);
+      gl_FragDepth = debugClipPosition.z / debugClipPosition.w * 0.5 + 0.5;
+      fragColor = vec4(debugColor, mix(0.72, 0.96, max(riskyFrontWall, safeFrontWall)) * revealFade);
+      return;
+    }
+
+    vec4 clipPosition = projectionMatrix * modelViewMatrix * vec4(firstPoint, 1.0);
+    gl_FragDepth = clipPosition.z / clipPosition.w * 0.5 + 0.5;
+    fragColor = vec4(compositedColor, compositedOpacity * revealFade);
+  }
+`
+
+export class PlanMorphMaterial extends ShaderMaterial {
+  constructor() {
+    super({
+      glslVersion: GLSL3,
+      uniforms: {
+        uCameraLocal: { value: new Vector3(0, 0, 5) },
+        uBaseColor: { value: new Color('#66766b') },
+        uHighlightColor: { value: new Color('#46e6dd') },
+        uShadowColor: { value: new Color('#06133f') },
+        uMonochromeMix: { value: 0.04 },
+        uRoomOpacity: { value: 0.2 },
+        uPropOpacity: { value: 0.66 },
+        uFrontWallOpacity: { value: 0.12 },
+        uFrontWallThreshold: { value: 0.53 },
+        uArchitectureActivation: { value: 1 },
+        uReveal: { value: 0 },
+        uTime: { value: 0 },
+        uFilmGrain: { value: 0.04 },
+        uFilmFlicker: { value: 0 },
+        uFilmTemporalEnabled: { value: 1 },
+        uStabilityVariant: { value: 0 },
+        uStabilityDebugView: { value: 0 },
+        uWaverAmount: { value: 0 },
+        uWaverScale: { value: 3.4 },
+        uWaverSpeed: { value: 0 },
+        uRippleAmount: { value: 0 },
+        uRippleRadius: { value: 1.25 },
+        uRippleAge: { value: 99 },
+        uRippleOrigin: { value: new Vector2() },
+      },
+      vertexShader,
+      fragmentShader,
+      transparent: true,
+      depthWrite: true,
+      depthTest: true,
+      side: DoubleSide,
+      toneMapped: false,
+    })
+  }
+}
