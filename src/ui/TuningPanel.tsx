@@ -5,6 +5,7 @@ import { useRoomVisualModeStore, type RoomVisualMode } from '../store/roomVisual
 import { useMorphStabilityExperimentStore } from '../store/morphStabilityExperimentStore'
 import { useMorphCameraExperimentStore } from '../store/morphCameraExperimentStore'
 import type { LowMorphCameraTuning } from '../store/morphCameraExperimentStore'
+import { useMorphNightOpticsStore, type MorphNightOpticsTuning } from '../store/morphNightOpticsStore'
 
 type NumericTuningKey = {
   [Key in keyof ExperienceTuning]: ExperienceTuning[Key] extends number ? Key : never
@@ -435,6 +436,103 @@ function MorphCameraControl({
   )
 }
 
+function MorphNightOpticsLab() {
+  const variant = useMorphNightOpticsStore((store) => store.variant)
+  const setVariant = useMorphNightOpticsStore((store) => store.setVariant)
+  const resetTuning = useMorphNightOpticsStore((store) => store.resetTuning)
+  const debugView = useMorphNightOpticsStore((store) => store.debugView)
+  const setDebugView = useMorphNightOpticsStore((store) => store.setDebugView)
+
+  return (
+    <>
+      <div className="persistence-selector" role="group" aria-label="Morph night optics variant">
+        <button
+          type="button"
+          className={variant === 'current' ? 'is-active' : ''}
+          aria-pressed={variant === 'current'}
+          onClick={() => setVariant('current')}
+        >
+          <span>A · Current</span>
+          <small>현재 룸 비주얼 유지</small>
+        </button>
+        <button
+          type="button"
+          className={variant === 'night-film' ? 'is-active' : ''}
+          aria-pressed={variant === 'night-film'}
+          onClick={() => setVariant('night-film')}
+        >
+          <span>B · Night Film</span>
+          <small>야간 투시 필름 후보</small>
+        </button>
+      </div>
+      {variant === 'night-film' ? (
+        <div className="morph-night-optics-tuning">
+          <div className="tuning-section-heading">
+            <h3>Night Film Response</h3>
+            <button type="button" onClick={resetTuning}>RESET LOOK</button>
+          </div>
+          <MorphNightOpticsControl tuningKey="lookMix" label="Look Mix" min={0} max={1} step={0.01} />
+          <MorphNightOpticsControl tuningKey="exposure" label="Night Exposure" min={0.35} max={2} step={0.01} />
+          <MorphNightOpticsControl tuningKey="shadowLift" label="Shadow Lift" min={0} max={0.3} step={0.005} />
+          <MorphNightOpticsControl tuningKey="localGrain" label="Local Film Grain" min={0} max={0.2} step={0.005} />
+          <MorphNightOpticsControl tuningKey="vignetteStrength" label="Vignette Strength" min={0} max={1} step={0.01} />
+          <MorphNightOpticsControl tuningKey="vignetteSoftness" label="Vignette Softness" min={0.05} max={0.8} step={0.01} />
+          <MorphNightOpticsControl tuningKey="vignetteIrregularity" label="Vignette Irregularity" min={0} max={0.5} step={0.01} />
+          <MorphNightOpticsControl tuningKey="vignetteOffsetX" label="Vignette Offset X" min={-0.25} max={0.25} step={0.005} />
+          <MorphNightOpticsControl tuningKey="vignetteOffsetY" label="Vignette Offset Y" min={-0.25} max={0.25} step={0.005} />
+          <MorphNightOpticsControl tuningKey="bloomStrength" label="Bloom Strength" min={0} max={2} step={0.01} />
+          <MorphNightOpticsControl tuningKey="bloomRadius" label="Bloom Radius" min={0.05} max={1.2} step={0.01} />
+          <MorphNightOpticsControl tuningKey="bloomCore" label="Bloom Core" min={0} max={1.5} step={0.01} />
+          <div className="persistence-selector" role="group" aria-label="Morph night optics debug view">
+            <button type="button" className={debugView === 'none' ? 'is-active' : ''} aria-pressed={debugView === 'none'} onClick={() => setDebugView('none')}>
+              <span>Normal View</span><small>최종 Night Film 합성</small>
+            </button>
+            <button type="button" className={debugView === 'bloom-mask' ? 'is-active' : ''} aria-pressed={debugView === 'bloom-mask'} onClick={() => setDebugView('bloom-mask')}>
+              <span>Bloom Mask</span><small>창·문 코어와 할레이션</small>
+            </button>
+            <button type="button" className={debugView === 'vignette-mask' ? 'is-active' : ''} aria-pressed={debugView === 'vignette-mask'} onClick={() => setDebugView('vignette-mask')}>
+              <span>Vignette Mask</span><small>비정형 렌즈 감광 영역</small>
+            </button>
+          </div>
+        </div>
+      ) : null}
+    </>
+  )
+}
+
+function MorphNightOpticsControl({
+  tuningKey,
+  label,
+  min,
+  max,
+  step,
+}: {
+  tuningKey: keyof MorphNightOpticsTuning
+  label: string
+  min: number
+  max: number
+  step: number
+}) {
+  const value = useMorphNightOpticsStore((store) => store[tuningKey])
+  const setTuning = useMorphNightOpticsStore((store) => store.setTuning)
+  return (
+    <label className="tuning-control">
+      <span className="tuning-control-heading">
+        <span>{label}</span>
+        <output>{value.toFixed(step < 0.01 ? 3 : 2)}</output>
+      </span>
+      <input
+        type="range"
+        min={min}
+        max={max}
+        step={step}
+        value={value}
+        onChange={(event) => setTuning(tuningKey, Number(event.currentTarget.value))}
+      />
+    </label>
+  )
+}
+
 export function TuningPanel() {
   const panelOpen = useTuningStore((store) => store.panelOpen)
   const togglePanel = useTuningStore((store) => store.togglePanel)
@@ -523,6 +621,10 @@ export function TuningPanel() {
               <section>
                 <h3>Morph Camera Lab</h3>
                 <MorphCameraLab />
+              </section>
+              <section>
+                <h3>Morph Night Optics Lab</h3>
+                <MorphNightOpticsLab />
               </section>
               <section>
                 <h3>Morph Stability Lab</h3>

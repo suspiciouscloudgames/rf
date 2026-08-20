@@ -93,6 +93,7 @@ const writeCameraDataset = (canvas: HTMLCanvasElement, camera: PerspectiveCamera
   canvas.dataset.cameraPosition = camera.position.toArray().map((value) => value.toFixed(2)).join(',')
   canvas.dataset.cameraTarget = target.toArray().map((value) => value.toFixed(2)).join(',')
   canvas.dataset.cameraFov = camera.fov.toFixed(2)
+  canvas.dataset.cameraAspect = camera.aspect.toFixed(4)
 }
 
 const resolveSignalFrame = (worldDepth = useTuningStore.getState().worldDepth) => {

@@ -9,6 +9,7 @@ import { useTuningStore } from '../store/tuningStore'
 import { MorphFilmOverlay } from '../ui/MorphFilmOverlay'
 import { useMorphStabilityExperimentStore } from '../store/morphStabilityExperimentStore'
 import { useMorphCameraExperimentStore } from '../store/morphCameraExperimentStore'
+import { useMorphNightOpticsStore } from '../store/morphNightOpticsStore'
 
 const IDLE_TIMEOUT_MS = 90_000
 const ExperienceCanvas = lazy(() =>
@@ -28,6 +29,7 @@ export function App() {
   const syncRoomVisualMode = useRoomVisualModeStore((store) => store.syncFromLocation)
   const syncMorphStabilityExperiment = useMorphStabilityExperimentStore((store) => store.syncFromLocation)
   const syncMorphCameraExperiment = useMorphCameraExperimentStore((store) => store.syncFromLocation)
+  const syncMorphNightOptics = useMorphNightOpticsStore((store) => store.syncFromLocation)
   const morphTemporalFlickerEnabled = useTuningStore((store) => store.morphTemporalFlickerEnabled)
 
   useEffect(() => {
@@ -35,10 +37,11 @@ export function App() {
       syncRoomVisualMode()
       syncMorphStabilityExperiment()
       syncMorphCameraExperiment()
+      syncMorphNightOptics()
     }
     window.addEventListener('popstate', syncLocationState)
     return () => window.removeEventListener('popstate', syncLocationState)
-  }, [syncMorphCameraExperiment, syncMorphStabilityExperiment, syncRoomVisualMode])
+  }, [syncMorphCameraExperiment, syncMorphNightOptics, syncMorphStabilityExperiment, syncRoomVisualMode])
 
   useEffect(() => {
     const timer = window.setTimeout(enterHub, 850)

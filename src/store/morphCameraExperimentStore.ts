@@ -11,8 +11,8 @@ export interface LowMorphCameraTuning {
 
 export const DEFAULT_LOW_MORPH_CAMERA_TUNING: LowMorphCameraTuning = {
   lowHeight: 1.2,
-  lowTargetHeight: 0.15,
-  lowDistance: 5.98,
+  lowTargetHeight: -0.35,
+  lowDistance: 7.6,
   lowFov: 36,
 }
 

@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useRef } from 'react'
 import { useFrame, useThree, type ThreeEvent } from '@react-three/fiber'
-import { MathUtils, Vector3, type Mesh } from 'three'
+import { MathUtils, Vector2, Vector3, type Mesh } from 'three'
 import { useExperienceStore } from '../../store/experienceStore'
 import { useTuningStore } from '../../store/tuningStore'
 import { useMorphStabilityExperimentStore } from '../../store/morphStabilityExperimentStore'
 import { PlanMorphMaterial } from './PlanMorphMaterial'
+import { useMorphNightOpticsStore } from '../../store/morphNightOpticsStore'
 
 const observationEntryRetractPortion = 0.72
 
@@ -14,6 +15,7 @@ export function PlanMorphApproachRoom() {
   const proxy = useRef<Mesh>(null)
   const cameraLocal = useRef(new Vector3())
   const rippleLocal = useRef(new Vector3())
+  const nightResolution = useRef(new Vector2())
   const rippleStartedAt = useRef(-100)
   const pointerStart = useRef<{ x: number; y: number } | null>(null)
   const reducedMotion = useRef(false)
@@ -25,6 +27,20 @@ export function PlanMorphApproachRoom() {
   const freezeTime = useMorphStabilityExperimentStore((store) => store.freezeTime)
   const shaderTime = useMorphStabilityExperimentStore((store) => store.shaderTime)
   const debugView = useMorphStabilityExperimentStore((store) => store.debugView)
+  const nightOpticsVariant = useMorphNightOpticsStore((store) => store.variant)
+  const nightLookMix = useMorphNightOpticsStore((store) => store.lookMix)
+  const nightExposure = useMorphNightOpticsStore((store) => store.exposure)
+  const nightShadowLift = useMorphNightOpticsStore((store) => store.shadowLift)
+  const nightLocalGrain = useMorphNightOpticsStore((store) => store.localGrain)
+  const nightVignetteStrength = useMorphNightOpticsStore((store) => store.vignetteStrength)
+  const nightVignetteSoftness = useMorphNightOpticsStore((store) => store.vignetteSoftness)
+  const nightVignetteIrregularity = useMorphNightOpticsStore((store) => store.vignetteIrregularity)
+  const nightVignetteOffsetX = useMorphNightOpticsStore((store) => store.vignetteOffsetX)
+  const nightVignetteOffsetY = useMorphNightOpticsStore((store) => store.vignetteOffsetY)
+  const nightBloomStrength = useMorphNightOpticsStore((store) => store.bloomStrength)
+  const nightBloomRadius = useMorphNightOpticsStore((store) => store.bloomRadius)
+  const nightBloomCore = useMorphNightOpticsStore((store) => store.bloomCore)
+  const nightDebugView = useMorphNightOpticsStore((store) => store.debugView)
 
   useEffect(() => {
     material.uniforms.uStabilityVariant.value = stabilityVariant === 'stabilized' ? 1 : 0
@@ -42,6 +58,8 @@ export function PlanMorphApproachRoom() {
     canvas.dataset.morphStabilityRotationAngle = rotationAngle.toFixed(2)
     canvas.dataset.morphStabilityFreezeTime = freezeTime ? 'on' : 'off'
     canvas.dataset.morphStabilityShaderTime = shaderTime.toFixed(3)
+    canvas.dataset.morphNightOpticsStage = nightOpticsVariant === 'night-film' ? 'n4-opening-halation' : 'current'
+    canvas.dataset.morphNightOpticsDebug = nightDebugView
 
     return () => {
       delete canvas.dataset.morphStabilityVariant
@@ -51,8 +69,10 @@ export function PlanMorphApproachRoom() {
       delete canvas.dataset.morphStabilityRotationAngle
       delete canvas.dataset.morphStabilityFreezeTime
       delete canvas.dataset.morphStabilityShaderTime
+      delete canvas.dataset.morphNightOpticsStage
+      delete canvas.dataset.morphNightOpticsDebug
     }
-  }, [canvas, debugView, freezeRotation, freezeTime, material, rotationAngle, shaderTime, stabilityVariant])
+  }, [canvas, debugView, freezeRotation, freezeTime, material, nightDebugView, nightOpticsVariant, rotationAngle, shaderTime, stabilityVariant])
 
   useEffect(() => {
     const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
@@ -127,6 +147,25 @@ export function PlanMorphApproachRoom() {
       : performance.now() / 1000 - rippleStartedAt.current
     material.uniforms.uRippleAge.value = rippleAge
     material.uniforms.uRippleOrigin.value.set(rippleLocal.current.x, rippleLocal.current.z)
+    material.uniforms.uNightLookEnabled.value = nightOpticsVariant === 'night-film' ? 1 : 0
+    material.uniforms.uNightLookMix.value = nightLookMix
+    material.uniforms.uNightExposure.value = nightExposure
+    material.uniforms.uNightShadowLift.value = nightShadowLift
+    material.uniforms.uNightLocalGrain.value = nightLocalGrain
+    gl.getDrawingBufferSize(nightResolution.current)
+    material.uniforms.uNightResolution.value.copy(nightResolution.current)
+    material.uniforms.uNightVignetteStrength.value = nightVignetteStrength
+    material.uniforms.uNightVignetteSoftness.value = nightVignetteSoftness
+    material.uniforms.uNightVignetteIrregularity.value = nightVignetteIrregularity
+    material.uniforms.uNightVignetteOffset.value.set(nightVignetteOffsetX, nightVignetteOffsetY)
+    material.uniforms.uNightBloomStrength.value = nightBloomStrength
+    material.uniforms.uNightBloomRadius.value = nightBloomRadius
+    material.uniforms.uNightBloomCore.value = nightBloomCore
+    material.uniforms.uNightDebugView.value = nightDebugView === 'bloom-mask'
+      ? 1
+      : nightDebugView === 'vignette-mask'
+        ? 2
+        : 0
 
     gl.domElement.dataset.planMorphVisibility = reveal.toFixed(3)
     gl.domElement.dataset.planMorphActivation = architectureActivation.toFixed(3)

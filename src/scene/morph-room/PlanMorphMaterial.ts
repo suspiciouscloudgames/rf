@@ -36,6 +36,20 @@ const fragmentShader = /* glsl */ `
   uniform float uRippleRadius;
   uniform float uRippleAge;
   uniform vec2 uRippleOrigin;
+  uniform float uNightLookEnabled;
+  uniform float uNightLookMix;
+  uniform float uNightExposure;
+  uniform float uNightShadowLift;
+  uniform float uNightLocalGrain;
+  uniform vec2 uNightResolution;
+  uniform float uNightVignetteStrength;
+  uniform float uNightVignetteSoftness;
+  uniform float uNightVignetteIrregularity;
+  uniform vec2 uNightVignetteOffset;
+  uniform float uNightBloomStrength;
+  uniform float uNightBloomRadius;
+  uniform float uNightBloomCore;
+  uniform float uNightDebugView;
 
   varying vec3 vLocalPosition;
   out vec4 fragColor;
@@ -206,7 +220,7 @@ const fragmentShader = /* glsl */ `
     return tree + (1.0 - activation) * 0.28;
   }
 
-  vec3 evaluateSceneField(vec3 point, float cutawayNearWalls) {
+  vec4 evaluateSceneField(vec3 point, float cutawayNearWalls) {
     float floorDistance = buildingFloorField(point);
     float wallDistance = buildingWallField(point);
     float frameDistance = openingFrameField(point);
@@ -232,14 +246,14 @@ const fragmentShader = /* glsl */ `
     float rippleFront = abs(rippleDistance - uRippleAge * 1.35);
     float rippleEnvelope = smoothstep(uRippleRadius, 0.0, rippleFront) * exp(-uRippleAge * 0.55);
     signedDistance -= sin(rippleDistance * 17.0 - uRippleAge * 10.0) * rippleEnvelope * uRippleAmount;
-    return vec3(signedDistance, wallInfluence, featureInfluence);
+    return vec4(signedDistance, wallInfluence, featureInfluence, frameDistance);
   }
 
-  vec3 sceneField(vec3 point) {
+  vec4 sceneField(vec3 point) {
     return evaluateSceneField(point, 0.0);
   }
 
-  vec3 sceneInteriorField(vec3 point) {
+  vec4 sceneInteriorField(vec3 point) {
     return evaluateSceneField(point, 1.0);
   }
 
@@ -282,6 +296,20 @@ const fragmentShader = /* glsl */ `
     return fract(sin(dot(value, vec2(12.9898, 78.233))) * 43758.5453);
   }
 
+  float nightVignetteMask() {
+    vec2 safeResolution = max(uNightResolution, vec2(1.0));
+    vec2 centered = gl_FragCoord.xy / safeResolution - vec2(0.5) - uNightVignetteOffset;
+    centered.x *= safeResolution.x / safeResolution.y * 0.82;
+    float angle = atan(centered.y, centered.x);
+    float lowFrequencyWarp = sin(angle * 2.0 + 0.74) * 0.052
+      + sin(angle * 3.0 - 1.15) * 0.029
+      + sin(angle * 5.0 + 0.38) * 0.014;
+    float warpedRadius = length(centered) + lowFrequencyWarp * uNightVignetteIrregularity;
+    float feather = mix(0.055, 0.24, uNightVignetteSoftness);
+    float edge = smoothstep(0.40 - feather, 0.64 + feather * 0.35, warpedRadius);
+    return 1.0 - edge * uNightVignetteStrength;
+  }
+
   vec3 shadeSurface(vec3 point, vec3 normal, float wallInfluence) {
     float occlusion = ambientOcclusion(point, normal);
     float diffuse = dot(normal, normalize(vec3(-0.45, 0.82, 0.38))) * 0.5 + 0.5;
@@ -305,7 +333,23 @@ const fragmentShader = /* glsl */ `
     float frameTime = floor(uTime * 12.0) / 12.0 * uFilmTemporalEnabled;
     float grain = random(gl_FragCoord.xy + frameTime * 149.0) - 0.5;
     float flicker = (random(vec2(frameTime, 7.31)) - 0.5) * uFilmFlicker;
-    return max(color + grain * uFilmGrain + flicker, 0.0);
+    color = max(color + grain * uFilmGrain + flicker, 0.0);
+    if (uNightLookEnabled > 0.5) {
+      float sourceLuminance = dot(color, vec3(0.299, 0.587, 0.114));
+      float exposedLuminance = 1.0 - exp(-sourceLuminance * uNightExposure * 1.85);
+      float midResponse = smoothstep(0.025, 0.68, exposedLuminance);
+      float highlightResponse = smoothstep(0.58, 0.96, exposedLuminance);
+      vec3 nightShadow = vec3(0.004, 0.022, 0.019);
+      vec3 nightMid = vec3(0.055, 0.315, 0.195);
+      vec3 nightHighlight = vec3(0.68, 0.94, 0.62);
+      vec3 nightColor = mix(nightShadow, nightMid, midResponse);
+      nightColor = mix(nightColor, nightHighlight, highlightResponse);
+      nightColor += vec3(0.015, 0.095, 0.055) * uNightShadowLift * (1.0 - exposedLuminance);
+      float localGrain = random(gl_FragCoord.xy * 0.71 + floor(uTime * 8.0) * 83.0) - 0.5;
+      nightColor += localGrain * uNightLocalGrain * mix(1.0, 0.35, exposedLuminance);
+      color = mix(color, max(nightColor, 0.0), uNightLookMix);
+    }
+    return color;
   }
 
   float resolveFrontWall(vec3 point, vec3 normal, float wallInfluence) {
@@ -385,7 +429,7 @@ const fragmentShader = /* glsl */ `
     }
 
     vec3 firstPoint = point;
-    vec3 firstField = sceneField(firstPoint);
+    vec4 firstField = sceneField(firstPoint);
     vec3 firstNormal = estimateNormal(firstPoint);
 
     if (debugEdgeCandidates) {
@@ -441,6 +485,7 @@ const fragmentShader = /* glsl */ `
     float secondaryWeight = 1.0;
     bool traceSecondarySurface = frontWall > 0.015;
     bool secondarySurfaceHit = false;
+    float openingFrameDistance = abs(firstField.w);
 
     if (useStabilizedFrontWall) {
       secondaryWeight = smoothstep(0.02, 0.20, frontWall);
@@ -479,7 +524,8 @@ const fragmentShader = /* glsl */ `
 
       if (secondHit) {
         secondarySurfaceHit = true;
-        vec3 secondField = sceneField(secondPoint);
+        vec4 secondField = sceneField(secondPoint);
+        openingFrameDistance = min(openingFrameDistance, abs(secondField.w));
         vec3 secondNormal = estimateNormal(secondPoint);
         vec3 secondColor = shadeSurface(secondPoint, secondNormal, secondField.y);
         float secondOpacity = mix(0.44, 0.96, mix(uRoomOpacity, uPropOpacity, secondField.z));
@@ -511,6 +557,26 @@ const fragmentShader = /* glsl */ `
       gl_FragDepth = debugClipPosition.z / debugClipPosition.w * 0.5 + 0.5;
       fragColor = vec4(debugColor, mix(0.72, 0.96, max(riskyFrontWall, safeFrontWall)) * revealFade);
       return;
+    }
+
+    if (uNightLookEnabled > 0.5) {
+      float bloomCore = 1.0 - smoothstep(0.012, 0.035 + uNightBloomCore * 0.020, openingFrameDistance);
+      float bloomHalo = 1.0 - smoothstep(0.06, max(uNightBloomRadius, 0.061), openingFrameDistance);
+      bloomHalo = max(bloomHalo - bloomCore * 0.58, 0.0);
+      float vignette = nightVignetteMask();
+      float subjectRelief = bloomHalo * 0.20 + bloomCore * 0.28;
+      vignette = mix(vignette, max(vignette, 0.78), subjectRelief);
+      compositedColor *= mix(1.0, vignette, uNightLookMix);
+      vec3 halationColor = vec3(0.42, 0.78, 0.38);
+      float halation = (bloomCore * uNightBloomCore * 0.55 + bloomHalo * 0.20) * uNightBloomStrength;
+      vec3 bloomSignal = halationColor * halation * uNightLookMix;
+      compositedColor += bloomSignal * (1.0 - clamp(compositedColor, 0.0, 1.0));
+      if (uNightDebugView > 0.5) {
+        compositedColor = uNightDebugView < 1.5
+          ? vec3(bloomCore, bloomHalo * 0.72, 0.02)
+          : vec3(vignette);
+        compositedOpacity = 0.94;
+      }
     }
 
     vec4 clipPosition = projectionMatrix * modelViewMatrix * vec4(firstPoint, 1.0);
@@ -548,6 +614,20 @@ export class PlanMorphMaterial extends ShaderMaterial {
         uRippleRadius: { value: 1.25 },
         uRippleAge: { value: 99 },
         uRippleOrigin: { value: new Vector2() },
+        uNightLookEnabled: { value: 0 },
+        uNightLookMix: { value: 1 },
+        uNightExposure: { value: 1.08 },
+        uNightShadowLift: { value: 0.065 },
+        uNightLocalGrain: { value: 0.055 },
+        uNightResolution: { value: new Vector2(1, 1) },
+        uNightVignetteStrength: { value: 0.72 },
+        uNightVignetteSoftness: { value: 0.34 },
+        uNightVignetteIrregularity: { value: 0.18 },
+        uNightVignetteOffset: { value: new Vector2(-0.025, 0.015) },
+        uNightBloomStrength: { value: 0.42 },
+        uNightBloomRadius: { value: 0.36 },
+        uNightBloomCore: { value: 0.32 },
+        uNightDebugView: { value: 0 },
       },
       vertexShader,
       fragmentShader,
