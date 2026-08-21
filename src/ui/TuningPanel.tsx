@@ -2,6 +2,10 @@ import { useEffect } from 'react'
 import type { ExperienceTuning, HubPersistenceMode } from '../store/tuningStore'
 import { useTuningStore } from '../store/tuningStore'
 import { useRoomVisualModeStore, type RoomVisualMode } from '../store/roomVisualModeStore'
+import { useMorphStabilityExperimentStore } from '../store/morphStabilityExperimentStore'
+import { useMorphCameraExperimentStore } from '../store/morphCameraExperimentStore'
+import type { LowMorphCameraTuning } from '../store/morphCameraExperimentStore'
+import { useMorphNightOpticsStore, type MorphNightOpticsTuning } from '../store/morphNightOpticsStore'
 
 type NumericTuningKey = {
   [Key in keyof ExperienceTuning]: ExperienceTuning[Key] extends number ? Key : never
@@ -23,11 +27,19 @@ type MorphColorKey = 'morphBaseColor' | 'morphHighlightColor' | 'morphShadowColo
 const roomModeOptions: Array<{ value: RoomVisualMode; label: string; hint: string }> = [
   { value: 'classic', label: 'Classic', hint: '기존 2step 비주얼' },
   { value: 'morph', label: 'Morph', hint: '실험적 표면 몰핑 룸' },
+  { value: 'morph-plan', label: 'Plan Morph', hint: '평면도 기반 구조 프로토타입' },
 ]
 
 const persistenceOptions: Array<{ value: HubPersistenceMode; label: string; hint: string }> = [
   { value: 'particles', label: 'Particles Only', hint: '모든 단계와 암전 위에 파티클만 유지' },
   { value: 'fullHub', label: 'Full Hub', hint: '허브 배경·환경·비선택 신호까지 유지' },
+]
+
+const hubBackgroundControls: ControlDefinition[] = [
+  { key: 'hubVideoBrightness', label: 'Video Brightness', hint: '허브 영상의 밝기 필터', min: 0, max: 1.5, step: 0.01, unit: '', digits: 2 },
+  { key: 'hubVideoScrimOpacity', label: 'Scrim Strength', hint: '중앙 외곽과 상하 암부 그라데이션 강도', min: 0, max: 1, step: 0.01, unit: '', digits: 2 },
+  { key: 'hubVideoOpacity', label: 'Video Opacity', hint: '어두운 배경 위에 합성되는 영상 전체 투명도', min: 0, max: 1, step: 0.01, unit: '', digits: 2 },
+  { key: 'hubVideoFadeOutSeconds', label: 'Video Fade Out', hint: '1→2 전환에서 영상이 완전히 어두워지는 시간', min: 0.5, max: 15, step: 0.1, unit: 's', digits: 1 },
 ]
 
 const timingControls: ControlDefinition[] = [
@@ -56,6 +68,9 @@ const morphAppearanceControls: ControlDefinition[] = [
 ]
 
 const morphMotionControls: ControlDefinition[] = [
+  { key: 'morphRotationPeriod', label: 'Room Rotation Period', hint: 'Morph Room 한 바퀴 회전 시간', min: 30, max: 900, step: 5, unit: 's', digits: 0 },
+  { key: 'morphFrontWallOpacity', label: 'Front Wall Opacity', hint: '카메라를 향한 벽의 최소 투명도', min: 0.02, max: 0.8, step: 0.01, unit: '', digits: 2 },
+  { key: 'morphFrontWallFadeAngle', label: 'Front Wall Fade Angle', hint: '카메라 쪽 벽이 투명해지는 각도 범위', min: 15, max: 85, step: 1, unit: '°', digits: 0 },
   { key: 'morphWaverAmount', label: 'Waver Amount', hint: '표면 변위 강도', min: 0, max: 0.12, step: 0.002, unit: '', digits: 3 },
   { key: 'morphWaverScale', label: 'Waver Scale', hint: '일렁임의 크기와 밀도', min: 0.5, max: 10, step: 0.1, unit: '', digits: 1 },
   { key: 'morphWaverSpeed', label: 'Waver Speed', hint: '표면이 움직이는 속도', min: 0, max: 1.5, step: 0.01, unit: '', digits: 2 },
@@ -164,6 +179,360 @@ function MorphColorControl({ definition }: { definition: (typeof morphColorContr
   )
 }
 
+function MorphTemporalFlickerControl() {
+  const enabled = useTuningStore((store) => store.morphTemporalFlickerEnabled)
+  const setTuningValue = useTuningStore((store) => store.setTuningValue)
+
+  return (
+    <div className="persistence-selector" role="group" aria-label="Morph temporal flicker">
+      <button
+        type="button"
+        className={enabled ? 'is-active' : ''}
+        aria-pressed={enabled}
+        onClick={() => setTuningValue('morphTemporalFlickerEnabled', true)}
+      >
+        <span>Flicker On</span>
+        <small>움직이는 필름 입자와 밝기 떨림</small>
+      </button>
+      <button
+        type="button"
+        className={enabled ? '' : 'is-active'}
+        aria-pressed={!enabled}
+        onClick={() => setTuningValue('morphTemporalFlickerEnabled', false)}
+      >
+        <span>Flicker Off</span>
+        <small>입자는 유지하고 시간 변화만 정지</small>
+      </button>
+    </div>
+  )
+}
+
+function MorphStabilityLab() {
+  const variant = useMorphStabilityExperimentStore((store) => store.variant)
+  const freezeRotation = useMorphStabilityExperimentStore((store) => store.freezeRotation)
+  const rotationAngle = useMorphStabilityExperimentStore((store) => store.rotationAngle)
+  const freezeTime = useMorphStabilityExperimentStore((store) => store.freezeTime)
+  const shaderTime = useMorphStabilityExperimentStore((store) => store.shaderTime)
+  const debugView = useMorphStabilityExperimentStore((store) => store.debugView)
+  const setVariant = useMorphStabilityExperimentStore((store) => store.setVariant)
+  const setFreezeRotation = useMorphStabilityExperimentStore((store) => store.setFreezeRotation)
+  const setRotationAngle = useMorphStabilityExperimentStore((store) => store.setRotationAngle)
+  const setFreezeTime = useMorphStabilityExperimentStore((store) => store.setFreezeTime)
+  const setShaderTime = useMorphStabilityExperimentStore((store) => store.setShaderTime)
+  const setDebugView = useMorphStabilityExperimentStore((store) => store.setDebugView)
+
+  return (
+    <>
+      <div className="persistence-selector" role="group" aria-label="Morph stability variant">
+        <button
+          type="button"
+          className={variant === 'baseline' ? 'is-active' : ''}
+          aria-pressed={variant === 'baseline'}
+          onClick={() => {
+            setDebugView('none')
+            setVariant('baseline')
+          }}
+        >
+          <span>A · Baseline</span>
+          <small>현재 Plan Morph 셰이더</small>
+        </button>
+        <button
+          type="button"
+          className={variant === 'stabilized' ? 'is-active' : ''}
+          aria-pressed={variant === 'stabilized'}
+          onClick={() => setVariant('stabilized')}
+        >
+          <span>B · Candidate</span>
+          <small>B4 · Bidirectional Cutaway</small>
+        </button>
+      </div>
+
+      <div className="stability-freeze-control">
+        <span>
+          <strong>Rotation</strong>
+          <small>지정 각도로 고정해 동일 프레임 비교</small>
+        </span>
+        <button
+          type="button"
+          className={freezeRotation ? 'is-active' : ''}
+          aria-pressed={freezeRotation}
+          onClick={() => setFreezeRotation(!freezeRotation)}
+        >
+          {freezeRotation ? 'FROZEN' : 'LIVE'}
+        </button>
+      </div>
+      <label className="tuning-control">
+        <span className="tuning-control-heading">
+          <span>Rotation Angle</span>
+          <output>{rotationAngle.toFixed(0)}°</output>
+        </span>
+        <input
+          type="range"
+          min="0"
+          max="359"
+          step="1"
+          value={rotationAngle}
+          onChange={(event) => {
+            setRotationAngle(Number(event.currentTarget.value))
+            if (!freezeRotation) setFreezeRotation(true)
+          }}
+        />
+      </label>
+
+      <div className="stability-freeze-control">
+        <span>
+          <strong>Shader Time</strong>
+          <small>Waver 고정 · 비교 중 Ripple 비활성</small>
+        </span>
+        <button
+          type="button"
+          className={freezeTime ? 'is-active' : ''}
+          aria-pressed={freezeTime}
+          onClick={() => setFreezeTime(!freezeTime)}
+        >
+          {freezeTime ? 'FROZEN' : 'LIVE'}
+        </button>
+      </div>
+      <label className="tuning-control">
+        <span className="tuning-control-heading">
+          <span>Shader Time</span>
+          <output>{shaderTime.toFixed(1)}s</output>
+        </span>
+        <input
+          type="range"
+          min="0"
+          max="60"
+          step="0.1"
+          value={shaderTime}
+          onChange={(event) => {
+            setShaderTime(Number(event.currentTarget.value))
+            if (!freezeTime) setFreezeTime(true)
+          }}
+        />
+      </label>
+      <div className="persistence-selector" role="group" aria-label="Morph stability debug view">
+        <button
+          type="button"
+          className={debugView === 'none' ? 'is-active' : ''}
+          aria-pressed={debugView === 'none'}
+          onClick={() => setDebugView('none')}
+        >
+          <span>Normal View</span>
+          <small>양방향 내부 노출 결과</small>
+        </button>
+        <button
+          type="button"
+          className={debugView === 'edge-candidate' ? 'is-active' : ''}
+          aria-pressed={debugView === 'edge-candidate'}
+          onClick={() => {
+            if (variant !== 'stabilized') setVariant('stabilized')
+            setDebugView('edge-candidate')
+          }}
+        >
+          <span>Edge Candidates</span>
+          <small>노랑 후보 · 빨강 고위험</small>
+        </button>
+        <button
+          type="button"
+          className={debugView === 'front-wall-risk' ? 'is-active' : ''}
+          aria-pressed={debugView === 'front-wall-risk'}
+          onClick={() => {
+            if (variant !== 'stabilized') setVariant('stabilized')
+            setDebugView('front-wall-risk')
+          }}
+        >
+          <span>Front Wall Risk</span>
+          <small>빨강 셸만 표시 · 초록 내부 합성</small>
+        </button>
+      </div>
+      <p className="stability-lab-note">
+        {debugView === 'edge-candidate'
+          ? 'Debug only: 후보를 표시하며 최종 Alpha는 변경하지 않습니다.'
+          : debugView === 'front-wall-risk'
+            ? '빨강은 내부 표면이 없는 약한 외벽 셸, 초록은 외벽 너머 내부 표면까지 합성된 영역입니다.'
+            : 'B는 외벽을 반투명 셸로 유지하면서 정면과 뒷면의 내부 표면을 합성합니다.'}
+      </p>
+    </>
+  )
+}
+
+function MorphCameraLab() {
+  const variant = useMorphCameraExperimentStore((store) => store.variant)
+  const setVariant = useMorphCameraExperimentStore((store) => store.setVariant)
+  const resetLowCameraTuning = useMorphCameraExperimentStore((store) => store.resetLowCameraTuning)
+
+  return (
+    <>
+      <div className="persistence-selector" role="group" aria-label="Morph camera variant">
+        <button
+          type="button"
+          className={variant === 'current' ? 'is-active' : ''}
+          aria-pressed={variant === 'current'}
+          onClick={() => setVariant('current')}
+        >
+          <span>A · Current</span>
+          <small>기존 2step 카메라</small>
+        </button>
+        <button
+          type="button"
+          className={variant === 'low' ? 'is-active' : ''}
+          aria-pressed={variant === 'low'}
+          onClick={() => setVariant('low')}
+        >
+          <span>B · Low Camera</span>
+          <small>낮은 시점의 고정 구도</small>
+        </button>
+      </div>
+      {variant === 'low' ? (
+        <div className="morph-camera-tuning">
+          <div className="tuning-section-heading">
+            <h3>Low Camera Framing</h3>
+            <button type="button" onClick={resetLowCameraTuning}>RESET LOW</button>
+          </div>
+          <MorphCameraControl tuningKey="lowHeight" label="Camera Height" min={0.35} max={2.4} step={0.01} unit="m" />
+          <MorphCameraControl tuningKey="lowTargetHeight" label="Target Height" min={-0.4} max={1.2} step={0.01} unit="m" />
+          <MorphCameraControl tuningKey="lowDistance" label="Distance" min={3.5} max={12} step={0.01} unit="m" />
+          <MorphCameraControl tuningKey="lowFov" label="FOV" min={24} max={50} step={0.1} unit="°" />
+          <p className="stability-lab-note">회전 중 위치와 FOV는 고정되며 빨간 경계는 소프트 가이드로만 사용합니다.</p>
+        </div>
+      ) : null}
+    </>
+  )
+}
+
+function MorphCameraControl({
+  tuningKey,
+  label,
+  min,
+  max,
+  step,
+  unit,
+}: {
+  tuningKey: keyof LowMorphCameraTuning
+  label: string
+  min: number
+  max: number
+  step: number
+  unit: string
+}) {
+  const value = useMorphCameraExperimentStore((store) => store[tuningKey])
+  const setLowCameraTuning = useMorphCameraExperimentStore((store) => store.setLowCameraTuning)
+
+  return (
+    <label className="tuning-control">
+      <span className="tuning-control-heading">
+        <span>{label}</span>
+        <output>{value.toFixed(step < 0.1 ? 2 : 1)}{unit}</output>
+      </span>
+      <input
+        type="range"
+        min={min}
+        max={max}
+        step={step}
+        value={value}
+        onChange={(event) => setLowCameraTuning(tuningKey, Number(event.currentTarget.value))}
+      />
+    </label>
+  )
+}
+
+function MorphNightOpticsLab() {
+  const variant = useMorphNightOpticsStore((store) => store.variant)
+  const setVariant = useMorphNightOpticsStore((store) => store.setVariant)
+  const resetTuning = useMorphNightOpticsStore((store) => store.resetTuning)
+  const debugView = useMorphNightOpticsStore((store) => store.debugView)
+  const setDebugView = useMorphNightOpticsStore((store) => store.setDebugView)
+
+  return (
+    <>
+      <div className="persistence-selector" role="group" aria-label="Morph night optics variant">
+        <button
+          type="button"
+          className={variant === 'current' ? 'is-active' : ''}
+          aria-pressed={variant === 'current'}
+          onClick={() => setVariant('current')}
+        >
+          <span>A · Current</span>
+          <small>현재 룸 비주얼 유지</small>
+        </button>
+        <button
+          type="button"
+          className={variant === 'night-film' ? 'is-active' : ''}
+          aria-pressed={variant === 'night-film'}
+          onClick={() => setVariant('night-film')}
+        >
+          <span>B · Night Film</span>
+          <small>야간 투시 필름 후보</small>
+        </button>
+      </div>
+      {variant === 'night-film' ? (
+        <div className="morph-night-optics-tuning">
+          <div className="tuning-section-heading">
+            <h3>Night Film Response</h3>
+            <button type="button" onClick={resetTuning}>RESET LOOK</button>
+          </div>
+          <MorphNightOpticsControl tuningKey="lookMix" label="Look Mix" min={0} max={1} step={0.01} />
+          <MorphNightOpticsControl tuningKey="exposure" label="Night Exposure" min={0.35} max={2} step={0.01} />
+          <MorphNightOpticsControl tuningKey="shadowLift" label="Shadow Lift" min={0} max={0.3} step={0.005} />
+          <MorphNightOpticsControl tuningKey="localGrain" label="Local Film Grain" min={0} max={0.2} step={0.005} />
+          <MorphNightOpticsControl tuningKey="vignetteStrength" label="Vignette Strength" min={0} max={1} step={0.01} />
+          <MorphNightOpticsControl tuningKey="vignetteSoftness" label="Vignette Softness" min={0.05} max={0.8} step={0.01} />
+          <MorphNightOpticsControl tuningKey="vignetteIrregularity" label="Vignette Irregularity" min={0} max={0.5} step={0.01} />
+          <MorphNightOpticsControl tuningKey="vignetteOffsetX" label="Vignette Offset X" min={-0.25} max={0.25} step={0.005} />
+          <MorphNightOpticsControl tuningKey="vignetteOffsetY" label="Vignette Offset Y" min={-0.25} max={0.25} step={0.005} />
+          <MorphNightOpticsControl tuningKey="bloomStrength" label="Bloom Strength" min={0} max={2} step={0.01} />
+          <MorphNightOpticsControl tuningKey="bloomRadius" label="Bloom Radius" min={0.05} max={1.2} step={0.01} />
+          <MorphNightOpticsControl tuningKey="bloomCore" label="Bloom Core" min={0} max={1.5} step={0.01} />
+          <div className="persistence-selector" role="group" aria-label="Morph night optics debug view">
+            <button type="button" className={debugView === 'none' ? 'is-active' : ''} aria-pressed={debugView === 'none'} onClick={() => setDebugView('none')}>
+              <span>Normal View</span><small>최종 Night Film 합성</small>
+            </button>
+            <button type="button" className={debugView === 'bloom-mask' ? 'is-active' : ''} aria-pressed={debugView === 'bloom-mask'} onClick={() => setDebugView('bloom-mask')}>
+              <span>Bloom Mask</span><small>창·문 코어와 할레이션</small>
+            </button>
+            <button type="button" className={debugView === 'vignette-mask' ? 'is-active' : ''} aria-pressed={debugView === 'vignette-mask'} onClick={() => setDebugView('vignette-mask')}>
+              <span>Vignette Mask</span><small>비정형 렌즈 감광 영역</small>
+            </button>
+          </div>
+        </div>
+      ) : null}
+    </>
+  )
+}
+
+function MorphNightOpticsControl({
+  tuningKey,
+  label,
+  min,
+  max,
+  step,
+}: {
+  tuningKey: keyof MorphNightOpticsTuning
+  label: string
+  min: number
+  max: number
+  step: number
+}) {
+  const value = useMorphNightOpticsStore((store) => store[tuningKey])
+  const setTuning = useMorphNightOpticsStore((store) => store.setTuning)
+  return (
+    <label className="tuning-control">
+      <span className="tuning-control-heading">
+        <span>{label}</span>
+        <output>{value.toFixed(step < 0.01 ? 3 : 2)}</output>
+      </span>
+      <input
+        type="range"
+        min={min}
+        max={max}
+        step={step}
+        value={value}
+        onChange={(event) => setTuning(tuningKey, Number(event.currentTarget.value))}
+      />
+    </label>
+  )
+}
+
 export function TuningPanel() {
   const panelOpen = useTuningStore((store) => store.panelOpen)
   const togglePanel = useTuningStore((store) => store.togglePanel)
@@ -211,6 +580,11 @@ export function TuningPanel() {
           </section>
 
           <section>
+            <h3>Hub Background</h3>
+            {hubBackgroundControls.map((control) => <TuningControl key={control.key} definition={control} />)}
+          </section>
+
+          <section>
             <h3>Timeline</h3>
             {timingControls.map((control) => <TuningControl key={control.key} definition={control} />)}
           </section>
@@ -236,7 +610,25 @@ export function TuningPanel() {
               </section>
               <section>
                 <h3>Morph Film Tone</h3>
+                <MorphTemporalFlickerControl />
                 {morphFilmControls.map((control) => <TuningControl key={control.key} definition={control} />)}
+              </section>
+            </>
+          ) : null}
+
+          {roomVisualMode === 'morph-plan' ? (
+            <>
+              <section>
+                <h3>Morph Camera Lab</h3>
+                <MorphCameraLab />
+              </section>
+              <section>
+                <h3>Morph Night Optics Lab</h3>
+                <MorphNightOpticsLab />
+              </section>
+              <section>
+                <h3>Morph Stability Lab</h3>
+                <MorphStabilityLab />
               </section>
             </>
           ) : null}

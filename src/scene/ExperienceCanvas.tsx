@@ -4,21 +4,29 @@ import { CameraController } from '../camera/CameraController'
 import { World } from './World'
 import { HubOrbitController } from '../interaction/HubOrbitController'
 import { useRoomVisualModeStore } from '../store/roomVisualModeStore'
+import { useMorphCameraExperimentStore } from '../store/morphCameraExperimentStore'
+import { useMorphNightOpticsStore } from '../store/morphNightOpticsStore'
 
 function CanvasModeDataset() {
   const mode = useRoomVisualModeStore((store) => store.mode)
+  const cameraVariant = useMorphCameraExperimentStore((store) => store.variant)
+  const nightOpticsVariant = useMorphNightOpticsStore((store) => store.variant)
   const gl = useThree((state) => state.gl)
 
   useEffect(() => {
     gl.domElement.dataset.roomVisualMode = mode
-  }, [gl, mode])
+    gl.domElement.dataset.morphCameraVariant = cameraVariant
+    gl.domElement.dataset.morphNightOpticsVariant = nightOpticsVariant
+  }, [cameraVariant, gl, mode, nightOpticsVariant])
 
   return null
 }
 
 export function ExperienceCanvas() {
   const roomVisualMode = useRoomVisualModeStore((store) => store.mode)
-  const dpr: [number, number] = roomVisualMode === 'morph' ? [0.65, 1] : [1, 1.5]
+  const dpr: [number, number] = roomVisualMode === 'morph' || roomVisualMode === 'morph-plan'
+    ? [0.65, 1]
+    : [1, 1.5]
 
   return (
     <Canvas

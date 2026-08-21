@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import en from '../locales/en.json'
 import ja from '../locales/ja.json'
 import { useExperienceStore } from '../store/experienceStore'
@@ -7,6 +8,106 @@ import { getFocusContent } from '../content/focusContent'
 import { hasDepthPortal } from '../signals/signalData'
 import { ObservationSubtitles } from './ObservationSubtitles'
 import { useTuningStore } from '../store/tuningStore'
+
+interface WebkitFullscreenDocument extends Document {
+  webkitFullscreenElement?: Element | null
+  webkitIsFullScreen?: boolean
+  webkitExitFullscreen?: () => Promise<void> | void
+  webkitCancelFullScreen?: () => Promise<void> | void
+}
+
+interface WebkitFullscreenElement extends HTMLElement {
+  webkitRequestFullscreen?: () => Promise<void> | void
+  webkitRequestFullScreen?: () => Promise<void> | void
+}
+
+function HubFullscreenControl({ copy }: { copy: typeof ja }) {
+  const registerInteraction = useExperienceStore((store) => store.registerInteraction)
+  const webkitDocument = document as WebkitFullscreenDocument
+  const fullscreenActive = () => Boolean(
+    document.fullscreenElement
+    ?? webkitDocument.webkitFullscreenElement
+    ?? webkitDocument.webkitIsFullScreen,
+  )
+  const [isFullscreen, setIsFullscreen] = useState(fullscreenActive())
+  const [showInstallHint, setShowInstallHint] = useState(false)
+
+  useEffect(() => {
+    const syncFullscreen = () => {
+      setIsFullscreen(fullscreenActive())
+      setShowInstallHint(false)
+    }
+    const handleFullscreenError = () => setShowInstallHint(true)
+    document.addEventListener('fullscreenchange', syncFullscreen)
+    document.addEventListener('webkitfullscreenchange', syncFullscreen)
+    document.addEventListener('fullscreenerror', handleFullscreenError)
+    document.addEventListener('webkitfullscreenerror', handleFullscreenError)
+    return () => {
+      document.removeEventListener('fullscreenchange', syncFullscreen)
+      document.removeEventListener('webkitfullscreenchange', syncFullscreen)
+      document.removeEventListener('fullscreenerror', handleFullscreenError)
+      document.removeEventListener('webkitfullscreenerror', handleFullscreenError)
+    }
+  }, [])
+
+  const toggleFullscreen = async () => {
+    registerInteraction()
+    setShowInstallHint(false)
+    if (fullscreenActive()) {
+      try {
+        if (document.exitFullscreen) {
+          await document.exitFullscreen()
+        } else if (webkitDocument.webkitExitFullscreen) {
+          await webkitDocument.webkitExitFullscreen()
+        } else if (webkitDocument.webkitCancelFullScreen) {
+          await webkitDocument.webkitCancelFullScreen()
+        }
+        return
+      } catch {
+        setShowInstallHint(true)
+        return
+      }
+    }
+
+    const root = document.documentElement as WebkitFullscreenElement
+    if (root.requestFullscreen) {
+      try {
+        await root.requestFullscreen()
+        return
+      } catch {
+        // Older iPadOS versions expose the standard method but only complete
+        // fullscreen through the prefixed WebKit implementation.
+      }
+    }
+    const webkitRequestFullscreen = root.webkitRequestFullscreen ?? root.webkitRequestFullScreen
+    if (webkitRequestFullscreen) {
+      try {
+        await webkitRequestFullscreen.call(root)
+        return
+      } catch {
+        // Fall through to the platform guidance below.
+      }
+    }
+    setShowInstallHint(true)
+  }
+
+  return (
+    <div className="system-controls hub-fullscreen-controls">
+      <button
+        type="button"
+        className={`fullscreen-control${isFullscreen ? ' is-active' : ''}`}
+        aria-pressed={isFullscreen}
+        onClick={() => { void toggleFullscreen() }}
+      >
+        <span className="fullscreen-control-icon" aria-hidden="true">{isFullscreen ? '×' : '⛶'}</span>
+        <span>{isFullscreen ? copy.exitFullscreen : copy.fullscreen}</span>
+      </button>
+      {showInstallHint ? (
+        <p className="fullscreen-install-hint" role="status">{copy.fullscreenInstallHint}</p>
+      ) : null}
+    </div>
+  )
+}
 
 export function Interface() {
   const stage = useExperienceStore((store) => store.stage)
@@ -42,6 +143,7 @@ export function Interface() {
 
       {stage === 'hub' && transition === 'none' ? (
         <>
+          <HubFullscreenControl copy={copy} />
           <div className="stage-copy hub-copy">
             <p>{copy.hubHint}</p>
             <span>FIELD 35.6812° N / 139.7671° E</span>

@@ -11,6 +11,7 @@ export function MorphFilmOverlay() {
   const mode = useRoomVisualModeStore((store) => store.mode)
   const grain = useTuningStore((store) => store.morphFilmGrain)
   const flicker = useTuningStore((store) => store.morphFilmFlicker)
+  const temporalFlickerEnabled = useTuningStore((store) => store.morphTemporalFlickerEnabled)
 
   if (mode === 'classic') return null
 
@@ -18,5 +19,11 @@ export function MorphFilmOverlay() {
     '--morph-film-grain': grain,
     '--morph-film-flicker': flicker,
   }
-  return <div className="morph-film-overlay" style={style} aria-hidden="true" />
+  return (
+    <div
+      className={`morph-film-overlay${temporalFlickerEnabled ? '' : ' is-temporal-flicker-disabled'}`}
+      style={style}
+      aria-hidden="true"
+    />
+  )
 }

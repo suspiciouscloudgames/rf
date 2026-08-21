@@ -5,7 +5,11 @@ import { HubVideoBackground } from '../ui/HubVideoBackground'
 import { TuningPanel } from '../ui/TuningPanel'
 import { useExperienceStore } from '../store/experienceStore'
 import { useRoomVisualModeStore } from '../store/roomVisualModeStore'
+import { useTuningStore } from '../store/tuningStore'
 import { MorphFilmOverlay } from '../ui/MorphFilmOverlay'
+import { useMorphStabilityExperimentStore } from '../store/morphStabilityExperimentStore'
+import { useMorphCameraExperimentStore } from '../store/morphCameraExperimentStore'
+import { useMorphNightOpticsStore } from '../store/morphNightOpticsStore'
 
 const IDLE_TIMEOUT_MS = 90_000
 const ExperienceCanvas = lazy(() =>
@@ -23,11 +27,21 @@ export function App() {
   const mediaUnlocked = useRef(false)
   const roomVisualMode = useRoomVisualModeStore((store) => store.mode)
   const syncRoomVisualMode = useRoomVisualModeStore((store) => store.syncFromLocation)
+  const syncMorphStabilityExperiment = useMorphStabilityExperimentStore((store) => store.syncFromLocation)
+  const syncMorphCameraExperiment = useMorphCameraExperimentStore((store) => store.syncFromLocation)
+  const syncMorphNightOptics = useMorphNightOpticsStore((store) => store.syncFromLocation)
+  const morphTemporalFlickerEnabled = useTuningStore((store) => store.morphTemporalFlickerEnabled)
 
   useEffect(() => {
-    window.addEventListener('popstate', syncRoomVisualMode)
-    return () => window.removeEventListener('popstate', syncRoomVisualMode)
-  }, [syncRoomVisualMode])
+    const syncLocationState = () => {
+      syncRoomVisualMode()
+      syncMorphStabilityExperiment()
+      syncMorphCameraExperiment()
+      syncMorphNightOptics()
+    }
+    window.addEventListener('popstate', syncLocationState)
+    return () => window.removeEventListener('popstate', syncLocationState)
+  }, [syncMorphCameraExperiment, syncMorphNightOptics, syncMorphStabilityExperiment, syncRoomVisualMode])
 
   useEffect(() => {
     const timer = window.setTimeout(enterHub, 850)
@@ -72,6 +86,7 @@ export function App() {
     <main
       className={`experience-shell state-${stage} transition-${transition}`}
       data-room-visual-mode={roomVisualMode}
+      data-morph-temporal-flicker={morphTemporalFlickerEnabled ? 'on' : 'off'}
     >
       <HubVideoBackground />
       <Suspense fallback={null}>

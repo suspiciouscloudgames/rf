@@ -8,6 +8,11 @@ import { getHouseRoot } from '../scene/sceneRegistry'
 import { smootherStep } from '../sequence/observationTiming'
 import { useTuningStore } from '../store/tuningStore'
 import { useRoomVisualModeStore } from '../store/roomVisualModeStore'
+import { useMorphCameraExperimentStore } from '../store/morphCameraExperimentStore'
+import {
+  CURRENT_PLAN_MORPH_CAMERA,
+  type MorphCameraPreset,
+} from './morphCameraPresets'
 
 interface ActiveTransition {
   kind: 'hubToApproach' | 'approachToObservation' | 'returnToHub'
@@ -20,6 +25,17 @@ interface ActiveTransition {
   endTarget?: Vector3
   endFov?: number
   targetRotationDelay?: number
+}
+
+interface CameraPresetTransition {
+  fromPosition: Vector3
+  fromTarget: Vector3
+  fromFov: number
+  toPosition: Vector3
+  toTarget: Vector3
+  toFov: number
+  elapsed: number
+  duration: number
 }
 
 const easeInOutCubic = (value: number) =>
@@ -36,6 +52,49 @@ const tempObservationOffset = new Vector3()
 const tempApproachLift = new Vector3(0, 0.16, 0)
 const tempMorphApproachPosition = new Vector3(4.2, 2.75, 5.15)
 const tempMorphApproachTarget = new Vector3(0, -0.08, 0)
+const tempPlanMorphApproachPosition = new Vector3(...CURRENT_PLAN_MORPH_CAMERA.position)
+const tempPlanMorphApproachTarget = new Vector3(...CURRENT_PLAN_MORPH_CAMERA.target)
+const lowPlanMorphCameraPreset: MorphCameraPreset = {
+  position: [0, 0, 0],
+  target: [0.7, 0, 0.42],
+  fov: 36,
+}
+const lowCameraDirectionX = 3.7 / Math.hypot(3.7, 4.7)
+const lowCameraDirectionZ = 4.7 / Math.hypot(3.7, 4.7)
+
+const resolvePlanMorphCameraPreset = () => {
+  const experiment = useMorphCameraExperimentStore.getState()
+  if (experiment.variant !== 'low') return CURRENT_PLAN_MORPH_CAMERA
+  lowPlanMorphCameraPreset.position[0] = lowPlanMorphCameraPreset.target[0] + lowCameraDirectionX * experiment.lowDistance
+  lowPlanMorphCameraPreset.position[1] = experiment.lowHeight
+  lowPlanMorphCameraPreset.position[2] = lowPlanMorphCameraPreset.target[2] + lowCameraDirectionZ * experiment.lowDistance
+  lowPlanMorphCameraPreset.target[1] = experiment.lowTargetHeight
+  lowPlanMorphCameraPreset.fov = experiment.lowFov
+  return lowPlanMorphCameraPreset
+}
+
+const resolvePlanMorphCameraFrame = (preset: MorphCameraPreset) => {
+  const house = getHouseRoot()
+  tempPlanMorphApproachPosition.set(...preset.position)
+  tempPlanMorphApproachTarget.set(...preset.target)
+  if (house) {
+    house.updateWorldMatrix(true, false)
+    tempPlanMorphApproachPosition.applyMatrix4(house.matrixWorld)
+    tempPlanMorphApproachTarget.applyMatrix4(house.matrixWorld)
+  }
+  return {
+    position: tempPlanMorphApproachPosition,
+    target: tempPlanMorphApproachTarget,
+    fov: preset.fov,
+  }
+}
+
+const writeCameraDataset = (canvas: HTMLCanvasElement, camera: PerspectiveCamera, target: Vector3) => {
+  canvas.dataset.cameraPosition = camera.position.toArray().map((value) => value.toFixed(2)).join(',')
+  canvas.dataset.cameraTarget = target.toArray().map((value) => value.toFixed(2)).join(',')
+  canvas.dataset.cameraFov = camera.fov.toFixed(2)
+  canvas.dataset.cameraAspect = camera.aspect.toFixed(4)
+}
 
 const resolveSignalFrame = (worldDepth = useTuningStore.getState().worldDepth) => {
   const selectedSignal = getSignalConfig(useExperienceStore.getState().selectedSignalId)
@@ -72,11 +131,19 @@ const resolveSignalFrame = (worldDepth = useTuningStore.getState().worldDepth) =
 
 export function CameraController() {
   const camera = useThree((view) => view.camera as PerspectiveCamera)
+  const gl = useThree((view) => view.gl)
   const stage = useExperienceStore((store) => store.stage)
   const transitionKind = useExperienceStore((store) => store.transition)
+  const cameraVariant = useMorphCameraExperimentStore((store) => store.variant)
+  const lowHeight = useMorphCameraExperimentStore((store) => store.lowHeight)
+  const lowTargetHeight = useMorphCameraExperimentStore((store) => store.lowTargetHeight)
+  const lowDistance = useMorphCameraExperimentStore((store) => store.lowDistance)
+  const lowFov = useMorphCameraExperimentStore((store) => store.lowFov)
   const finishTransition = useExperienceStore((store) => store.finishTransition)
   const target = useRef(new Vector3(...cameraPresets.hub.target))
   const transition = useRef<ActiveTransition | null>(null)
+  const cameraPresetTransition = useRef<CameraPresetTransition | null>(null)
+  const previousCameraVariant = useRef(cameraVariant)
   const observationElapsed = useRef(0)
   const guidedObservationDuration = useRef(useTuningStore.getState().guidedObservationSeconds)
   const guidedStartPosition = useRef(camera.position.clone())
@@ -84,6 +151,49 @@ export function CameraController() {
   const observationWasActive = useRef(false)
   const hubPosition = useMemo(() => new Vector3(...cameraPresets.hub.position), [])
   const hubTarget = useMemo(() => new Vector3(...cameraPresets.hub.target), [])
+
+  useEffect(() => {
+    if (
+      stage !== 'approach'
+      || transitionKind !== 'none'
+      || useRoomVisualModeStore.getState().mode !== 'morph-plan'
+    ) return
+    const frame = resolvePlanMorphCameraFrame(resolvePlanMorphCameraPreset())
+    const variantChanged = previousCameraVariant.current !== cameraVariant
+    previousCameraVariant.current = cameraVariant
+    if (variantChanged) {
+      cameraPresetTransition.current = {
+        fromPosition: camera.position.clone(),
+        fromTarget: target.current.clone(),
+        fromFov: camera.fov,
+        toPosition: frame.position.clone(),
+        toTarget: frame.target.clone(),
+        toFov: frame.fov,
+        elapsed: 0,
+        duration: 0.4,
+      }
+      gl.domElement.dataset.morphCameraTransition = 'running'
+      return
+    }
+    cameraPresetTransition.current = null
+    camera.position.copy(frame.position)
+    target.current.copy(frame.target)
+    camera.fov = frame.fov
+    camera.updateProjectionMatrix()
+    camera.lookAt(target.current)
+    writeCameraDataset(gl.domElement, camera, target.current)
+    gl.domElement.dataset.morphCameraTransition = 'settled'
+  }, [
+    camera,
+    cameraVariant,
+    gl,
+    lowDistance,
+    lowFov,
+    lowHeight,
+    lowTargetHeight,
+    stage,
+    transitionKind,
+  ])
 
   useEffect(() => {
     const observationActive = stage === 'observation' && transitionKind === 'none'
@@ -173,6 +283,24 @@ export function CameraController() {
   useFrame(({ gl }, delta) => {
     const active = transition.current
     if (!active) {
+      const presetTransition = cameraPresetTransition.current
+      if (presetTransition && stage === 'approach' && transitionKind === 'none') {
+        presetTransition.elapsed += delta
+        const rawPresetProgress = Math.min(presetTransition.elapsed / presetTransition.duration, 1)
+        const presetProgress = easeInOutCubic(rawPresetProgress)
+        camera.position.lerpVectors(presetTransition.fromPosition, presetTransition.toPosition, presetProgress)
+        target.current.lerpVectors(presetTransition.fromTarget, presetTransition.toTarget, presetProgress)
+        camera.fov = MathUtils.lerp(presetTransition.fromFov, presetTransition.toFov, presetProgress)
+        camera.updateProjectionMatrix()
+        camera.lookAt(target.current)
+        writeCameraDataset(gl.domElement, camera, target.current)
+        if (rawPresetProgress >= 1) {
+          cameraPresetTransition.current = null
+          gl.domElement.dataset.morphCameraTransition = 'settled'
+        }
+        return
+      }
+      if (presetTransition) cameraPresetTransition.current = null
       if (stage === 'observation' && transitionKind === 'none') {
         const { signal, focus, nearObservationPosition } = resolveSignalFrame()
         if (signal.depthPortal) {
@@ -203,19 +331,28 @@ export function CameraController() {
     const progress = easeInOutCubic(rawProgress)
 
     if (active.kind === 'hubToApproach') {
-      const morphRoomActive = useRoomVisualModeStore.getState().mode === 'morph'
+      const roomMode = useRoomVisualModeStore.getState().mode
+      const morphRoomActive = roomMode === 'morph' || roomMode === 'morph-plan'
       if (morphRoomActive) {
+        const planMorphActive = roomMode === 'morph-plan'
+        const planMorphFrame = planMorphActive
+          ? resolvePlanMorphCameraFrame(resolvePlanMorphCameraPreset())
+          : null
         const house = getHouseRoot()
-        tempPosition.copy(tempMorphApproachPosition)
-        tempTarget.copy(tempMorphApproachTarget)
-        if (house) {
+        tempPosition.copy(planMorphFrame?.position ?? tempMorphApproachPosition)
+        tempTarget.copy(planMorphFrame?.target ?? tempMorphApproachTarget)
+        if (!planMorphActive && house) {
           house.updateWorldMatrix(true, false)
           tempPosition.applyMatrix4(house.matrixWorld)
           tempTarget.applyMatrix4(house.matrixWorld)
         }
         camera.position.lerpVectors(active.fromPosition, tempPosition, progress)
         target.current.lerpVectors(active.fromTarget, tempTarget, progress)
-        camera.fov = MathUtils.lerp(active.fromFov, 40, progress)
+        camera.fov = MathUtils.lerp(
+          active.fromFov,
+          planMorphFrame?.fov ?? 40,
+          progress,
+        )
       } else {
         const { signal, anchor, normal } = resolveSignalFrame()
         tempPosition.copy(anchor).addScaledVector(normal, signal.approachDistance).add(tempApproachLift)
@@ -238,9 +375,7 @@ export function CameraController() {
     camera.updateProjectionMatrix()
     camera.lookAt(target.current)
     camera.userData.transitionProgress = rawProgress
-    gl.domElement.dataset.cameraPosition = camera.position.toArray().map((value) => value.toFixed(2)).join(',')
-    gl.domElement.dataset.cameraTarget = target.current.toArray().map((value) => value.toFixed(2)).join(',')
-    gl.domElement.dataset.cameraFov = camera.fov.toFixed(2)
+    writeCameraDataset(gl.domElement, camera, target.current)
 
     if (rawProgress < 1) return
     transition.current = null

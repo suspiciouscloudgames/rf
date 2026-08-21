@@ -1,9 +1,9 @@
 import { create } from 'zustand'
 
-export type RoomVisualMode = 'classic' | 'morph' | 'morph-legacy'
+export type RoomVisualMode = 'classic' | 'morph' | 'morph-plan' | 'morph-legacy'
 
 const isRoomVisualMode = (value: unknown): value is RoomVisualMode =>
-  value === 'classic' || value === 'morph' || value === 'morph-legacy'
+  value === 'classic' || value === 'morph' || value === 'morph-plan' || value === 'morph-legacy'
 
 const getFallbackMode = (): RoomVisualMode => {
   const configuredMode = import.meta.env.VITE_ROOM_VISUAL_DEFAULT
