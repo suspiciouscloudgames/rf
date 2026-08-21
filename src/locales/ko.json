@@ -12,6 +12,8 @@
   "returningLabel": "거리를 복원하고 있습니다",
   "home": "처음으로 돌아가기",
   "fullscreen": "전체 화면",
+  "exitFullscreen": "전체 화면 종료",
+  "fullscreenInstallHint": "iPad에서는 공유 → 홈 화면에 추가 → 웹 앱으로 열기를 선택해 주세요.",
   "soundOn": "미디어 켜짐",
   "soundOff": "미디어 켜기",
   "narrationTitle": "관찰 01 — 귀 기울이는 집",

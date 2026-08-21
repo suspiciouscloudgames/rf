@@ -10,6 +10,7 @@ import { MorphFilmOverlay } from '../ui/MorphFilmOverlay'
 import { useMorphStabilityExperimentStore } from '../store/morphStabilityExperimentStore'
 import { useMorphCameraExperimentStore } from '../store/morphCameraExperimentStore'
 import { useMorphNightOpticsStore } from '../store/morphNightOpticsStore'
+import { localeCopy } from '../locales'
 
 const IDLE_TIMEOUT_MS = 90_000
 const ExperienceCanvas = lazy(() =>
