@@ -110,6 +110,7 @@ function HubFullscreenControl({ copy }: { copy: typeof ja }) {
 }
 
 export function Interface() {
+  const [isWelcomeOpen, setIsWelcomeOpen] = useState(false)
   const stage = useExperienceStore((store) => store.stage)
   const transition = useExperienceStore((store) => store.transition)
   const language = useExperienceStore((store) => store.language)
@@ -123,31 +124,44 @@ export function Interface() {
   const focusCopy = getFocusContent(language, selectedSignalId)
   const portalObservation = hasDepthPortal(selectedSignalId)
 
-  const stateLabel = stage === 'hub'
-    ? copy.hubLabel
-    : stage === 'approach'
-      ? copy.approachLabel
-      : stage === 'observation'
-        ? copy.observationLabel
-        : copy.returningLabel
+  useEffect(() => {
+    document.documentElement.lang = language
+  }, [language])
+
+  useEffect(() => {
+    if (!isWelcomeOpen) return
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setIsWelcomeOpen(false)
+    }
+    window.addEventListener('keydown', closeOnEscape)
+    return () => window.removeEventListener('keydown', closeOnEscape)
+  }, [isWelcomeOpen])
 
   return (
     <div className={`interface state-${stage} transition-${transition} ${effectActive ? 'effect-active' : ''}`}>
-      {stage !== 'loading' ? (
-        <div className="telemetry" aria-live="polite">
-          <span>{stateLabel}</span>
-          <span className="telemetry-line" />
-          <span>{String(Math.round(progress * 100)).padStart(3, '0')} / 100</span>
-        </div>
-      ) : null}
-
       {stage === 'hub' && transition === 'none' ? (
         <>
           <HubFullscreenControl copy={copy} />
           <div className="stage-copy hub-copy">
             <p>{copy.hubHint}</p>
-            <span>FIELD 35.6812° N / 139.7671° E</span>
+            <span>{copy.location}</span>
           </div>
+          {isWelcomeOpen ? (
+            <div
+              className="welcome-modal-backdrop"
+              onPointerDown={(event) => {
+                if (event.target === event.currentTarget) setIsWelcomeOpen(false)
+              }}
+            >
+              <section className="welcome-modal" role="dialog" aria-modal="true" aria-labelledby="welcome-message-title" lang={language}>
+                <button className="welcome-modal-close" type="button" aria-label={copy.closeTrace} onClick={() => setIsWelcomeOpen(false)}>×</button>
+                <h1 id="welcome-message-title">{copy.welcomeMessageTitle}</h1>
+                <div className="welcome-modal-copy">
+                  {copy.welcomeMessageParagraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
+                </div>
+              </section>
+            </div>
+          ) : null}
         </>
       ) : null}
 
@@ -167,7 +181,7 @@ export function Interface() {
         <>
           {transition === 'none' && observationMode === 'guided' && !portalObservation ? (
             <aside className="narration-panel" lang={language}>
-              <span className="narration-index">TRANSMISSION / {String(Math.round(progress * sequenceDuration)).padStart(2, '0')}:{sequenceDuration}</span>
+              <span className="narration-index">{copy.transmission} / {String(Math.round(progress * sequenceDuration)).padStart(2, '0')}:{sequenceDuration}</span>
               <h1>{focusCopy.title}</h1>
               <TypewriterText text={focusCopy.narration} />
             </aside>
@@ -180,7 +194,7 @@ export function Interface() {
       {transition === 'returnToHub' ? <div className="return-message">{copy.returningLabel}<span>•••</span></div> : null}
 
       {stage === 'observation' && observationMode === 'guided' ? (
-        <div className="progress-track" aria-label="Sequence progress" aria-valuenow={Math.round(progress * 100)} role="progressbar">
+        <div className="progress-track" aria-label={copy.sequenceProgress} aria-valuenow={Math.round(progress * 100)} role="progressbar">
           <span style={{ transform: `scaleX(${progress})` }} />
         </div>
       ) : null}

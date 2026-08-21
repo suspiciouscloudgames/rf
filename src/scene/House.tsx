@@ -1,10 +1,10 @@
-import { lazy, Suspense, useEffect, useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { type Group } from 'three'
 import { useExperienceStore } from '../store/experienceStore'
 import { ObservationSignals } from '../signals/ObservationSignals'
 import { setHouseRoot } from './sceneRegistry'
-import { ObservationLayer } from './ObservationLayer'
+import { FloorplanHouse } from './FloorplanHouse'
 import { DepthPortalBoundary, DepthPortalPreloader } from './depth-portal/DepthPortalBoundary'
 import { DepthPortalLayer } from './depth-portal/DepthPortalLayer'
 import { getSignalConfig, hasDepthPortal } from '../signals/signalData'
@@ -42,7 +42,9 @@ export function House() {
       ? 0
       : stage === 'hub' ? 0.012 : stage === 'approach' ? 0.005 : 0.003
     group.current.rotation.y += delta * speed
-    group.current.position.y = Math.sin(performance.now() * 0.00015) * 0.018
+    group.current.position.y = 0
+
+    group.current.scale.setScalar(1)
   })
 
   return (

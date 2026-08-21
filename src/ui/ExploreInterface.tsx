@@ -1,6 +1,5 @@
 import { useEffect, useRef } from 'react'
-import en from '../locales/en.json'
-import ja from '../locales/ja.json'
+import { localeCopy } from '../locales'
 import { useExperienceStore } from '../store/experienceStore'
 
 const exploreItems = [
@@ -13,9 +12,10 @@ export function ExploreInterface() {
   const language = useExperienceStore((store) => store.language)
   const selectedItemId = useExperienceStore((store) => store.selectedExploreItemId)
   const setSelectedItem = useExperienceStore((store) => store.setSelectedExploreItem)
-  const copy = language === 'en' ? en : ja
+  const copy = localeCopy[language]
   const videoRef = useRef<HTMLVideoElement>(null)
   const selectedItem = exploreItems.find((item) => item.id === selectedItemId) ?? null
+  const selectedItemNumber = selectedItem ? exploreItems.findIndex((item) => item.id === selectedItem.id) + 1 : 0
 
   useEffect(() => {
     const video = videoRef.current
@@ -56,7 +56,7 @@ export function ExploreInterface() {
       {selectedItem ? (
         <aside className="explore-panel">
           <button type="button" className="explore-close" onClick={() => setSelectedItem(null)} aria-label={copy.closeTrace}>×</button>
-          <span className="narration-index">TRACE / {selectedItem.id.slice(-5).toUpperCase()}</span>
+          <span className="narration-index">{copy.trace} / {String(selectedItemNumber).padStart(2, '0')}</span>
           <h2>{copy[selectedItem.title]}</h2>
           {selectedItem.type === 'video' ? (
             <video ref={videoRef} src="/assets/archive-signal.mp4" muted loop playsInline preload="auto" />

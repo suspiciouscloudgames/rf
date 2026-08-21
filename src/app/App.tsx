@@ -19,6 +19,7 @@ const tuningPanelEnabled = import.meta.env.VITE_SHOW_TUNING_PANEL !== 'false'
 
 export function App() {
   const stage = useExperienceStore((store) => store.stage)
+  const language = useExperienceStore((store) => store.language)
   const transition = useExperienceStore((store) => store.transition)
   const enterHub = useExperienceStore((store) => store.enterHub)
   const beginReturn = useExperienceStore((store) => store.beginReturn)
@@ -89,6 +90,7 @@ export function App() {
       data-morph-temporal-flicker={morphTemporalFlickerEnabled ? 'on' : 'off'}
     >
       <HubVideoBackground />
+      <div className="model-haze" aria-hidden="true" />
       <Suspense fallback={null}>
         <ExperienceCanvas />
       </Suspense>
@@ -101,7 +103,7 @@ export function App() {
       {stage === 'loading' ? (
         <div className="loader" role="status">
           <span className="loader-mark" />
-          <span>観測領域を調整しています</span>
+          <span>{localeCopy[language].loading}</span>
         </div>
       ) : null}
     </main>

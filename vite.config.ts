@@ -8,9 +8,9 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       manifest: {
-        name: 'Layers of Observation',
-        short_name: 'Observation',
-        description: 'A touch-based 3D observation interface.',
+        name: 'Entries from Here',
+        short_name: 'Entries from Here',
+        description: '터치 기반 3D 관찰 인터페이스',
         theme_color: '#080b0c',
         background_color: '#080b0c',
         display: 'standalone',

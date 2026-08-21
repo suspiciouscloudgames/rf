@@ -231,7 +231,7 @@ export function CameraController() {
     }
     window.addEventListener('experience-transition', onTransition)
     return () => window.removeEventListener('experience-transition', onTransition)
-  }, [camera, hubPosition])
+  }, [camera, hubPosition, hubTarget])
 
   useEffect(() => {
     if (transitionKind === 'none') return
@@ -278,7 +278,7 @@ export function CameraController() {
       guidedStartFov.current = tuning.entryFov
     }
     transition.current = base
-  }, [camera, hubPosition, transitionKind])
+  }, [camera, hubPosition, hubTarget, transitionKind])
 
   useFrame(({ gl }, delta) => {
     const active = transition.current

@@ -3,7 +3,7 @@ import { create } from 'zustand'
 export type ExperienceStage = 'loading' | 'hub' | 'approach' | 'observation'
 export type TransitionKind = 'none' | 'hubToApproach' | 'approachToObservation' | 'returnToHub'
 export type ObservationMode = 'guided' | 'explore'
-export type Language = 'en' | 'ja'
+export type Language = 'ja' | 'ko' | 'en'
 export type SignalId = 'signal-01' | 'signal-02' | 'signal-03' | 'signal-04' | 'signal-05'
 export type ObservationVisualStatus = 'idle' | 'loading' | 'ready' | 'fallback'
 

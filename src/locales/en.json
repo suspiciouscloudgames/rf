@@ -1,9 +1,9 @@
 {
-  "title": "LAYERS OF OBSERVATION",
+  "title": "ENTRIES FROM HERE",
   "archive": "ARCHIVE / 01",
   "loading": "CALIBRATING OBSERVATION FIELD",
   "hubLabel": "EXTERIOR FIELD",
-  "hubHint": "A signal persists inside the structure.",
+  "hubHint": "A faint signal persists inside the structure.",
   "hubAction": "Locate signal",
   "approachLabel": "SURFACE TRACE",
   "approachHint": "The surface is transmitting. Look closer.",
@@ -29,5 +29,19 @@
   "traceVideoTitle": "Residual transmission",
   "traceVideoBody": "A moving record loops where the original signal was interrupted.",
   "closeTrace": "Close trace",
-  "rotateDevice": "Please rotate the device to landscape orientation."
+  "rotateDevice": "Please rotate the device to landscape orientation.",
+  "location": "FIELD 35.6812° N / 139.7671° E",
+  "transmission": "TRANSMISSION",
+  "trace": "TRACE",
+  "sequenceProgress": "Sequence progress",
+  "researchArchive": "Resonant-field research archive",
+  "openResearchArchive": "Open research video",
+  "closeResearchArchive": "Close research video",
+  "referenceText": "REFERENCE TEXT",
+  "welcomeMessageButton": "A message for those who came here",
+  "welcomeMessageTitle": "To those who came here",
+  "welcomeMessageParagraphs": [
+    "Hello. Until recently, I lived here. I gathered the records left by the previous residents and the things I observed in this place to create this page. You might call it a small guide to the things that have not yet been noticed.",
+    "I do not think I will be able to return here. If you have a detector, please look for the companion entity by the window. If you find it, I would be grateful if you left a note here about how it is doing. If you do not have a detector, I simply hope you find a good feeling there."
+  ]
 }
