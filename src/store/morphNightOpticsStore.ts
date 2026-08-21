@@ -20,17 +20,17 @@ export interface MorphNightOpticsTuning {
 
 export const DEFAULT_MORPH_NIGHT_OPTICS_TUNING: MorphNightOpticsTuning = {
   lookMix: 1,
-  exposure: 1.08,
-  shadowLift: 0.065,
+  exposure: 1.69,
+  shadowLift: 0.07,
   localGrain: 0.055,
-  vignetteStrength: 0.72,
-  vignetteSoftness: 0.34,
-  vignetteIrregularity: 0.18,
-  vignetteOffsetX: -0.025,
-  vignetteOffsetY: 0.015,
-  bloomStrength: 0.42,
-  bloomRadius: 0.36,
-  bloomCore: 0.32,
+  vignetteStrength: 1,
+  vignetteSoftness: 0.7,
+  vignetteIrregularity: 0.45,
+  vignetteOffsetX: 0.03,
+  vignetteOffsetY: 0.025,
+  bloomStrength: 0.3,
+  bloomRadius: 1.2,
+  bloomCore: 0.87,
 }
 
 interface MorphNightOpticsState extends MorphNightOpticsTuning {
@@ -84,7 +84,7 @@ const clampTuning = (values: MorphNightOpticsTuning): MorphNightOpticsTuning => 
 
 const readValues = (): MorphNightOpticsValues => {
   if (typeof window === 'undefined') {
-    return { variant: 'current', debugView: 'none', ...DEFAULT_MORPH_NIGHT_OPTICS_TUNING }
+    return { variant: 'night-film', debugView: 'none', ...DEFAULT_MORPH_NIGHT_OPTICS_TUNING }
   }
   const params = new URLSearchParams(window.location.search)
   const tuning = {} as MorphNightOpticsTuning
@@ -92,7 +92,7 @@ const readValues = (): MorphNightOpticsValues => {
     tuning[key] = readFiniteNumber(params, queryKeys[key], DEFAULT_MORPH_NIGHT_OPTICS_TUNING[key])
   })
   return {
-    variant: params.get('nightLook') === 'film' ? 'night-film' : 'current',
+    variant: params.get('nightLook') === 'current' ? 'current' : 'night-film',
     debugView: params.get('nightDebug') === 'bloom'
       ? 'bloom-mask'
       : params.get('nightDebug') === 'vignette'
@@ -104,7 +104,7 @@ const readValues = (): MorphNightOpticsValues => {
 
 const updateQuery = (values: MorphNightOpticsValues) => {
   const url = new URL(window.location.href)
-  if (values.variant === 'night-film') url.searchParams.set('nightLook', 'film')
+  if (values.variant === 'current') url.searchParams.set('nightLook', 'current')
   else url.searchParams.delete('nightLook')
   if (values.debugView === 'bloom-mask') url.searchParams.set('nightDebug', 'bloom')
   else if (values.debugView === 'vignette-mask') url.searchParams.set('nightDebug', 'vignette')

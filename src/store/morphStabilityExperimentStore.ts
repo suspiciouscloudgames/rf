@@ -28,7 +28,7 @@ const DEFAULT_EXPERIMENT_VALUES: MorphStabilityExperimentValues = {
   variant: 'baseline',
   freezeRotation: false,
   rotationAngle: 45,
-  freezeTime: false,
+  freezeTime: true,
   shaderTime: 0,
   debugView: 'none',
 }
@@ -59,9 +59,17 @@ export const readMorphStabilityExperiment = (): MorphStabilityExperimentValues =
     || (requestedVariant !== 'a' && params.get('room') === 'morph-plan')
   return {
     variant: useStabilizedVariant ? 'stabilized' : 'baseline',
-    freezeRotation: readBooleanQuery(params, 'freezeRotation', legacyFreeze),
+    freezeRotation: readBooleanQuery(
+      params,
+      'freezeRotation',
+      legacyFreeze || DEFAULT_EXPERIMENT_VALUES.freezeRotation,
+    ),
     rotationAngle: normalizeAngle(readFiniteNumber(params, 'angle', DEFAULT_EXPERIMENT_VALUES.rotationAngle)),
-    freezeTime: readBooleanQuery(params, 'freezeTime', legacyFreeze),
+    freezeTime: readBooleanQuery(
+      params,
+      'freezeTime',
+      legacyFreeze || DEFAULT_EXPERIMENT_VALUES.freezeTime,
+    ),
     shaderTime: Math.max(0, readFiniteNumber(params, 'time', DEFAULT_EXPERIMENT_VALUES.shaderTime)),
     debugView: params.get('debug') === 'edge'
       ? 'edge-candidate'

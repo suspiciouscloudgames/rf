@@ -7,7 +7,7 @@ const isRoomVisualMode = (value: unknown): value is RoomVisualMode =>
 
 const getFallbackMode = (): RoomVisualMode => {
   const configuredMode = import.meta.env.VITE_ROOM_VISUAL_DEFAULT
-  return isRoomVisualMode(configuredMode) ? configuredMode : 'classic'
+  return isRoomVisualMode(configuredMode) ? configuredMode : 'morph-plan'
 }
 
 export const readRoomVisualMode = (): RoomVisualMode => {

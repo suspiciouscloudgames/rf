@@ -10,10 +10,10 @@ export interface LowMorphCameraTuning {
 }
 
 export const DEFAULT_LOW_MORPH_CAMERA_TUNING: LowMorphCameraTuning = {
-  lowHeight: 1.2,
-  lowTargetHeight: -0.35,
-  lowDistance: 7.6,
-  lowFov: 36,
+  lowHeight: 0.91,
+  lowTargetHeight: -0.16,
+  lowDistance: 6.15,
+  lowFov: 36.4,
 }
 
 interface MorphCameraExperimentState extends LowMorphCameraTuning {
@@ -48,11 +48,11 @@ const clampCameraTuning = (values: LowMorphCameraTuning): LowMorphCameraTuning =
 
 const readMorphCameraExperiment = (): MorphCameraExperimentValues => {
   if (typeof window === 'undefined') {
-    return { variant: 'current', ...DEFAULT_LOW_MORPH_CAMERA_TUNING }
+    return { variant: 'low', ...DEFAULT_LOW_MORPH_CAMERA_TUNING }
   }
   const params = new URLSearchParams(window.location.search)
   return {
-    variant: params.get('cameraView') === 'low' ? 'low' : 'current',
+    variant: params.get('cameraView') === 'current' ? 'current' : 'low',
     ...clampCameraTuning({
       lowHeight: readFiniteNumber(params, 'lowHeight', DEFAULT_LOW_MORPH_CAMERA_TUNING.lowHeight),
       lowTargetHeight: readFiniteNumber(params, 'lowTargetHeight', DEFAULT_LOW_MORPH_CAMERA_TUNING.lowTargetHeight),
@@ -64,7 +64,7 @@ const readMorphCameraExperiment = (): MorphCameraExperimentValues => {
 
 const updateCameraQuery = (values: MorphCameraExperimentValues) => {
   const url = new URL(window.location.href)
-  if (values.variant === 'low') url.searchParams.set('cameraView', 'low')
+  if (values.variant === 'current') url.searchParams.set('cameraView', 'current')
   else url.searchParams.delete('cameraView')
 
   const tuningKeys = Object.keys(DEFAULT_LOW_MORPH_CAMERA_TUNING) as Array<keyof LowMorphCameraTuning>
