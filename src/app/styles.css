@@ -846,27 +846,27 @@ button:focus-visible {
   display: block;
   position: relative;
   width: 154px;
-  min-height: 46px;
-  padding: 12px 38px 12px 14px;
-  border: 0;
-  border-radius: 2px;
-  color: rgba(246,240,227,.94);
-  background: linear-gradient(110deg, rgba(15,31,27,.82), rgba(5,12,12,.58));
-  box-shadow: inset 0 1px rgba(239,224,194,.14), 0 8px 24px rgba(0,0,0,.18);
-  backdrop-filter: blur(8px);
+  min-height: 58px;
+  padding: 12px 34px 12px 12px;
+  border: 1px solid rgba(225,153,72,.4);
+  border-radius: 0;
+  color: rgba(239,231,215,.88);
+  background: rgba(5,8,10,.55);
+  box-shadow: none;
+  backdrop-filter: blur(7px);
   pointer-events: auto;
   cursor: pointer;
-  font-family: "Noto Sans KR", "Hiragino Kaku Gothic ProN", ui-sans-serif, sans-serif;
   font-size: 15px;
-  font-weight: 500;
-  line-height: 1.35;
-  letter-spacing: .035em;
+  font-weight: 400;
+  line-height: 1.4;
+  letter-spacing: .08em;
   text-align: left;
 }
 .explore-trace.active {
-  color: #fff8e9;
-  background: linear-gradient(110deg, rgba(46,47,31,.9), rgba(12,25,21,.7));
-  box-shadow: inset 3px 0 #e2a05d, inset 0 1px rgba(255,237,205,.18), 0 9px 28px rgba(0,0,0,.24);
+  border-color: #e6a45a;
+  color: rgba(245,237,222,.94);
+  background: rgba(5,8,10,.6);
+  box-shadow: 0 0 24px rgba(222,145,63,.14);
 }
 .memo-cluster {
   position: absolute;
@@ -894,15 +894,15 @@ button:focus-visible {
 
 .explore-trace .memo-open-symbol {
   position: absolute;
-  top: 50%;
-  right: 13px;
+  top: 8px;
+  right: 9px;
   display: block;
-  transform: translateY(-52%);
+  transform: none;
   margin: 0;
   color: #e4a15f;
   font-family: ui-sans-serif, sans-serif;
-  font-size: 17px;
-  font-weight: 300;
+  font-size: 14px;
+  font-weight: 400;
   line-height: 1;
 }
 
