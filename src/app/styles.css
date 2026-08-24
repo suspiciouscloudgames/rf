@@ -763,7 +763,7 @@ button:focus-visible {
   width: max-content;
   transform: translateX(-50%);
   color: rgba(241, 224, 198, .65);
-  font-size: 9px;
+  font-size: 12px;
   letter-spacing: .14em;
   text-transform: uppercase;
   text-shadow: 0 1px 5px #060808;
