@@ -28,7 +28,7 @@ export function Interface() {
   const focusCopy = getFocusContent(language, selectedSignalId)
   const approachRecord = getApproachContent(language, selectedSignalId)
   const portalObservation = hasDepthPortal(selectedSignalId)
-  const residentMemoObservation = selectedSignalId === 'signal-01'
+  const residentMemoObservation = selectedSignalId !== null
   const showResidentMemoSequence = residentMemoObservation && (
     transition === 'approachToObservation'
     || (stage === 'observation' && transition === 'none' && observationMode === 'guided')
@@ -124,7 +124,7 @@ export function Interface() {
               <TypewriterText text={focusCopy.narration} />
             </aside>
           ) : null}
-          {transition === 'none' && observationMode === 'guided' && portalObservation ? <ObservationSubtitles /> : null}
+          {transition === 'none' && observationMode === 'guided' && portalObservation && !residentMemoObservation ? <ObservationSubtitles /> : null}
           {transition === 'none' && observationMode === 'explore' ? <ExploreInterface /> : null}
         </>
       ) : null}
