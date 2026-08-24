@@ -94,6 +94,7 @@ export function Interface() {
           <TypewriterText
             text={approachRecord.body}
             className="approach-record-text"
+            characterDelay={52}
             autoScroll
             instant={!animateApproachRecord}
           />
