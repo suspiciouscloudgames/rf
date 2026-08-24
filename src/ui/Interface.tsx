@@ -9,7 +9,6 @@ import { ObservationSubtitles } from './ObservationSubtitles'
 import { useTuningStore } from '../store/tuningStore'
 import { ResearchDrawer } from './ResearchDrawer'
 import { getApproachContent } from '../content/approachContent'
-import { ObservationMemoSequence } from './ObservationMemoSequence'
 
 export function Interface() {
   const [isWelcomeOpen, setIsWelcomeOpen] = useState(false)
@@ -29,9 +28,9 @@ export function Interface() {
   const approachRecord = getApproachContent(language, selectedSignalId)
   const portalObservation = hasDepthPortal(selectedSignalId)
   const residentMemoObservation = selectedSignalId !== null
-  const showResidentMemoSequence = residentMemoObservation && (
+  const showResidentMemos = residentMemoObservation && (
     transition === 'approachToObservation'
-    || (stage === 'observation' && transition === 'none' && observationMode === 'guided')
+    || (stage === 'observation' && transition === 'none')
   )
 
   useEffect(() => {
@@ -113,7 +112,7 @@ export function Interface() {
         </button>
       ) : null}
 
-      {showResidentMemoSequence ? <ObservationMemoSequence /> : null}
+      {showResidentMemos ? <ExploreInterface sequentialReveal /> : null}
 
       {stage === 'observation' ? (
         <>
@@ -125,7 +124,7 @@ export function Interface() {
             </aside>
           ) : null}
           {transition === 'none' && observationMode === 'guided' && portalObservation && !residentMemoObservation ? <ObservationSubtitles /> : null}
-          {transition === 'none' && observationMode === 'explore' ? <ExploreInterface /> : null}
+          {transition === 'none' && observationMode === 'explore' && !residentMemoObservation ? <ExploreInterface /> : null}
         </>
       ) : null}
 

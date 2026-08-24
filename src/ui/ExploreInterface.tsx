@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react'
+import type { CSSProperties } from 'react'
 import { localeCopy } from '../locales'
 import { useExperienceStore } from '../store/experienceStore'
 import { getObservationMemos } from '../content/observationMemos'
@@ -9,7 +10,13 @@ const exploreItems = [
   { id: 'trace-video', label: 'traceVideo', title: 'traceVideoTitle', body: 'traceVideoBody', type: 'video' },
 ] as const
 
-export function ExploreInterface() {
+interface ExploreInterfaceProps {
+  sequentialReveal?: boolean
+}
+
+type RevealStyle = CSSProperties & { '--memo-delay'?: string }
+
+export function ExploreInterface({ sequentialReveal = false }: ExploreInterfaceProps) {
   const language = useExperienceStore((store) => store.language)
   const selectedItemId = useExperienceStore((store) => store.selectedExploreItemId)
   const selectedSignalId = useExperienceStore((store) => store.selectedSignalId)
@@ -61,7 +68,8 @@ export function ExploreInterface() {
           <button
             key={item.id}
             type="button"
-            className={`explore-trace trace-${index + 1} ${selectedItemId === item.id ? 'active' : ''}`}
+            className={`explore-trace trace-${index + 1} ${sequentialReveal ? 'memo-reveal' : ''} ${selectedItemId === item.id ? 'active' : ''}`}
+            style={sequentialReveal ? { '--memo-delay': `${0.2 + index * 0.78}s` } as RevealStyle : undefined}
             onClick={() => setSelectedItem(selectedItemId === item.id ? null : item.id)}
             aria-pressed={selectedItemId === item.id}
           >
