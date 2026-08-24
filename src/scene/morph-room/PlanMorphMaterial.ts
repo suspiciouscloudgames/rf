@@ -386,14 +386,19 @@ const fragmentShader = /* glsl */ `
     return furniture;
   }
 
-  vec4 evaluateSceneField(vec3 point, float cutawayNearWalls) {
+  vec3 deformedScenePoint(vec3 point) {
     float meltHeight = smoothstep(FLOOR_Y + 0.10, HALF_HEIGHT, point.y);
     float meltFlow = 0.58
       + sin(point.x * 1.72 + sin(point.z * 1.28) + uTime * 0.035) * 0.24
       + sin(point.z * 2.36 - point.x * 0.44 - uTime * 0.021) * 0.12;
-    vec3 meltedPoint = point;
-    meltedPoint.y += meltHeight * meltFlow * uWaverAmount * 3.15;
-    meltedPoint.x += sin(point.y * 2.1 + point.z * 1.35) * meltHeight * uWaverAmount * 0.42;
+    vec3 deformedPoint = point;
+    deformedPoint.y += meltHeight * meltFlow * uWaverAmount * 3.15;
+    deformedPoint.x += sin(point.y * 2.1 + point.z * 1.35) * meltHeight * uWaverAmount * 0.42;
+    return deformedPoint;
+  }
+
+  vec4 evaluateSceneField(vec3 point, float cutawayNearWalls) {
+    vec3 meltedPoint = deformedScenePoint(point);
 
     float architectureHeight = mix(0.065, 1.0, uArchitectureActivation);
     vec3 collapsedPoint = meltedPoint;
@@ -533,6 +538,19 @@ const fragmentShader = /* glsl */ `
     return color;
   }
 
+  vec3 applyFurnitureRim(vec3 color, vec3 point, vec3 normal) {
+    float furnitureProximity = 1.0 - smoothstep(
+      0.012,
+      0.070,
+      abs(furnitureField(deformedScenePoint(point)))
+    );
+    vec3 viewDirection = normalize(uCameraLocal - point);
+    float grazingAngle = 1.0 - abs(dot(normal, viewDirection));
+    float rim = smoothstep(0.52, 0.94, grazingAngle) * furnitureProximity;
+    vec3 furnitureRimColor = vec3(0.10, 0.72, 0.62);
+    return color + furnitureRimColor * rim * 0.105;
+  }
+
   float resolveFrontWall(vec3 point, vec3 normal, float wallInfluence) {
     vec3 horizontalNormal = vec3(normal.x, 0.0, normal.z);
     vec3 viewDirection = vec3(uCameraLocal.x - point.x, 0.0, uCameraLocal.z - point.z);
@@ -643,7 +661,11 @@ const fragmentShader = /* glsl */ `
       );
       firstWallInfluence = max(firstWallInfluence, firstWallProximity);
     }
-    vec3 firstColor = shadeSurface(firstPoint, firstNormal, firstWallInfluence);
+    vec3 firstColor = applyFurnitureRim(
+      shadeSurface(firstPoint, firstNormal, firstWallInfluence),
+      firstPoint,
+      firstNormal
+    );
     float tunedFirstOpacity = mix(uRoomOpacity, uPropOpacity, firstField.z);
     float baseFirstOpacity = mix(0.44, 0.96, tunedFirstOpacity);
     vec3 frontWallNormal = firstNormal;
@@ -708,7 +730,11 @@ const fragmentShader = /* glsl */ `
         vec4 secondField = sceneField(secondPoint);
         openingFrameDistance = min(openingFrameDistance, abs(secondField.w));
         vec3 secondNormal = estimateNormal(secondPoint);
-        vec3 secondColor = shadeSurface(secondPoint, secondNormal, secondField.y);
+        vec3 secondColor = applyFurnitureRim(
+          shadeSurface(secondPoint, secondNormal, secondField.y),
+          secondPoint,
+          secondNormal
+        );
         float secondOpacity = mix(0.44, 0.96, mix(uRoomOpacity, uPropOpacity, secondField.z));
 
         if (useStabilizedFrontWall) {
