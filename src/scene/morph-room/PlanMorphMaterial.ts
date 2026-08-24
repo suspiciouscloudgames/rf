@@ -238,16 +238,16 @@ const fragmentShader = /* glsl */ `
 
   float detachedTreeField(vec3 point) {
     float activation = uArchitectureActivation;
-    const float treeScale = 0.80;
+    const float treeScale = 1.02;
     vec3 localPoint = (point - vec3(-1.100, FLOOR_Y, 1.990)) / treeScale;
     float treeBounds = sdEllipsoid(
-      localPoint - vec3(0.0, 0.82 * activation, 0.0),
-      mix(vec3(0.12), vec3(0.92, 1.55, 0.88), activation)
+      localPoint - vec3(0.0, 1.10 * activation, 0.0),
+      mix(vec3(0.12), vec3(0.86, 2.18, 0.82), activation)
     );
     if (treeBounds > 0.34) return (treeBounds + (1.0 - activation) * 0.28) * treeScale;
 
-    float trunkHeight = mix(0.08, 1.12, activation);
-    float trunkRadius = mix(0.028, 0.105, activation);
+    float trunkHeight = mix(0.08, 1.58, activation);
+    float trunkRadius = mix(0.024, 0.082, activation);
     float tree = sdCapsule(
       localPoint,
       vec3(0.0, 0.0, 0.0),
@@ -258,9 +258,9 @@ const fragmentShader = /* glsl */ `
       tree,
       sdCapsule(
         localPoint,
-        vec3(0.025 * activation, trunkHeight * 0.62, -0.018 * activation),
-        vec3(-0.035 * activation, trunkHeight + 0.27 * activation, 0.025 * activation),
-        trunkRadius * 0.68
+        vec3(0.025 * activation, trunkHeight * 0.66, -0.018 * activation),
+        vec3(-0.055 * activation, trunkHeight + 0.31 * activation, 0.025 * activation),
+        trunkRadius * 0.62
       ),
       0.055 * activation + 0.008
     );
@@ -271,21 +271,24 @@ const fragmentShader = /* glsl */ `
     tree = smoothUnion(tree, sdCapsule(localPoint, vec3(0.0, 0.035, 0.0), vec3(0.12 * activation, 0.008, -0.49 * activation), rootRadius), 0.052);
     tree = smoothUnion(tree, sdCapsule(localPoint, vec3(0.0, 0.035, 0.0), vec3(-0.18 * activation, 0.010, -0.34 * activation), rootRadius * 0.82), 0.045);
 
-    float branchRadius = mix(0.012, 0.047, activation);
-    tree = smoothUnion(tree, sdCapsule(localPoint, vec3(0.01, 0.58, 0.0) * activation, vec3(0.48, 0.96, 0.16) * activation, branchRadius), 0.046);
-    tree = smoothUnion(tree, sdCapsule(localPoint, vec3(-0.01, 0.66, 0.0) * activation, vec3(-0.46, 1.03, 0.18) * activation, branchRadius), 0.046);
-    tree = smoothUnion(tree, sdCapsule(localPoint, vec3(0.02, 0.72, -0.01) * activation, vec3(0.31, 1.14, -0.36) * activation, branchRadius * 0.88), 0.042);
-    tree = smoothUnion(tree, sdCapsule(localPoint, vec3(0.0, 0.78, 0.0) * activation, vec3(-0.30, 1.20, -0.32) * activation, branchRadius * 0.82), 0.042);
-    tree = smoothUnion(tree, sdCapsule(localPoint, vec3(0.0, 0.91, 0.0) * activation, vec3(0.18, 1.38, 0.12) * activation, branchRadius * 0.72), 0.038);
+    float branchRadius = mix(0.010, 0.038, activation);
+    tree = smoothUnion(tree, sdCapsule(localPoint, vec3(0.01, 0.92, 0.0) * activation, vec3(0.55, 1.48, 0.14) * activation, branchRadius), 0.040);
+    tree = smoothUnion(tree, sdCapsule(localPoint, vec3(-0.01, 1.00, 0.0) * activation, vec3(-0.56, 1.54, 0.18) * activation, branchRadius), 0.040);
+    tree = smoothUnion(tree, sdCapsule(localPoint, vec3(0.02, 1.08, -0.01) * activation, vec3(0.38, 1.68, -0.42) * activation, branchRadius * 0.86), 0.036);
+    tree = smoothUnion(tree, sdCapsule(localPoint, vec3(0.0, 1.14, 0.0) * activation, vec3(-0.36, 1.72, -0.38) * activation, branchRadius * 0.80), 0.036);
+    tree = smoothUnion(tree, sdCapsule(localPoint, vec3(0.0, 1.28, 0.0) * activation, vec3(0.14, 1.98, 0.08) * activation, branchRadius * 0.70), 0.032);
 
-    vec3 leafRadius = mix(vec3(0.055), vec3(0.34, 0.27, 0.31), activation);
-    float leaves = sdEllipsoid(localPoint - vec3(0.50, 1.04, 0.18) * activation, leafRadius);
-    leaves = smoothUnion(leaves, sdEllipsoid(localPoint - vec3(-0.49, 1.10, 0.20) * activation, leafRadius * vec3(1.02, 0.92, 1.0)), 0.105 * activation + 0.006);
-    leaves = smoothUnion(leaves, sdEllipsoid(localPoint - vec3(0.34, 1.22, -0.38) * activation, leafRadius * vec3(0.96, 1.0, 1.08)), 0.105 * activation + 0.006);
-    leaves = smoothUnion(leaves, sdEllipsoid(localPoint - vec3(-0.33, 1.27, -0.34) * activation, leafRadius * vec3(0.92, 1.03, 0.96)), 0.105 * activation + 0.006);
-    leaves = smoothUnion(leaves, sdEllipsoid(localPoint - vec3(0.18, 1.48, 0.12) * activation, leafRadius * vec3(0.86, 1.12, 0.88)), 0.095 * activation + 0.006);
-    leaves = smoothUnion(leaves, sdEllipsoid(localPoint - vec3(-0.12, 1.42, 0.04) * activation, leafRadius * vec3(0.82, 1.04, 0.84)), 0.09 * activation + 0.006);
-    tree = smoothUnion(tree, leaves, 0.10 * activation + 0.008);
+    vec3 leafRadius = mix(vec3(0.050), vec3(0.27, 0.40, 0.25), activation);
+    float leaves = sdEllipsoid(localPoint - vec3(0.53, 1.52, 0.15) * activation, leafRadius * vec3(0.92, 1.18, 0.94));
+    leaves = smoothUnion(leaves, sdEllipsoid(localPoint - vec3(-0.54, 1.57, 0.18) * activation, leafRadius * vec3(0.96, 1.24, 1.0)), 0.075 * activation + 0.006);
+    leaves = smoothUnion(leaves, sdEllipsoid(localPoint - vec3(0.37, 1.72, -0.40) * activation, leafRadius * vec3(0.90, 1.08, 1.03)), 0.075 * activation + 0.006);
+    leaves = smoothUnion(leaves, sdEllipsoid(localPoint - vec3(-0.35, 1.76, -0.36) * activation, leafRadius * vec3(0.88, 1.12, 0.96)), 0.075 * activation + 0.006);
+    leaves = smoothUnion(leaves, sdEllipsoid(localPoint - vec3(0.06, 1.97, 0.04) * activation, leafRadius * vec3(0.96, 0.90, 0.94)), 0.07 * activation + 0.006);
+    vec3 hangingLeafRadius = mix(vec3(0.035), vec3(0.13, 0.46, 0.13), activation);
+    leaves = smoothUnion(leaves, sdEllipsoid(localPoint - vec3(0.55, 1.24, 0.15) * activation, hangingLeafRadius), 0.055 * activation + 0.005);
+    leaves = smoothUnion(leaves, sdEllipsoid(localPoint - vec3(-0.53, 1.28, 0.17) * activation, hangingLeafRadius * vec3(0.90, 1.12, 0.94)), 0.055 * activation + 0.005);
+    leaves = smoothUnion(leaves, sdEllipsoid(localPoint - vec3(0.34, 1.42, -0.39) * activation, hangingLeafRadius * vec3(0.86, 0.96, 0.90)), 0.05 * activation + 0.005);
+    tree = smoothUnion(tree, leaves, 0.075 * activation + 0.008);
     return (tree + (1.0 - activation) * 0.28) * treeScale;
   }
 
