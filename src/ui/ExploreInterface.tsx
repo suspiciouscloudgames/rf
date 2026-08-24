@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { CSSProperties } from 'react'
 import { localeCopy } from '../locales'
 import { useExperienceStore } from '../store/experienceStore'
@@ -18,6 +18,37 @@ interface ExploreInterfaceProps {
 
 type RevealStyle = CSSProperties & { '--memo-delay'?: string }
 
+const memoCharacterDelay = (character: string) => {
+  if (/[.!?。！？]/.test(character)) return 190
+  if (/[,、]/.test(character)) return 85
+  if (/\s/.test(character)) return 18
+  return 28
+}
+
+function MemoTypewriterText({ text, startDelay }: { text: string; startDelay: number }) {
+  const [visibleLength, setVisibleLength] = useState(0)
+
+  useEffect(() => {
+    setVisibleLength(0)
+  }, [text])
+
+  useEffect(() => {
+    if (visibleLength >= text.length) return
+    const delay = visibleLength === 0
+      ? startDelay
+      : memoCharacterDelay(text[visibleLength - 1] ?? '')
+    const timer = window.setTimeout(() => setVisibleLength((length) => length + 1), delay)
+    return () => window.clearTimeout(timer)
+  }, [startDelay, text, visibleLength])
+
+  return (
+    <span className="resident-introduction">
+      {text.slice(0, visibleLength)}
+      <span className="memo-type-cursor" aria-hidden="true" />
+    </span>
+  )
+}
+
 export function ExploreInterface({ sequentialReveal = false }: ExploreInterfaceProps) {
   const language = useExperienceStore((store) => store.language)
   const selectedItemId = useExperienceStore((store) => store.selectedExploreItemId)
@@ -31,7 +62,8 @@ export function ExploreInterface({ sequentialReveal = false }: ExploreInterfaceP
     id: memo.id,
     label: memo.resident,
     title: memo.title,
-    body: memo.body,
+    body: getResidentProfile(language, memo.id),
+    previewBody: memo.body,
     type: 'text' as const,
     resident: memo.resident,
   })) ?? exploreItems.map((item) => ({
@@ -39,6 +71,7 @@ export function ExploreInterface({ sequentialReveal = false }: ExploreInterfaceP
     label: copy[item.label],
     title: copy[item.title],
     body: copy[item.body],
+    previewBody: copy[item.body],
     resident: null,
   }))
   const videoRef = useRef<HTMLVideoElement>(null)
@@ -81,6 +114,7 @@ export function ExploreInterface({ sequentialReveal = false }: ExploreInterfaceP
     <div className="explore-interface" lang={language}>
       <div className="explore-traces">
         {items.map((item, index) => {
+          const memoDelay = 0.3 + index * revealStep
           const button = (
             <button
               type="button"
@@ -99,7 +133,7 @@ export function ExploreInterface({ sequentialReveal = false }: ExploreInterfaceP
               key={item.id}
               type="button"
               className={`memo-cluster memo-reveal trace-${index + 1}`}
-              style={{ '--memo-delay': `${0.3 + index * revealStep}s` } as RevealStyle}
+              style={{ '--memo-delay': `${memoDelay}s` } as RevealStyle}
               onClick={() => setSelectedItem(selectedItemId === item.id ? null : item.id)}
               aria-pressed={selectedItemId === item.id}
               aria-label={`${item.label} — ${openRecordLabel}`}
@@ -108,7 +142,7 @@ export function ExploreInterface({ sequentialReveal = false }: ExploreInterfaceP
                 {item.label}
                 <span className="memo-open-symbol" aria-hidden="true">↗</span>
               </span>
-              <span className="resident-introduction">{getResidentProfile(language, item.id)}</span>
+              <MemoTypewriterText text={item.previewBody} startDelay={memoDelay * 1000} />
             </button>
           )
         })}
