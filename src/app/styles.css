@@ -459,7 +459,7 @@ button:focus-visible {
 
 .research-subtitle {
   position: absolute;
-  bottom: 30px;
+  bottom: 44px;
   left: 50%;
   width: 90%;
   display: block;
@@ -491,7 +491,7 @@ button:focus-visible {
   padding: 3px 6px 4px;
   color: #f4f4f2;
   background: rgba(2, 3, 8, .94);
-  font-size: clamp(14px, 1.3vw, 18px);
+  font-size: clamp(16px, 1.55vw, 21px);
   line-height: 1.65;
   letter-spacing: .015em;
   text-wrap: balance;
