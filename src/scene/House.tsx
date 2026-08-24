@@ -42,7 +42,7 @@ export function House() {
     <group ref={group} position={[0, 0, 0]}>
       <DepthPortalPreloader />
       <ApproachRoomSwitcher />
-      <ObservationLayer />
+      {roomVisualMode !== 'morph-plan' ? <ObservationLayer /> : null}
       <DepthPortalBoundary>
         <DepthPortalLayer />
       </DepthPortalBoundary>
