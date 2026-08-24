@@ -1,4 +1,3 @@
-import { useEffect } from 'react'
 import type { ThreeEvent } from '@react-three/fiber'
 import { useExperienceStore } from '../../store/experienceStore'
 import type { DepthPortalConfig } from './depthPortalConfig'
@@ -29,15 +28,6 @@ const resolveHotspot = (x: number, y: number) => hotspots.find((hotspot) => {
 export function DepthPortalHotspots({ config, interactive }: DepthPortalHotspotsProps) {
   const setSelectedExploreItem = useExperienceStore((store) => store.setSelectedExploreItem)
 
-  useEffect(() => () => {
-    document.body.style.cursor = ''
-  }, [])
-
-  const handlePointerMove = (event: ThreeEvent<PointerEvent>) => {
-    if (!interactive || !event.uv) return
-    document.body.style.cursor = resolveHotspot(event.uv.x, event.uv.y) ? 'pointer' : ''
-  }
-
   const handlePointerDown = (event: ThreeEvent<PointerEvent>) => {
     if (!interactive || !event.uv) return
     const hotspot = resolveHotspot(event.uv.x, event.uv.y)
@@ -51,8 +41,6 @@ export function DepthPortalHotspots({ config, interactive }: DepthPortalHotspots
       name="depth-portal-hotspots"
       position={[0, 0, 0.29]}
       visible={interactive}
-      onPointerMove={handlePointerMove}
-      onPointerOut={() => { document.body.style.cursor = '' }}
       onPointerDown={handlePointerDown}
       renderOrder={40}
     >

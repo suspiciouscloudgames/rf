@@ -360,7 +360,6 @@ button:focus-visible {
   -webkit-tap-highlight-color: transparent;
 }
 
-.fullscreen-control:hover,
 .fullscreen-control:focus-visible,
 .fullscreen-control.is-active {
   border-color: rgba(240, 162, 81, .55);
