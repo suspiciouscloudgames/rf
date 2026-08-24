@@ -163,21 +163,21 @@ const fragmentShader = /* glsl */ `
     const float doorHalfWidth = 0.338;
     const float doorTop = 0.700;
 
-    float distance = 99.0;
-
     float backLeftEnd = windowOneCenter - windowOneHalfWidth;
     float backRightStart = windowOneCenter + windowOneHalfWidth;
-    distance = min(distance, horizontalWall(point, (-HALF_WIDTH + backLeftEnd) * 0.5, (backLeftEnd + HALF_WIDTH) * 0.5, 0.0, HALF_HEIGHT, -HALF_DEPTH));
-    distance = min(distance, horizontalWall(point, (backRightStart + HALF_WIDTH) * 0.5, (HALF_WIDTH - backRightStart) * 0.5, 0.0, HALF_HEIGHT, -HALF_DEPTH));
-    distance = min(distance, horizontalWall(point, windowOneCenter, windowOneHalfWidth, (-HALF_HEIGHT - windowHalfHeight) * 0.5, (HALF_HEIGHT - windowHalfHeight) * 0.5, -HALF_DEPTH));
-    distance = min(distance, horizontalWall(point, windowOneCenter, windowOneHalfWidth, (HALF_HEIGHT + windowHalfHeight) * 0.5, (HALF_HEIGHT - windowHalfHeight) * 0.5, -HALF_DEPTH));
+    float backWall = horizontalWall(point, (-HALF_WIDTH + backLeftEnd) * 0.5, (backLeftEnd + HALF_WIDTH) * 0.5, 0.0, HALF_HEIGHT, -HALF_DEPTH);
+    backWall = smoothUnion(backWall, horizontalWall(point, (backRightStart + HALF_WIDTH) * 0.5, (HALF_WIDTH - backRightStart) * 0.5, 0.0, HALF_HEIGHT, -HALF_DEPTH), 0.065);
+    backWall = smoothUnion(backWall, horizontalWall(point, windowOneCenter, windowOneHalfWidth, (-HALF_HEIGHT - windowHalfHeight) * 0.5, (HALF_HEIGHT - windowHalfHeight) * 0.5, -HALF_DEPTH), 0.065);
+    backWall = smoothUnion(backWall, horizontalWall(point, windowOneCenter, windowOneHalfWidth, (HALF_HEIGHT + windowHalfHeight) * 0.5, (HALF_HEIGHT - windowHalfHeight) * 0.5, -HALF_DEPTH), 0.065);
 
     float leftBackEnd = windowTwoCenter - windowTwoHalfWidth;
     float leftFrontStart = windowTwoCenter + windowTwoHalfWidth;
-    distance = min(distance, verticalWall(point, (-HALF_DEPTH + leftBackEnd) * 0.5, (leftBackEnd + HALF_DEPTH) * 0.5, 0.0, HALF_HEIGHT, -HALF_WIDTH));
-    distance = min(distance, verticalWall(point, (leftFrontStart + HALF_DEPTH) * 0.5, (HALF_DEPTH - leftFrontStart) * 0.5, 0.0, HALF_HEIGHT, -HALF_WIDTH));
-    distance = min(distance, verticalWall(point, windowTwoCenter, windowTwoHalfWidth, (-HALF_HEIGHT - windowHalfHeight) * 0.5, (HALF_HEIGHT - windowHalfHeight) * 0.5, -HALF_WIDTH));
-    distance = min(distance, verticalWall(point, windowTwoCenter, windowTwoHalfWidth, (HALF_HEIGHT + windowHalfHeight) * 0.5, (HALF_HEIGHT - windowHalfHeight) * 0.5, -HALF_WIDTH));
+    float leftWall = verticalWall(point, (-HALF_DEPTH + leftBackEnd) * 0.5, (leftBackEnd + HALF_DEPTH) * 0.5, 0.0, HALF_HEIGHT, -HALF_WIDTH);
+    leftWall = smoothUnion(leftWall, verticalWall(point, (leftFrontStart + HALF_DEPTH) * 0.5, (HALF_DEPTH - leftFrontStart) * 0.5, 0.0, HALF_HEIGHT, -HALF_WIDTH), 0.065);
+    leftWall = smoothUnion(leftWall, verticalWall(point, windowTwoCenter, windowTwoHalfWidth, (-HALF_HEIGHT - windowHalfHeight) * 0.5, (HALF_HEIGHT - windowHalfHeight) * 0.5, -HALF_WIDTH), 0.065);
+    leftWall = smoothUnion(leftWall, verticalWall(point, windowTwoCenter, windowTwoHalfWidth, (HALF_HEIGHT + windowHalfHeight) * 0.5, (HALF_HEIGHT - windowHalfHeight) * 0.5, -HALF_WIDTH), 0.065);
+
+    float distance = min(backWall, leftWall);
 
     distance = min(distance, verticalWall(point, (-HALF_DEPTH + EXTENSION_END_Z) * 0.5, (EXTENSION_END_Z + HALF_DEPTH) * 0.5, 0.0, HALF_HEIGHT, HALF_WIDTH));
     distance = min(distance, horizontalWall(point, (-HALF_WIDTH + EXTENSION_START_X) * 0.5, (EXTENSION_START_X + HALF_WIDTH) * 0.5, 0.0, HALF_HEIGHT, HALF_DEPTH));
@@ -186,9 +186,10 @@ const fragmentShader = /* glsl */ `
 
     float doorLeftEnd = doorCenter - doorHalfWidth;
     float doorRightStart = doorCenter + doorHalfWidth;
-    distance = min(distance, horizontalWall(point, (EXTENSION_START_X + doorLeftEnd) * 0.5, (doorLeftEnd - EXTENSION_START_X) * 0.5, 0.0, HALF_HEIGHT, EXTENSION_END_Z));
-    distance = min(distance, horizontalWall(point, (doorRightStart + HALF_WIDTH) * 0.5, (HALF_WIDTH - doorRightStart) * 0.5, 0.0, HALF_HEIGHT, EXTENSION_END_Z));
-    distance = min(distance, horizontalWall(point, doorCenter, doorHalfWidth, (doorTop + HALF_HEIGHT) * 0.5, (HALF_HEIGHT - doorTop) * 0.5, EXTENSION_END_Z));
+    float doorWall = horizontalWall(point, (EXTENSION_START_X + doorLeftEnd) * 0.5, (doorLeftEnd - EXTENSION_START_X) * 0.5, 0.0, HALF_HEIGHT, EXTENSION_END_Z);
+    doorWall = smoothUnion(doorWall, horizontalWall(point, (doorRightStart + HALF_WIDTH) * 0.5, (HALF_WIDTH - doorRightStart) * 0.5, 0.0, HALF_HEIGHT, EXTENSION_END_Z), 0.065);
+    doorWall = smoothUnion(doorWall, horizontalWall(point, doorCenter, doorHalfWidth, (doorTop + HALF_HEIGHT) * 0.5, (HALF_HEIGHT - doorTop) * 0.5, EXTENSION_END_Z), 0.065);
+    distance = min(distance, doorWall);
     return distance;
   }
 
@@ -202,13 +203,17 @@ const fragmentShader = /* glsl */ `
     const float windowOneCenter = -1.234;
     const float windowOneHalfWidth = ROOM_WIDTH / 6.0;
     float windowOneZ = -HALF_DEPTH + 0.045 * activation;
-    float frame = sdRoundBox(point - vec3(windowOneCenter, -windowHalfHeight, windowOneZ), vec3(windowOneHalfWidth, frameThickness, frameDepth), 0.055);
+    float frame = sdRoundBox(point - vec3(windowOneCenter - windowOneHalfWidth, 0.0, windowOneZ), vec3(frameThickness, windowHalfHeight + frameThickness, frameDepth), 0.055);
+    frame = smoothUnion(frame, sdRoundBox(point - vec3(windowOneCenter + windowOneHalfWidth, 0.0, windowOneZ), vec3(frameThickness, windowHalfHeight + frameThickness, frameDepth), 0.055), 0.045);
+    frame = smoothUnion(frame, sdRoundBox(point - vec3(windowOneCenter, -windowHalfHeight, windowOneZ), vec3(windowOneHalfWidth, frameThickness, frameDepth), 0.055), 0.045);
     frame = smoothUnion(frame, sdRoundBox(point - vec3(windowOneCenter, windowHalfHeight, windowOneZ), vec3(windowOneHalfWidth, frameThickness, frameDepth), 0.055), 0.045);
 
     const float windowTwoCenter = -0.425;
     const float windowTwoHalfWidth = ROOM_DEPTH / 6.0;
     float windowTwoX = -HALF_WIDTH + 0.045 * activation;
-    float secondFrame = sdRoundBox(point - vec3(windowTwoX, -windowHalfHeight, windowTwoCenter), vec3(frameDepth, frameThickness, windowTwoHalfWidth), 0.055);
+    float secondFrame = sdRoundBox(point - vec3(windowTwoX, 0.0, windowTwoCenter - windowTwoHalfWidth), vec3(frameDepth, windowHalfHeight + frameThickness, frameThickness), 0.055);
+    secondFrame = smoothUnion(secondFrame, sdRoundBox(point - vec3(windowTwoX, 0.0, windowTwoCenter + windowTwoHalfWidth), vec3(frameDepth, windowHalfHeight + frameThickness, frameThickness), 0.055), 0.045);
+    secondFrame = smoothUnion(secondFrame, sdRoundBox(point - vec3(windowTwoX, -windowHalfHeight, windowTwoCenter), vec3(frameDepth, frameThickness, windowTwoHalfWidth), 0.055), 0.045);
     secondFrame = smoothUnion(secondFrame, sdRoundBox(point - vec3(windowTwoX, windowHalfHeight, windowTwoCenter), vec3(frameDepth, frameThickness, windowTwoHalfWidth), 0.055), 0.045);
     frame = min(frame, secondFrame);
 
