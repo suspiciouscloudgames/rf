@@ -884,13 +884,15 @@ button:focus-visible {
 .trace-3 { left: 58%; top: 30%; }
 .trace-4 { left: 72%; top: 58%; }
 
-.explore-trace small {
-  display: block;
-  margin-top: 7px;
+.explore-trace .memo-open-symbol {
+  position: absolute;
+  top: 7px;
+  right: 8px;
+  margin: 0;
   color: #e8a45d;
-  font-family: ui-monospace, monospace;
-  font-size: 8px;
-  letter-spacing: .08em;
+  font-family: ui-sans-serif, sans-serif;
+  font-size: 14px;
+  line-height: 1;
 }
 
 .resident-introduction {

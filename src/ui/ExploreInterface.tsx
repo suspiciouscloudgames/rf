@@ -87,9 +87,10 @@ export function ExploreInterface({ sequentialReveal = false }: ExploreInterfaceP
               className={`explore-trace ${selectedItemId === item.id ? 'active' : ''}`}
               onClick={() => setSelectedItem(selectedItemId === item.id ? null : item.id)}
               aria-pressed={selectedItemId === item.id}
+              aria-label={`${item.label} — ${openRecordLabel}`}
             >
-              <span>{String(index + 1).padStart(2, '0')}</span>
               {item.label}
+              <span className="memo-open-symbol" aria-hidden="true">↗</span>
             </button>
           )
           if (!sequentialReveal) return <div key={item.id} className={`memo-cluster trace-${index + 1}`}>{button}</div>
@@ -101,11 +102,11 @@ export function ExploreInterface({ sequentialReveal = false }: ExploreInterfaceP
               style={{ '--memo-delay': `${0.3 + index * revealStep}s` } as RevealStyle}
               onClick={() => setSelectedItem(selectedItemId === item.id ? null : item.id)}
               aria-pressed={selectedItemId === item.id}
+              aria-label={`${item.label} — ${openRecordLabel}`}
             >
               <span className={`explore-trace ${selectedItemId === item.id ? 'active' : ''}`}>
-                <span>{String(index + 1).padStart(2, '0')}</span>
                 {item.label}
-                <small>{openRecordLabel} →</small>
+                <span className="memo-open-symbol" aria-hidden="true">↗</span>
               </span>
               <span className="resident-introduction">{getResidentProfile(language, item.id)}</span>
             </button>
