@@ -68,7 +68,18 @@ export const useExperienceStore = create<ExperienceStore>((set, get) => ({
   enterHub: () => set({ stage: 'hub', ...resetExperience, lastInteractionTime: Date.now() }),
   enterApproach: (signalId = 'signal-01') => {
     const { stage, transition } = get()
-    if (stage !== 'hub' || transition !== 'none') return
+    if (transition !== 'none') return
+    if (stage === 'approach') {
+      set({
+        selectedSignalId: signalId,
+        currentObservationId: `observation-${signalId.slice(-2)}`,
+        observationVisualStatus: 'loading',
+        animateApproachRecord: true,
+        lastInteractionTime: Date.now(),
+      })
+      return
+    }
+    if (stage !== 'hub') return
     set({
       transition: 'hubToApproach',
       selectedSignalId: signalId,

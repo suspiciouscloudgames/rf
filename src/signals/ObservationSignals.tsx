@@ -33,7 +33,7 @@ function ObservationSignal({ signal }: { signal: ObservationSignalConfig }) {
   const observationLayerHidden = stage === 'observation'
     || transition === 'approachToObservation'
     || transition === 'returnToApproach'
-  const isActionable = transition === 'none' && (inHub || (inApproach && isSelected))
+  const isActionable = transition === 'none' && (inHub || inApproach)
   const visuallyActive = !observationLayerHidden && (inHub || preserveFullHub || isSelected)
   const copy = localeCopy[language]
   const actionLabel = inApproach ? copy.approachAction : copy.hubAction
@@ -60,7 +60,7 @@ function ObservationSignal({ signal }: { signal: ObservationSignalConfig }) {
   const selectSignal = () => {
     if (consumeSignalTapSuppression()) return
     if (!isActionable) return
-    if (inHub) enterApproach(signal.id)
+    if (inHub || !isSelected) enterApproach(signal.id)
     else enterObservation()
   }
 
