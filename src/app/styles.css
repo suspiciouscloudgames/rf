@@ -602,10 +602,20 @@ button:focus-visible {
   overflow: visible;
 }
 
-.research-cycle-link circle {
+.research-cycle-dots {
   fill: none;
   stroke: currentColor;
-  stroke-width: 1.45;
+  stroke-width: 1.65;
+  stroke-linecap: round;
+  stroke-dasharray: .001 .057;
+  transform: rotate(-90deg);
+  transform-origin: center;
+}
+
+.research-cycle-mask {
+  fill: none;
+  stroke: #fff;
+  stroke-width: 4;
   stroke-linecap: round;
   stroke-dasharray: 1;
   stroke-dashoffset: 1;
@@ -1433,7 +1443,7 @@ button:focus-visible {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .noise, .morph-film-overlay, .interface.effect-active, .scene-signal-button, .observation-subtitle-line, .observation-subtitle-cursor, .research-cycle-link circle { animation: none; stroke-dashoffset: 0; }
+  .noise, .morph-film-overlay, .interface.effect-active, .scene-signal-button, .observation-subtitle-line, .observation-subtitle-cursor, .research-cycle-mask { animation: none; stroke-dashoffset: 0; }
   .hub-video-background { transition-duration: 100ms !important; }
   .research-drawer { transition-duration: 100ms; }
 }
