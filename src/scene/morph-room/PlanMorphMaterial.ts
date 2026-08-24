@@ -202,17 +202,13 @@ const fragmentShader = /* glsl */ `
     const float windowOneCenter = -1.234;
     const float windowOneHalfWidth = ROOM_WIDTH / 6.0;
     float windowOneZ = -HALF_DEPTH + 0.045 * activation;
-    float frame = sdRoundBox(point - vec3(windowOneCenter - windowOneHalfWidth, 0.0, windowOneZ), vec3(frameThickness, windowHalfHeight + frameThickness, frameDepth), 0.055);
-    frame = smoothUnion(frame, sdRoundBox(point - vec3(windowOneCenter + windowOneHalfWidth, 0.0, windowOneZ), vec3(frameThickness, windowHalfHeight + frameThickness, frameDepth), 0.055), 0.045);
-    frame = smoothUnion(frame, sdRoundBox(point - vec3(windowOneCenter, -windowHalfHeight, windowOneZ), vec3(windowOneHalfWidth, frameThickness, frameDepth), 0.055), 0.045);
+    float frame = sdRoundBox(point - vec3(windowOneCenter, -windowHalfHeight, windowOneZ), vec3(windowOneHalfWidth, frameThickness, frameDepth), 0.055);
     frame = smoothUnion(frame, sdRoundBox(point - vec3(windowOneCenter, windowHalfHeight, windowOneZ), vec3(windowOneHalfWidth, frameThickness, frameDepth), 0.055), 0.045);
 
     const float windowTwoCenter = -0.425;
     const float windowTwoHalfWidth = ROOM_DEPTH / 6.0;
     float windowTwoX = -HALF_WIDTH + 0.045 * activation;
-    float secondFrame = sdRoundBox(point - vec3(windowTwoX, 0.0, windowTwoCenter - windowTwoHalfWidth), vec3(frameDepth, windowHalfHeight + frameThickness, frameThickness), 0.055);
-    secondFrame = smoothUnion(secondFrame, sdRoundBox(point - vec3(windowTwoX, 0.0, windowTwoCenter + windowTwoHalfWidth), vec3(frameDepth, windowHalfHeight + frameThickness, frameThickness), 0.055), 0.045);
-    secondFrame = smoothUnion(secondFrame, sdRoundBox(point - vec3(windowTwoX, -windowHalfHeight, windowTwoCenter), vec3(frameDepth, frameThickness, windowTwoHalfWidth), 0.055), 0.045);
+    float secondFrame = sdRoundBox(point - vec3(windowTwoX, -windowHalfHeight, windowTwoCenter), vec3(frameDepth, frameThickness, windowTwoHalfWidth), 0.055);
     secondFrame = smoothUnion(secondFrame, sdRoundBox(point - vec3(windowTwoX, windowHalfHeight, windowTwoCenter), vec3(frameDepth, frameThickness, windowTwoHalfWidth), 0.055), 0.045);
     frame = min(frame, secondFrame);
 
