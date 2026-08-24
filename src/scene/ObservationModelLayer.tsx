@@ -78,7 +78,7 @@ function ActiveObservationModel({ config }: ActiveObservationModelProps) {
     const transitionProgress = Number(camera.userData.transitionProgress ?? 0)
     const entering = selected && transition === 'approachToObservation'
     const observing = selected && stage === 'observation' && transition === 'none'
-    const returning = selected && transition === 'returnToHub'
+    const returning = selected && (transition === 'returnToHub' || transition === 'returnToApproach')
     const targetOpacity = entering
       ? MathUtils.smoothstep(transitionProgress, 0, 0.22)
       : observing

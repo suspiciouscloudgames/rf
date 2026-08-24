@@ -1,113 +1,13 @@
 import { useEffect, useState } from 'react'
-import en from '../locales/en.json'
-import ja from '../locales/ja.json'
-import { useExperienceStore } from '../store/experienceStore'
+import { localeCopy } from '../locales'
+import { useExperienceStore, type Language } from '../store/experienceStore'
 import { TypewriterText } from './TypewriterText'
 import { ExploreInterface } from './ExploreInterface'
 import { getFocusContent } from '../content/focusContent'
 import { hasDepthPortal } from '../signals/signalData'
 import { ObservationSubtitles } from './ObservationSubtitles'
 import { useTuningStore } from '../store/tuningStore'
-
-interface WebkitFullscreenDocument extends Document {
-  webkitFullscreenElement?: Element | null
-  webkitIsFullScreen?: boolean
-  webkitExitFullscreen?: () => Promise<void> | void
-  webkitCancelFullScreen?: () => Promise<void> | void
-}
-
-interface WebkitFullscreenElement extends HTMLElement {
-  webkitRequestFullscreen?: () => Promise<void> | void
-  webkitRequestFullScreen?: () => Promise<void> | void
-}
-
-function HubFullscreenControl({ copy }: { copy: typeof ja }) {
-  const registerInteraction = useExperienceStore((store) => store.registerInteraction)
-  const webkitDocument = document as WebkitFullscreenDocument
-  const fullscreenActive = () => Boolean(
-    document.fullscreenElement
-    ?? webkitDocument.webkitFullscreenElement
-    ?? webkitDocument.webkitIsFullScreen,
-  )
-  const [isFullscreen, setIsFullscreen] = useState(fullscreenActive())
-  const [showInstallHint, setShowInstallHint] = useState(false)
-
-  useEffect(() => {
-    const syncFullscreen = () => {
-      setIsFullscreen(fullscreenActive())
-      setShowInstallHint(false)
-    }
-    const handleFullscreenError = () => setShowInstallHint(true)
-    document.addEventListener('fullscreenchange', syncFullscreen)
-    document.addEventListener('webkitfullscreenchange', syncFullscreen)
-    document.addEventListener('fullscreenerror', handleFullscreenError)
-    document.addEventListener('webkitfullscreenerror', handleFullscreenError)
-    return () => {
-      document.removeEventListener('fullscreenchange', syncFullscreen)
-      document.removeEventListener('webkitfullscreenchange', syncFullscreen)
-      document.removeEventListener('fullscreenerror', handleFullscreenError)
-      document.removeEventListener('webkitfullscreenerror', handleFullscreenError)
-    }
-  }, [])
-
-  const toggleFullscreen = async () => {
-    registerInteraction()
-    setShowInstallHint(false)
-    if (fullscreenActive()) {
-      try {
-        if (document.exitFullscreen) {
-          await document.exitFullscreen()
-        } else if (webkitDocument.webkitExitFullscreen) {
-          await webkitDocument.webkitExitFullscreen()
-        } else if (webkitDocument.webkitCancelFullScreen) {
-          await webkitDocument.webkitCancelFullScreen()
-        }
-        return
-      } catch {
-        setShowInstallHint(true)
-        return
-      }
-    }
-
-    const root = document.documentElement as WebkitFullscreenElement
-    if (root.requestFullscreen) {
-      try {
-        await root.requestFullscreen()
-        return
-      } catch {
-        // Older iPadOS versions expose the standard method but only complete
-        // fullscreen through the prefixed WebKit implementation.
-      }
-    }
-    const webkitRequestFullscreen = root.webkitRequestFullscreen ?? root.webkitRequestFullScreen
-    if (webkitRequestFullscreen) {
-      try {
-        await webkitRequestFullscreen.call(root)
-        return
-      } catch {
-        // Fall through to the platform guidance below.
-      }
-    }
-    setShowInstallHint(true)
-  }
-
-  return (
-    <div className="system-controls hub-fullscreen-controls">
-      <button
-        type="button"
-        className={`fullscreen-control${isFullscreen ? ' is-active' : ''}`}
-        aria-pressed={isFullscreen}
-        onClick={() => { void toggleFullscreen() }}
-      >
-        <span className="fullscreen-control-icon" aria-hidden="true">{isFullscreen ? '×' : '⛶'}</span>
-        <span>{isFullscreen ? copy.exitFullscreen : copy.fullscreen}</span>
-      </button>
-      {showInstallHint ? (
-        <p className="fullscreen-install-hint" role="status">{copy.fullscreenInstallHint}</p>
-      ) : null}
-    </div>
-  )
-}
+import { ResearchDrawer } from './ResearchDrawer'
 
 export function Interface() {
   const [isWelcomeOpen, setIsWelcomeOpen] = useState(false)
@@ -119,8 +19,9 @@ export function Interface() {
   const observationMode = useExperienceStore((store) => store.observationMode)
   const selectedSignalId = useExperienceStore((store) => store.selectedSignalId)
   const beginReturn = useExperienceStore((store) => store.beginReturn)
+  const setLanguage = useExperienceStore((store) => store.setLanguage)
   const sequenceDuration = useTuningStore((store) => store.guidedObservationSeconds)
-  const copy = language === 'en' ? en : ja
+  const copy = localeCopy[language]
   const focusCopy = getFocusContent(language, selectedSignalId)
   const portalObservation = hasDepthPortal(selectedSignalId)
 
@@ -141,7 +42,26 @@ export function Interface() {
     <div className={`interface state-${stage} transition-${transition} ${effectActive ? 'effect-active' : ''}`}>
       {stage === 'hub' && transition === 'none' ? (
         <>
-          <HubFullscreenControl copy={copy} />
+          <ResearchDrawer />
+          <div className="hub-controls">
+            <div className="language-switch" role="group" aria-label="Language">
+              {([
+                ['ja', 'JP'],
+                ['en', 'EN'],
+                ['ko', 'KO'],
+              ] as Array<[Language, string]>).map(([option, label]) => (
+                <button
+                  key={option}
+                  type="button"
+                  className={language === option ? 'active' : ''}
+                  aria-pressed={language === option}
+                  onClick={() => setLanguage(option)}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
           <div className="stage-copy hub-copy">
             <p>{copy.hubHint}</p>
             <span>{copy.location}</span>
@@ -172,7 +92,7 @@ export function Interface() {
       ) : null}
 
       {(stage !== 'hub' || transition !== 'none') && stage !== 'loading' ? (
-        <button className="home-button" onClick={beginReturn} disabled={transition === 'returnToHub'}>
+        <button className="home-button" onClick={beginReturn} disabled={transition !== 'none'}>
           <span aria-hidden="true">←</span> {copy.home}
         </button>
       ) : null}
@@ -191,7 +111,7 @@ export function Interface() {
         </>
       ) : null}
 
-      {transition === 'returnToHub' ? <div className="return-message">{copy.returningLabel}<span>•••</span></div> : null}
+      {(transition === 'returnToHub' || transition === 'returnToApproach') ? <div className="return-message">{copy.returningLabel}<span>•••</span></div> : null}
 
       {stage === 'observation' && observationMode === 'guided' ? (
         <div className="progress-track" aria-label={copy.sequenceProgress} aria-valuenow={Math.round(progress * 100)} role="progressbar">

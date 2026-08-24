@@ -25,7 +25,7 @@ export const resolvePortalProgress = (
       parallax: 0,
     }
   }
-  if (transition === 'returnToHub') {
+  if (transition === 'returnToHub' || transition === 'returnToApproach') {
     if (stage !== 'observation') return hiddenProgress
     const reverse = 1 - progress
     const parallax = MathUtils.smoothstep(
@@ -69,5 +69,5 @@ export const resolvePortalDarkness = (
     0,
     darkenSeconds,
   )
-  return transition === 'returnToHub' ? darkness * (1 - progress) : darkness
+  return transition === 'returnToHub' || transition === 'returnToApproach' ? darkness * (1 - progress) : darkness
 }

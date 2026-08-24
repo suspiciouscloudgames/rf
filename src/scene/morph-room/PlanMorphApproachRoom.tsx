@@ -102,6 +102,8 @@ export function PlanMorphApproachRoom() {
     const transitionProgress = Number(camera.userData.transitionProgress ?? 0)
     const reveal = transition === 'hubToApproach'
       ? transitionProgress
+      : transition === 'returnToApproach'
+        ? transitionProgress
       : stage === 'approach'
         ? transition === 'approachToObservation' ? 1 - transitionProgress : 1
         : 0
@@ -110,6 +112,8 @@ export function PlanMorphApproachRoom() {
       ? 1 - MathUtils.smoothstep(transitionProgress, 0, observationEntryRetractPortion)
       : transition === 'hubToApproach'
         ? MathUtils.smoothstep(transitionProgress, 0, 0.82)
+        : transition === 'returnToApproach'
+          ? MathUtils.smoothstep(transitionProgress, 0, 0.82)
         : 1
     const furnitureSinkProgress = observationEntryActive
       ? MathUtils.smoothstep(transitionProgress, 0.08, 0.68)

@@ -36,7 +36,7 @@ export function Environment() {
       : snapshot.transition === 'approachToObservation'
       ? progress
       : snapshot.stage === 'observation'
-        ? snapshot.transition === 'returnToHub' ? 1 - progress : 1
+        ? snapshot.transition === 'returnToHub' || snapshot.transition === 'returnToApproach' ? 1 - progress : 1
         : 0
     const fog = scene.fog as Fog
     fog.color.setRGB(

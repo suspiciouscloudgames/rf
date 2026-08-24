@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 
 export type ExperienceStage = 'loading' | 'hub' | 'approach' | 'observation'
-export type TransitionKind = 'none' | 'hubToApproach' | 'approachToObservation' | 'returnToHub'
+export type TransitionKind = 'none' | 'hubToApproach' | 'approachToObservation' | 'returnToApproach' | 'returnToHub'
 export type ObservationMode = 'guided' | 'explore'
 export type Language = 'ja' | 'ko' | 'en'
 export type SignalId = 'signal-01' | 'signal-02' | 'signal-03' | 'signal-04' | 'signal-05'
@@ -71,19 +71,30 @@ export const useExperienceStore = create<ExperienceStore>((set, get) => ({
   },
   beginReturn: () => {
     const { stage, transition } = get()
-    if (stage === 'loading' || (stage === 'hub' && transition === 'none') || transition === 'returnToHub') return
+    if (stage === 'loading' || (stage === 'hub' && transition === 'none') || transition !== 'none') return
+    const nextTransition = stage === 'observation' ? 'returnToApproach' : 'returnToHub'
     set({
-      transition: 'returnToHub',
+      transition: nextTransition,
       effectActive: false,
       selectedExploreItemId: null,
       lastInteractionTime: Date.now(),
     })
-    window.dispatchEvent(new CustomEvent('experience-transition', { detail: 'returnToHub' }))
+    window.dispatchEvent(new CustomEvent('experience-transition', { detail: nextTransition }))
   },
   finishTransition: () => {
     const { transition } = get()
     if (transition === 'hubToApproach') set({ stage: 'approach', transition: 'none' })
     else if (transition === 'approachToObservation') set({ stage: 'observation', transition: 'none' })
+    else if (transition === 'returnToApproach') set({
+      stage: 'approach',
+      transition: 'none',
+      observationMode: 'guided',
+      selectedExploreItemId: null,
+      sequenceProgress: 0,
+      effectActive: false,
+      observationVisualStatus: 'loading',
+      lastInteractionTime: Date.now(),
+    })
     else if (transition === 'returnToHub') set({ stage: 'hub', ...resetExperience, lastInteractionTime: Date.now() })
   },
   setObservationMode: (observationMode) => set({ observationMode }),

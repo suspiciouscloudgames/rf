@@ -35,7 +35,7 @@ export function House() {
   useFrame((_, delta) => {
     if (!group.current) return
     const portalFocused = hasDepthPortal(selectedSignalId)
-      && (stage === 'observation' || transition === 'approachToObservation' || transition === 'returnToHub')
+      && (stage === 'observation' || transition === 'approachToObservation' || transition === 'returnToApproach' || transition === 'returnToHub')
     const planRoomOwnsRotation = roomVisualMode === 'morph-plan'
       && (stage === 'approach' || transition === 'hubToApproach')
     const speed = portalFocused || planRoomOwnsRotation
