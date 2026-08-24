@@ -660,10 +660,10 @@ button:focus-visible {
 .research-drawer-handle-label {
   color: rgba(236, 226, 207, .78);
   font-family: ui-sans-serif, "Noto Sans KR", sans-serif;
-  font-size: 10px;
-  font-weight: 400;
+  font-size: 13px;
+  font-weight: 500;
   line-height: 1;
-  letter-spacing: .17em;
+  letter-spacing: .13em;
   writing-mode: vertical-rl;
   text-orientation: mixed;
   white-space: nowrap;
