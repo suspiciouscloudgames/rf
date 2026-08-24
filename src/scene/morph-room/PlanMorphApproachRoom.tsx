@@ -89,6 +89,11 @@ export function PlanMorphApproachRoom() {
       delete canvas.dataset.planMorphDimensions
       delete canvas.dataset.planMorphWindowRatio
       delete canvas.dataset.planMorphTreeConnection
+      delete canvas.dataset.planMorphTreeDetail
+      delete canvas.dataset.planMorphFurnitureGroups
+      delete canvas.dataset.planMorphFurnitureDetail
+      delete canvas.dataset.planMorphFurnitureSink
+      delete canvas.dataset.planMorphFurnitureState
     }
   }, [canvas, material])
 
@@ -106,6 +111,9 @@ export function PlanMorphApproachRoom() {
       : transition === 'hubToApproach'
         ? MathUtils.smoothstep(transitionProgress, 0, 0.82)
         : 1
+    const furnitureSinkProgress = observationEntryActive
+      ? MathUtils.smoothstep(transitionProgress, 0.08, 0.68)
+      : 0
     proxy.current.visible = reveal > 0.002
 
     const tuning = useTuningStore.getState()
@@ -131,6 +139,7 @@ export function PlanMorphApproachRoom() {
       MathUtils.degToRad(tuning.morphFrontWallFadeAngle),
     )
     material.uniforms.uArchitectureActivation.value = architectureActivation
+    material.uniforms.uFurnitureSinkProgress.value = furnitureSinkProgress
     material.uniforms.uReveal.value = reveal
     material.uniforms.uTime.value = experiment.freezeTime ? experiment.shaderTime : clock.elapsedTime
     material.uniforms.uFilmGrain.value = tuning.morphFilmGrain * 0.35
@@ -174,6 +183,15 @@ export function PlanMorphApproachRoom() {
     gl.domElement.dataset.planMorphDimensions = '4.128,2.832,2.640'
     gl.domElement.dataset.planMorphWindowRatio = '0.333'
     gl.domElement.dataset.planMorphTreeConnection = 'detached'
+    gl.domElement.dataset.planMorphTreeDetail = 'branched-canopy-v2'
+    gl.domElement.dataset.planMorphFurnitureGroups = 'flowerpot,desk-chair,cat-bed,bed,cabinet'
+    gl.domElement.dataset.planMorphFurnitureDetail = 'recognizable-sdf-v1'
+    gl.domElement.dataset.planMorphFurnitureSink = furnitureSinkProgress.toFixed(3)
+    gl.domElement.dataset.planMorphFurnitureState = furnitureSinkProgress >= 0.999
+      ? 'submerged'
+      : furnitureSinkProgress > 0.001
+        ? 'sinking'
+        : 'visible'
   })
 
   const beginPointer = (event: ThreeEvent<PointerEvent>) => {

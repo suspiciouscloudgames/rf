@@ -22,6 +22,7 @@ const fragmentShader = /* glsl */ `
   uniform float uFrontWallOpacity;
   uniform float uFrontWallThreshold;
   uniform float uArchitectureActivation;
+  uniform float uFurnitureSinkProgress;
   uniform float uReveal;
   uniform float uTime;
   uniform float uFilmGrain;
@@ -78,6 +79,11 @@ const fragmentShader = /* glsl */ `
       + length(max(distanceToEdge, 0.0)) - radius;
   }
 
+  float sdFastBox(vec3 point, vec3 halfSize) {
+    vec3 distanceToEdge = abs(point) - halfSize;
+    return max(distanceToEdge.x, max(distanceToEdge.y, distanceToEdge.z));
+  }
+
   float sdEllipsoid(vec3 point, vec3 radius) {
     float firstLength = length(point / radius);
     float secondLength = length(point / (radius * radius));
@@ -89,6 +95,25 @@ const fragmentShader = /* glsl */ `
     vec3 segment = end - start;
     float projection = clamp(dot(pointOffset, segment) / dot(segment, segment), 0.0, 1.0);
     return length(pointOffset - segment * projection) - radius;
+  }
+
+  float sdCappedCylinderY(vec3 point, float halfHeight, float radius) {
+    vec2 distanceToEdge = abs(vec2(length(point.xz), point.y)) - vec2(radius, halfHeight);
+    return min(max(distanceToEdge.x, distanceToEdge.y), 0.0) + length(max(distanceToEdge, 0.0));
+  }
+
+  float sdTorusY(vec3 point, vec2 radius) {
+    return length(vec2(length(point.xz) - radius.x, point.y)) - radius.y;
+  }
+
+  vec3 rotateY(vec3 point, float angle) {
+    float cosine = cos(angle);
+    float sine = sin(angle);
+    return vec3(
+      cosine * point.x + sine * point.z,
+      point.y,
+      -sine * point.x + cosine * point.z
+    );
   }
 
   float smoothUnion(float firstDistance, float secondDistance, float blendRadius) {
@@ -206,18 +231,154 @@ const fragmentShader = /* glsl */ `
 
   float detachedTreeField(vec3 point) {
     float activation = uArchitectureActivation;
-    vec3 localPoint = point - vec3(-1.100, FLOOR_Y, 1.990);
-    float trunkRadius = mix(0.035, 0.145, activation);
-    float trunkHeight = mix(0.08, 0.96, activation);
-    float tree = sdCapsule(localPoint, vec3(0.0, 0.0, 0.0), vec3(0.03, trunkHeight, -0.02), trunkRadius);
-    float rootRadius = mix(0.018, 0.085, activation);
-    tree = smoothUnion(tree, sdCapsule(localPoint, vec3(0.0, 0.03, 0.0), vec3(0.48 * activation, 0.015, 0.16 * activation), rootRadius), 0.08);
-    tree = smoothUnion(tree, sdCapsule(localPoint, vec3(0.0, 0.03, 0.0), vec3(-0.42 * activation, 0.01, 0.22 * activation), rootRadius), 0.08);
-    tree = smoothUnion(tree, sdCapsule(localPoint, vec3(0.0, 0.03, 0.0), vec3(0.10 * activation, 0.01, -0.44 * activation), rootRadius), 0.08);
-    vec3 canopyRadius = mix(vec3(0.08), vec3(0.62, 0.48, 0.58), activation);
-    float canopy = sdEllipsoid(localPoint - vec3(0.02, trunkHeight + 0.22 * activation, 0.0), canopyRadius);
-    tree = smoothUnion(tree, canopy, 0.18 * activation + 0.01);
-    return tree + (1.0 - activation) * 0.28;
+    const float treeScale = 0.80;
+    vec3 localPoint = (point - vec3(-1.100, FLOOR_Y, 1.990)) / treeScale;
+    float treeBounds = sdEllipsoid(
+      localPoint - vec3(0.0, 0.82 * activation, 0.0),
+      mix(vec3(0.12), vec3(0.92, 1.55, 0.88), activation)
+    );
+    if (treeBounds > 0.34) return (treeBounds + (1.0 - activation) * 0.28) * treeScale;
+
+    float trunkHeight = mix(0.08, 1.12, activation);
+    float trunkRadius = mix(0.028, 0.105, activation);
+    float tree = sdCapsule(
+      localPoint,
+      vec3(0.0, 0.0, 0.0),
+      vec3(0.025 * activation, trunkHeight, -0.018 * activation),
+      trunkRadius
+    );
+    tree = smoothUnion(
+      tree,
+      sdCapsule(
+        localPoint,
+        vec3(0.025 * activation, trunkHeight * 0.62, -0.018 * activation),
+        vec3(-0.035 * activation, trunkHeight + 0.27 * activation, 0.025 * activation),
+        trunkRadius * 0.68
+      ),
+      0.055 * activation + 0.008
+    );
+
+    float rootRadius = mix(0.014, 0.058, activation);
+    tree = smoothUnion(tree, sdCapsule(localPoint, vec3(0.0, 0.035, 0.0), vec3(0.52 * activation, 0.012, 0.18 * activation), rootRadius), 0.052);
+    tree = smoothUnion(tree, sdCapsule(localPoint, vec3(0.0, 0.035, 0.0), vec3(-0.48 * activation, 0.010, 0.24 * activation), rootRadius), 0.052);
+    tree = smoothUnion(tree, sdCapsule(localPoint, vec3(0.0, 0.035, 0.0), vec3(0.12 * activation, 0.008, -0.49 * activation), rootRadius), 0.052);
+    tree = smoothUnion(tree, sdCapsule(localPoint, vec3(0.0, 0.035, 0.0), vec3(-0.18 * activation, 0.010, -0.34 * activation), rootRadius * 0.82), 0.045);
+
+    float branchRadius = mix(0.012, 0.047, activation);
+    tree = smoothUnion(tree, sdCapsule(localPoint, vec3(0.01, 0.58, 0.0) * activation, vec3(0.48, 0.96, 0.16) * activation, branchRadius), 0.046);
+    tree = smoothUnion(tree, sdCapsule(localPoint, vec3(-0.01, 0.66, 0.0) * activation, vec3(-0.46, 1.03, 0.18) * activation, branchRadius), 0.046);
+    tree = smoothUnion(tree, sdCapsule(localPoint, vec3(0.02, 0.72, -0.01) * activation, vec3(0.31, 1.14, -0.36) * activation, branchRadius * 0.88), 0.042);
+    tree = smoothUnion(tree, sdCapsule(localPoint, vec3(0.0, 0.78, 0.0) * activation, vec3(-0.30, 1.20, -0.32) * activation, branchRadius * 0.82), 0.042);
+    tree = smoothUnion(tree, sdCapsule(localPoint, vec3(0.0, 0.91, 0.0) * activation, vec3(0.18, 1.38, 0.12) * activation, branchRadius * 0.72), 0.038);
+
+    vec3 leafRadius = mix(vec3(0.055), vec3(0.34, 0.27, 0.31), activation);
+    float leaves = sdEllipsoid(localPoint - vec3(0.50, 1.04, 0.18) * activation, leafRadius);
+    leaves = smoothUnion(leaves, sdEllipsoid(localPoint - vec3(-0.49, 1.10, 0.20) * activation, leafRadius * vec3(1.02, 0.92, 1.0)), 0.105 * activation + 0.006);
+    leaves = smoothUnion(leaves, sdEllipsoid(localPoint - vec3(0.34, 1.22, -0.38) * activation, leafRadius * vec3(0.96, 1.0, 1.08)), 0.105 * activation + 0.006);
+    leaves = smoothUnion(leaves, sdEllipsoid(localPoint - vec3(-0.33, 1.27, -0.34) * activation, leafRadius * vec3(0.92, 1.03, 0.96)), 0.105 * activation + 0.006);
+    leaves = smoothUnion(leaves, sdEllipsoid(localPoint - vec3(0.18, 1.48, 0.12) * activation, leafRadius * vec3(0.86, 1.12, 0.88)), 0.095 * activation + 0.006);
+    leaves = smoothUnion(leaves, sdEllipsoid(localPoint - vec3(-0.12, 1.42, 0.04) * activation, leafRadius * vec3(0.82, 1.04, 0.84)), 0.09 * activation + 0.006);
+    tree = smoothUnion(tree, leaves, 0.10 * activation + 0.008);
+    return (tree + (1.0 - activation) * 0.28) * treeScale;
+  }
+
+  float furnitureSink(float delay) {
+    return smoothstep(delay, 1.0, uFurnitureSinkProgress) * 1.58;
+  }
+
+  float flowerpotField(vec3 point) {
+    vec3 localPoint = point - vec3(-1.57, FLOOR_Y + 0.82 - furnitureSink(0.10), -1.19);
+    float bounds = sdFastBox(localPoint - vec3(0.0, 0.23, 0.0), vec3(0.27, 0.52, 0.27));
+    if (bounds > 0.24) return bounds;
+
+    float pot = sdCappedCylinderY(localPoint, 0.13, 0.13);
+    pot = smoothUnion(pot, sdTorusY(localPoint - vec3(0.0, 0.13, 0.0), vec2(0.13, 0.025)), 0.022);
+    float plant = sdCapsule(localPoint, vec3(0.0, 0.12, 0.0), vec3(-0.03, 0.44, 0.01), 0.018);
+    plant = min(plant, sdCapsule(localPoint, vec3(-0.01, 0.25, 0.0), vec3(-0.13, 0.38, 0.03), 0.014));
+    plant = min(plant, sdCapsule(localPoint, vec3(-0.01, 0.29, 0.0), vec3(0.14, 0.43, -0.02), 0.014));
+    plant = smoothUnion(plant, sdEllipsoid(localPoint - vec3(-0.15, 0.40, 0.03), vec3(0.11, 0.045, 0.065)), 0.025);
+    plant = smoothUnion(plant, sdEllipsoid(localPoint - vec3(0.16, 0.45, -0.02), vec3(0.12, 0.050, 0.070)), 0.025);
+    plant = smoothUnion(plant, sdEllipsoid(localPoint - vec3(-0.02, 0.49, 0.0), vec3(0.09, 0.055, 0.075)), 0.025);
+    return min(pot, plant);
+  }
+
+  float deskAndChairField(vec3 point) {
+    vec3 deskPoint = point - vec3(-1.08, FLOOR_Y - furnitureSink(0.00), -0.79);
+    float bounds = sdFastBox(deskPoint - vec3(0.16, 0.46, 0.17), vec3(0.92, 0.60, 0.84));
+    if (bounds > 0.28) return bounds;
+
+    float desk = sdRoundBox(deskPoint - vec3(0.0, 0.72, 0.0), vec3(0.59, 0.055, 0.28), 0.045);
+    desk = min(desk, sdCapsule(deskPoint, vec3(-0.49, 0.06, -0.19), vec3(-0.49, 0.67, -0.19), 0.042));
+    desk = min(desk, sdCapsule(deskPoint, vec3(0.49, 0.06, -0.19), vec3(0.49, 0.67, -0.19), 0.042));
+    desk = min(desk, sdCapsule(deskPoint, vec3(-0.49, 0.06, 0.19), vec3(-0.49, 0.67, 0.19), 0.042));
+    desk = min(desk, sdCapsule(deskPoint, vec3(0.49, 0.06, 0.19), vec3(0.49, 0.67, 0.19), 0.042));
+    desk = min(desk, sdRoundBox(deskPoint - vec3(0.0, 0.625, 0.23), vec3(0.32, 0.075, 0.055), 0.025));
+
+    vec3 chairPoint = rotateY(deskPoint - vec3(0.68, 0.0, 0.58), -0.16);
+    float chair = sdRoundBox(chairPoint - vec3(0.0, 0.40, 0.0), vec3(0.23, 0.055, 0.22), 0.055);
+    chair = min(chair, sdRoundBox(chairPoint - vec3(0.0, 0.67, 0.17), vec3(0.23, 0.25, 0.045), 0.065));
+    chair = min(chair, sdCapsule(chairPoint, vec3(-0.17, 0.04, -0.14), vec3(-0.17, 0.35, -0.14), 0.032));
+    chair = min(chair, sdCapsule(chairPoint, vec3(0.17, 0.04, -0.14), vec3(0.17, 0.35, -0.14), 0.032));
+    chair = min(chair, sdCapsule(chairPoint, vec3(-0.17, 0.04, 0.14), vec3(-0.17, 0.35, 0.14), 0.032));
+    chair = min(chair, sdCapsule(chairPoint, vec3(0.17, 0.04, 0.14), vec3(0.17, 0.35, 0.14), 0.032));
+    return min(desk, chair);
+  }
+
+  float catBedField(vec3 point) {
+    vec3 localPoint = rotateY(
+      point - vec3(-1.64, FLOOR_Y - furnitureSink(0.05), 0.37),
+      -0.22
+    );
+    float bounds = sdFastBox(localPoint - vec3(0.0, 0.21, 0.0), vec3(0.48, 0.34, 0.44));
+    if (bounds > 0.24) return bounds;
+
+    float cushion = sdEllipsoid(localPoint - vec3(0.0, 0.10, 0.02), vec3(0.31, 0.075, 0.27));
+    float bolsters = sdCapsule(localPoint, vec3(-0.30, 0.12, -0.20), vec3(-0.30, 0.15, 0.18), 0.09);
+    bolsters = smoothUnion(bolsters, sdCapsule(localPoint, vec3(0.30, 0.12, -0.20), vec3(0.30, 0.15, 0.18), 0.09), 0.055);
+    bolsters = smoothUnion(bolsters, sdCapsule(localPoint, vec3(-0.25, 0.17, 0.22), vec3(0.25, 0.17, 0.22), 0.10), 0.065);
+    float halfHood = sdTorusY(localPoint - vec3(0.0, 0.25, 0.18), vec2(0.27, 0.055));
+    halfHood = max(halfHood, -localPoint.z + 0.09);
+    return min(cushion, min(bolsters, halfHood));
+  }
+
+  float bedField(vec3 point) {
+    vec3 localPoint = point - vec3(1.48, FLOOR_Y - furnitureSink(0.02), 0.21);
+    float bounds = sdFastBox(localPoint - vec3(0.0, 0.34, 0.0), vec3(0.59, 0.56, 1.04));
+    if (bounds > 0.28) return bounds;
+
+    float bed = sdRoundBox(localPoint - vec3(0.0, 0.15, 0.0), vec3(0.46, 0.15, 0.86), 0.08);
+    bed = smoothUnion(bed, sdRoundBox(localPoint - vec3(0.0, 0.34, 0.02), vec3(0.43, 0.13, 0.81), 0.10), 0.055);
+    bed = min(bed, sdRoundBox(localPoint - vec3(0.0, 0.48, -0.78), vec3(0.47, 0.43, 0.065), 0.075));
+    float pillow = sdEllipsoid(localPoint - vec3(0.0, 0.51, -0.56), vec3(0.32, 0.09, 0.20));
+    float blanket = sdRoundBox(localPoint - vec3(0.0, 0.48, 0.26), vec3(0.40, 0.055, 0.46), 0.07);
+    blanket = smoothUnion(blanket, sdCapsule(localPoint, vec3(-0.39, 0.46, -0.18), vec3(0.39, 0.46, -0.18), 0.045), 0.035);
+    return min(bed, min(pillow, blanket));
+  }
+
+  float cabinetField(vec3 point) {
+    vec3 localPoint = point - vec3(1.64, FLOOR_Y - furnitureSink(0.08), -1.06);
+    float bounds = sdFastBox(localPoint - vec3(0.0, 0.59, 0.0), vec3(0.50, 0.72, 0.40));
+    if (bounds > 0.26) return bounds;
+
+    float cabinet = sdRoundBox(localPoint - vec3(0.0, 0.62, 0.0), vec3(0.32, 0.57, 0.23), 0.055);
+    cabinet = min(cabinet, sdRoundBox(localPoint - vec3(-0.325, 0.78, 0.0), vec3(0.025, 0.35, 0.205), 0.018));
+    cabinet = min(cabinet, sdRoundBox(localPoint - vec3(-0.325, 0.33, 0.0), vec3(0.025, 0.075, 0.205), 0.018));
+    cabinet = min(cabinet, sdCapsule(localPoint, vec3(-0.36, 0.70, -0.07), vec3(-0.36, 0.86, -0.07), 0.018));
+    cabinet = min(cabinet, sdCapsule(localPoint, vec3(-0.36, 0.70, 0.07), vec3(-0.36, 0.86, 0.07), 0.018));
+    cabinet = min(cabinet, sdCapsule(localPoint, vec3(-0.24, 0.03, -0.15), vec3(-0.24, 0.08, -0.15), 0.035));
+    cabinet = min(cabinet, sdCapsule(localPoint, vec3(-0.24, 0.03, 0.15), vec3(-0.24, 0.08, 0.15), 0.035));
+    cabinet = min(cabinet, sdCapsule(localPoint, vec3(0.24, 0.03, -0.15), vec3(0.24, 0.08, -0.15), 0.035));
+    cabinet = min(cabinet, sdCapsule(localPoint, vec3(0.24, 0.03, 0.15), vec3(0.24, 0.08, 0.15), 0.035));
+    return cabinet;
+  }
+
+  float furnitureField(vec3 point) {
+    float furniture = flowerpotField(point);
+    furniture = min(furniture, deskAndChairField(point));
+    furniture = min(furniture, catBedField(point));
+    furniture = min(furniture, bedField(point));
+    furniture = min(furniture, cabinetField(point));
+    return furniture;
   }
 
   vec4 evaluateSceneField(vec3 point, float cutawayNearWalls) {
@@ -225,6 +386,7 @@ const fragmentShader = /* glsl */ `
     float wallDistance = buildingWallField(point);
     float frameDistance = openingFrameField(point);
     float treeDistance = detachedTreeField(point);
+    float furnitureDistance = furnitureField(point);
     if (cutawayNearWalls > 0.5) {
       vec2 cameraDirection = normalize(uCameraLocal.xz + vec2(0.0001, 0.0));
       float nearWallCoordinate = dot(point.xz, cameraDirection);
@@ -232,11 +394,12 @@ const fragmentShader = /* glsl */ `
     }
     float buildingDistance = smoothUnion(floorDistance, wallDistance, 0.075);
     buildingDistance = smoothUnion(buildingDistance, frameDistance, 0.055);
-    float signedDistance = min(buildingDistance, treeDistance);
+    float featureDistance = min(frameDistance, min(treeDistance, furnitureDistance));
+    float signedDistance = min(buildingDistance, min(treeDistance, furnitureDistance));
 
-    float nearestNonWall = min(floorDistance, min(frameDistance, treeDistance));
+    float nearestNonWall = min(floorDistance, featureDistance);
     float wallInfluence = 1.0 - smoothstep(-0.025, 0.085, wallDistance - nearestNonWall);
-    float featureInfluence = 1.0 - smoothstep(-0.025, 0.10, min(frameDistance, treeDistance) - min(floorDistance, wallDistance));
+    float featureInfluence = 1.0 - smoothstep(-0.025, 0.10, featureDistance - min(floorDistance, wallDistance));
 
     float waveTime = uTime * uWaverSpeed;
     float fieldWave = sin((point.x + point.z * 0.67) * uWaverScale + waveTime)
@@ -600,6 +763,7 @@ export class PlanMorphMaterial extends ShaderMaterial {
         uFrontWallOpacity: { value: 0.12 },
         uFrontWallThreshold: { value: 0.53 },
         uArchitectureActivation: { value: 1 },
+        uFurnitureSinkProgress: { value: 0 },
         uReveal: { value: 0 },
         uTime: { value: 0 },
         uFilmGrain: { value: 0.04 },
