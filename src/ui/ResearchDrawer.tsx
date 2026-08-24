@@ -28,6 +28,7 @@ export function ResearchDrawer() {
     ? 'observation-patterns'
     : 'end-of-solitude'
   const cycleTarget = researchArticles.find((article) => article.id === cycleTargetId) ?? researchArticles[0]
+  const breakObservationTitle = language === 'ko' && selectedArticle.id === 'observation-patterns'
 
   const selectArticle = (articleId: ResearchArticleId) => {
     setSelectedArticleId(articleId)
@@ -132,7 +133,13 @@ export function ResearchDrawer() {
             </div>
           </div>
           <article ref={articlePanelRef} className="research-article-panel" lang={language}>
-            <h2>{selectedArticle.title[language]}</h2>
+            <h2>
+              {breakObservationTitle ? (
+                <>
+                  우주 관측 데이터와<br />미분류 관측 패턴
+                </>
+              ) : selectedArticle.title[language]}
+            </h2>
             <p>
               {renderArticleBody()}
               <button
