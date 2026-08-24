@@ -8,6 +8,7 @@ import { hasDepthPortal } from '../signals/signalData'
 import { ObservationSubtitles } from './ObservationSubtitles'
 import { useTuningStore } from '../store/tuningStore'
 import { ResearchDrawer } from './ResearchDrawer'
+import { getApproachContent } from '../content/approachContent'
 
 export function Interface() {
   const [isWelcomeOpen, setIsWelcomeOpen] = useState(false)
@@ -23,6 +24,7 @@ export function Interface() {
   const sequenceDuration = useTuningStore((store) => store.guidedObservationSeconds)
   const copy = localeCopy[language]
   const focusCopy = getFocusContent(language, selectedSignalId)
+  const approachRecord = getApproachContent(language, selectedSignalId)
   const portalObservation = hasDepthPortal(selectedSignalId)
 
   useEffect(() => {
@@ -86,9 +88,10 @@ export function Interface() {
       ) : null}
 
       {stage === 'approach' && transition === 'none' ? (
-        <>
-          <div className="stage-copy approach-copy"><p>{copy.approachHint}</p></div>
-        </>
+        <aside className="approach-record" lang={language}>
+          <h1>{approachRecord.title}</h1>
+          <p>{approachRecord.body}</p>
+        </aside>
       ) : null}
 
       {(stage !== 'hub' || transition !== 'none') && stage !== 'loading' ? (

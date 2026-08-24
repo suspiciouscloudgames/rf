@@ -624,7 +624,45 @@ button:focus-visible {
 }
 
 .hub-copy { left: 9%; bottom: 10%; }
-.approach-copy { left: 8%; top: 24%; }
+.approach-record {
+  position: absolute;
+  top: 11%;
+  left: max(4%, env(safe-area-inset-left));
+  width: min(390px, 31vw);
+  max-height: 68vh;
+  box-sizing: border-box;
+  overflow: auto;
+  padding: 20px 22px 24px;
+  border-left: 1px solid rgba(216, 145, 63, .46);
+  color: #c9c3b8;
+  background: linear-gradient(90deg, rgba(5, 7, 8, .82), rgba(5, 7, 8, .26));
+  backdrop-filter: blur(9px);
+  scrollbar-color: rgba(216, 145, 63, .38) transparent;
+  scrollbar-width: thin;
+  pointer-events: auto;
+  font-family: "Nanum Myeongjo", AppleMyungjo, "Noto Serif KR", serif;
+}
+
+.approach-record[lang="ja"] { font-family: "Yu Mincho", "Hiragino Mincho ProN", "Noto Serif JP", serif; }
+.approach-record[lang="en"] { font-family: Georgia, "Times New Roman", serif; }
+
+.approach-record h1 {
+  margin: 0 0 16px;
+  color: #e0d7c8;
+  font-size: clamp(18px, 1.65vw, 23px);
+  font-weight: 500;
+  line-height: 1.35;
+  letter-spacing: .045em;
+}
+
+.approach-record p {
+  margin: 0;
+  color: #c5beb2;
+  font-size: clamp(13px, 1.12vw, 15.5px);
+  line-height: 1.9;
+  letter-spacing: .012em;
+  word-break: keep-all;
+}
 
 .scene-signal-button {
   position: relative;
