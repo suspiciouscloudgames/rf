@@ -25,7 +25,7 @@ const memoCharacterDelay = (character: string) => {
   return 28
 }
 
-function MemoTypewriterText({ text, startDelay }: { text: string; startDelay: number }) {
+function MemoTypewriterText({ title, text, startDelay }: { title: string; text: string; startDelay: number }) {
   const [visibleLength, setVisibleLength] = useState(0)
   const [showCursor, setShowCursor] = useState(true)
 
@@ -45,16 +45,19 @@ function MemoTypewriterText({ text, startDelay }: { text: string; startDelay: nu
 
   return (
     <span className="resident-introduction">
-      {text.slice(0, visibleLength)}
-      {showCursor && (
-        <span
-          className={`memo-type-cursor ${visibleLength >= text.length ? 'typing-complete' : ''}`}
-          aria-hidden="true"
-          onAnimationEnd={() => {
-            if (visibleLength >= text.length) setShowCursor(false)
-          }}
-        />
-      )}
+      <span className="resident-record-title">{title}</span>
+      <span className="resident-record-body">
+        {text.slice(0, visibleLength)}
+        {showCursor && (
+          <span
+            className={`memo-type-cursor ${visibleLength >= text.length ? 'typing-complete' : ''}`}
+            aria-hidden="true"
+            onAnimationEnd={() => {
+              if (visibleLength >= text.length) setShowCursor(false)
+            }}
+          />
+        )}
+      </span>
     </span>
   )
 }
@@ -152,7 +155,7 @@ export function ExploreInterface({ sequentialReveal = false }: ExploreInterfaceP
                 {item.label}
                 <span className="memo-open-symbol" aria-hidden="true">↗</span>
               </span>
-              <MemoTypewriterText text={item.previewBody} startDelay={memoDelay * 1000} />
+              <MemoTypewriterText title={item.title} text={item.previewBody} startDelay={memoDelay * 1000} />
             </button>
           )
         })}
@@ -161,7 +164,6 @@ export function ExploreInterface({ sequentialReveal = false }: ExploreInterfaceP
         <aside className="explore-panel">
           <button type="button" className="explore-close" onClick={() => setSelectedItem(null)} aria-label={copy.closeTrace}>×</button>
           <span className="narration-index">{selectedItem.resident ?? `${copy.trace} / ${String(selectedItemNumber).padStart(2, '0')}`}</span>
-          <h2>{selectedItem.title}</h2>
           {selectedItem.type === 'video' ? (
             <video ref={videoRef} src="/assets/archive-signal.mp4" muted loop playsInline preload="auto" />
           ) : null}

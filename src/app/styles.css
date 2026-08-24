@@ -923,6 +923,18 @@ button:focus-visible {
   animation: resident-introduction-enter .36s ease-out both;
 }
 
+.resident-record-title {
+  display: block;
+  margin-bottom: 4px;
+  color: rgba(242, 234, 219, .92);
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.resident-record-body {
+  display: inline;
+}
+
 .memo-type-cursor {
   display: inline-block;
   width: 3px;
