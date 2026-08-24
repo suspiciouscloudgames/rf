@@ -125,12 +125,12 @@ export function PlanMorphApproachRoom() {
           ? 0
           : 1
     const furnitureSinkProgress = observationEntryActive
-      ? MathUtils.smoothstep(transitionProgress, 0.10, 0.93)
+      ? 1 - MathUtils.smoothstep(transitionProgress, 0.34, 0.92)
       : transition === 'returnToApproach'
-        ? 1 - MathUtils.smoothstep(transitionProgress, 0.04, 0.88)
+        ? MathUtils.smoothstep(transitionProgress, 0.08, 0.82)
         : stage === 'observation'
-          ? 1
-          : 0
+          ? 0
+          : 1
     proxy.current.visible = reveal > 0.002
 
     const tuning = useTuningStore.getState()
@@ -205,10 +205,10 @@ export function PlanMorphApproachRoom() {
     gl.domElement.dataset.planMorphFurnitureDetail = 'recognizable-sdf-v1'
     gl.domElement.dataset.planMorphFurnitureSink = furnitureSinkProgress.toFixed(3)
     gl.domElement.dataset.planMorphFurnitureState = furnitureSinkProgress >= 0.999
-      ? 'submerged'
+      ? 'concealed'
       : furnitureSinkProgress > 0.001
-        ? 'sinking'
-        : 'visible'
+        ? 'transitioning'
+        : 'revealed'
   })
 
   const beginPointer = (event: ThreeEvent<PointerEvent>) => {
