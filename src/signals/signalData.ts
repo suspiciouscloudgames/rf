@@ -81,11 +81,11 @@ export const observationSignals: ObservationSignalConfig[] = [
   {
     id: 'signal-05',
     observationId: 'observation-05',
-    anchor: [-1.10, -0.20, 1.62],
+    anchor: [-1.10, -0.48, 2.28],
     normal: [0, 0, -1],
     approachDistance: 3.5,
     observationDepth: 0.86,
-    focusPosition: [-1.10, -0.32, 1.78],
+    focusPosition: [-1.10, -0.34, 1.99],
     observationOffset: [-0.08, 0.14, 1.52],
     accent: '#809fb0',
     phase: 4.6,
