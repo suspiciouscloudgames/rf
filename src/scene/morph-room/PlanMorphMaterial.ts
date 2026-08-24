@@ -254,7 +254,7 @@ const fragmentShader = /* glsl */ `
       vec3(0.018 * activation, trunkHeight, -0.012 * activation),
       trunkRadius
     );
-    vec3 baseRadius = mix(vec3(0.026), vec3(0.155, 0.105, 0.142), activation);
+    vec3 baseRadius = mix(vec3(0.026), vec3(0.220, 0.135, 0.195), activation);
     float trunkBase = sdEllipsoid(
       localPoint - vec3(-0.008, 0.055, 0.012) * activation,
       baseRadius
