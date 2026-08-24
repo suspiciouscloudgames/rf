@@ -389,11 +389,19 @@ const fragmentShader = /* glsl */ `
   }
 
   vec4 evaluateSceneField(vec3 point, float cutawayNearWalls) {
-    float floorDistance = buildingFloorField(point);
-    float wallDistance = buildingWallField(point);
-    float frameDistance = openingFrameField(point);
-    float treeDistance = detachedTreeField(point);
-    float furnitureDistance = furnitureField(point);
+    float meltHeight = smoothstep(FLOOR_Y + 0.10, HALF_HEIGHT, point.y);
+    float meltFlow = 0.58
+      + sin(point.x * 1.72 + sin(point.z * 1.28) + uTime * 0.035) * 0.24
+      + sin(point.z * 2.36 - point.x * 0.44 - uTime * 0.021) * 0.12;
+    vec3 meltedPoint = point;
+    meltedPoint.y += meltHeight * meltFlow * uWaverAmount * 3.15;
+    meltedPoint.x += sin(point.y * 2.1 + point.z * 1.35) * meltHeight * uWaverAmount * 0.42;
+
+    float floorDistance = buildingFloorField(meltedPoint);
+    float wallDistance = buildingWallField(meltedPoint);
+    float frameDistance = openingFrameField(meltedPoint);
+    float treeDistance = detachedTreeField(meltedPoint);
+    float furnitureDistance = furnitureField(meltedPoint);
     if (cutawayNearWalls > 0.5) {
       vec2 cameraDirection = normalize(uCameraLocal.xz + vec2(0.0001, 0.0));
       float nearWallCoordinate = dot(point.xz, cameraDirection);
@@ -409,8 +417,8 @@ const fragmentShader = /* glsl */ `
     float featureInfluence = 1.0 - smoothstep(-0.025, 0.10, featureDistance - min(floorDistance, wallDistance));
 
     float waveTime = uTime * uWaverSpeed;
-    float fieldWave = sin((point.x + point.z * 0.67) * uWaverScale + waveTime)
-      * cos((point.y - point.z * 0.38) * uWaverScale * 0.73 - waveTime * 0.71);
+    float fieldWave = sin((meltedPoint.x + meltedPoint.z * 0.67) * uWaverScale + waveTime)
+      * cos((meltedPoint.y - meltedPoint.z * 0.38) * uWaverScale * 0.73 - waveTime * 0.71);
     signedDistance += fieldWave * uWaverAmount;
     float rippleDistance = distance(point.xz, uRippleOrigin);
     float rippleFront = abs(rippleDistance - uRippleAge * 1.35);
