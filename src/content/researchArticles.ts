@@ -150,7 +150,7 @@ export const researchArticleCuePhrases: Partial<Record<number, Record<Language, 
     ja: '激しい感情変化',
     en: 'intense changes in human emotion',
   },
-  4: { ko: '감응장', ja: '感応場', en: 'resonant field' },
+  4: { ko: '감응장', ja: '感応場', en: 'affective field' },
   6: { ko: '미지의 출현체', ja: '未知の出現体', en: 'Unknown emergent entities' },
   11: { ko: '검출기', ja: '検出器', en: 'detector' },
   15: { ko: '반려체', ja: '伴侶体', en: 'companions' },
@@ -163,18 +163,18 @@ export const researchArticleLinkPhrases: Record<ResearchArticleId, Record<Langua
   'observation-patterns': {
     ko: '우주 관측 데이터와 미분류 관측 패턴',
     ja: '宇宙観測データと未分類観測パターン',
-    en: 'astronomical observation data and unclassified observational patterns',
+    en: 'Astronomical Observation Data and Unclassified Observation Patterns',
   },
   emotion: { ko: '감정', ja: '感情', en: 'Emotion' },
-  'affective-field': { ko: '감응장', ja: '感応場', en: 'resonant fields' },
-  'emergent-entities': { ko: '감응성 출현체', ja: '感応性出現体', en: 'resonant emergent entity' },
-  detector: { ko: '감응장 검출기', ja: '感応場検出器', en: 'Resonant-field detectors' },
-  companions: { ko: '관측형 반려체', ja: '観測型伴侶体', en: 'observational companions' },
-  classification: { ko: '감응장의 분류', ja: '感応場の分類', en: 'classification system for resonant fields' },
-  characteristics: { ko: '반려체와의 생활', ja: '伴侶体との暮らし', en: 'living with companion entities' },
-  'service-app': { ko: '서비스 앱과 캐릭터화', ja: 'サービスアプリとキャラクター化', en: 'Service apps and character design' },
-  'real-estate': { ko: '서비스화와 부동산', ja: 'サービス化と不動産', en: 'services and real-estate markets' },
-  'end-of-solitude': { ko: '고독의 종말', ja: '孤独の終焉', en: 'the end of solitude' },
+  'affective-field': { ko: '감응장', ja: '感応場', en: 'Affective Field' },
+  'emergent-entities': { ko: '감응성 출현체', ja: '感応性出現体', en: 'Affective Emergent Entities' },
+  detector: { ko: '감응장 검출기', ja: '感応場検出器', en: 'Affective-Field Detector' },
+  companions: { ko: '관측형 반려체', ja: '観測型伴侶体', en: 'Observer-Dependent Companion Entities' },
+  classification: { ko: '감응장의 분류', ja: '感応場の分類', en: 'Classification of Affective Fields' },
+  characteristics: { ko: '반려체와의 생활', ja: '伴侶体との暮らし', en: 'Living with Companion Entities' },
+  'service-app': { ko: '서비스 앱과 캐릭터화', ja: 'サービスアプリとキャラクター化', en: 'Service Apps and Characterization' },
+  'real-estate': { ko: '서비스화와 부동산', ja: 'サービス化と不動産', en: 'Commercialization and Real Estate' },
+  'end-of-solitude': { ko: '고독의 종말', ja: '孤独の終焉', en: 'The End of Solitude' },
 }
 
 export const researchArticleBodyAliases: Partial<Record<ResearchArticleId, Partial<Record<Language, string[]>>>> = {
@@ -182,5 +182,35 @@ export const researchArticleBodyAliases: Partial<Record<ResearchArticleId, Parti
     ko: ['우주 관측 데이터의 미분류 패턴'],
     ja: ['宇宙観測データの未分類パターン'],
     en: ['unclassified patterns in astronomical data'],
+  },
+  'affective-field': {
+    en: ['affective fields'],
+  },
+  'emergent-entities': {
+    en: ['affective emergent entity', 'emergent entities'],
+  },
+  detector: {
+    en: ['affective-field detectors', 'the detector'],
+  },
+  companions: {
+    en: ['observer-dependent companion entity', 'companion entities'],
+  },
+  classification: {
+    en: ['six patterns', 'classification of affective fields'],
+  },
+  characteristics: {
+    ko: ['반려체의 특성'],
+    ja: ['伴侶体の特性'],
+    en: ['life with companion entities', 'characteristics of companions'],
+  },
+  'service-app': {
+    en: ['service apps and characterization', 'service apps'],
+  },
+  'real-estate': {
+    en: ['commercialization and the real-estate market', 'real estate and domestic services'],
+  },
+  'end-of-solitude': {
+    ja: ['孤独の終わり'],
+    en: ['end of solitude'],
   },
 }
