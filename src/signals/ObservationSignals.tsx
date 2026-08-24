@@ -2,8 +2,7 @@ import { Html } from '@react-three/drei'
 import { useFrame } from '@react-three/fiber'
 import { useMemo, useRef } from 'react'
 import { Color, MeshBasicMaterial, Quaternion, Vector3, type Group, type Mesh } from 'three'
-import en from '../locales/en.json'
-import ja from '../locales/ja.json'
+import { localeCopy } from '../locales'
 import { useExperienceStore } from '../store/experienceStore'
 import { observationSignals, type ObservationSignalConfig } from './signalData'
 import { consumeSignalTapSuppression } from '../interaction/orbitGesture'
@@ -33,7 +32,7 @@ function ObservationSignal({ signal }: { signal: ObservationSignalConfig }) {
   const inApproach = stage === 'approach'
   const isActionable = transition === 'none' && (inHub || (inApproach && isSelected))
   const visuallyActive = inHub || preserveFullHub || isSelected
-  const copy = language === 'en' ? en : ja
+  const copy = localeCopy[language]
   const actionLabel = inApproach ? copy.approachAction : copy.hubAction
 
   useFrame(({ clock, camera }, delta) => {
