@@ -469,15 +469,15 @@ button:focus-visible {
   color: rgba(225, 220, 210, .94);
   background: linear-gradient(90deg, rgba(12, 15, 15, .18), rgba(12, 15, 15, .68) 18%, rgba(12, 15, 15, .68) 82%, rgba(12, 15, 15, .18));
   backdrop-filter: blur(3px);
-  font-family: "Nanum Myeongjo", AppleMyungjo, "Noto Serif KR", serif;
-  font-weight: 400;
+  font-family: "Helvetica Neue", Arial, "Noto Sans KR", sans-serif;
+  font-weight: 450;
   text-align: center;
   text-shadow: 0 2px 12px rgba(0, 0, 0, .72);
   z-index: 2;
 }
 
-.research-subtitle[lang="ja"] { font-family: "Yu Mincho", "Hiragino Mincho ProN", "Noto Serif JP", serif; }
-.research-subtitle[lang="en"] { font-family: Georgia, "Times New Roman", serif; }
+.research-subtitle[lang="ja"] { font-family: "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif; }
+.research-subtitle[lang="en"] { font-family: "Helvetica Neue", Arial, sans-serif; }
 
 .research-countdown {
   position: absolute;
@@ -512,8 +512,8 @@ button:focus-visible {
   margin: 0;
   padding: 0 1px 1px;
   border: 0;
-  border-bottom: 1px solid rgba(61, 108, 169, .82);
-  color: #4f83c4;
+  border-bottom: 1px solid rgba(43, 67, 255, .9);
+  color: #3850ff;
   background: transparent;
   cursor: pointer;
   font-size: inherit;
@@ -528,7 +528,7 @@ button:focus-visible {
 .research-subtitle-link span {
   display: inline-block;
   margin-left: 5px;
-  color: #5d8fc9;
+  color: #3850ff;
   font-family: "Helvetica Neue", Arial, sans-serif;
   font-size: .78em;
   font-weight: 300;
