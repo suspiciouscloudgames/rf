@@ -611,7 +611,7 @@ button:focus-visible {
   stroke-dashoffset: 1;
   transform: rotate(-90deg);
   transform-origin: center;
-  animation: research-cycle-draw 2.5s ease-in-out infinite;
+  animation: research-cycle-draw 8s ease-in-out infinite;
 }
 
 .research-subtitle[lang="ko"] p { word-break: keep-all; }
