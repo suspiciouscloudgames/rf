@@ -21,6 +21,7 @@ export function Interface() {
   const selectedSignalId = useExperienceStore((store) => store.selectedSignalId)
   const beginReturn = useExperienceStore((store) => store.beginReturn)
   const setLanguage = useExperienceStore((store) => store.setLanguage)
+  const animateApproachRecord = useExperienceStore((store) => store.animateApproachRecord)
   const sequenceDuration = useTuningStore((store) => store.guidedObservationSeconds)
   const copy = localeCopy[language]
   const focusCopy = getFocusContent(language, selectedSignalId)
@@ -96,6 +97,7 @@ export function Interface() {
             characterDelay={22}
             sentenceDelay={620}
             autoScroll
+            instant={!animateApproachRecord}
           />
         </aside>
       ) : null}

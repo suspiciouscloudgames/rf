@@ -19,6 +19,7 @@ interface ExperienceStore {
   isAudioEnabled: boolean
   effectActive: boolean
   observationVisualStatus: ObservationVisualStatus
+  animateApproachRecord: boolean
   lastInteractionTime: number
   enterHub: () => void
   enterApproach: (signalId?: SignalId) => void
@@ -44,6 +45,7 @@ const resetExperience = {
   sequenceProgress: 0,
   effectActive: false,
   observationVisualStatus: 'idle' as const,
+  animateApproachRecord: false,
 }
 
 export const useExperienceStore = create<ExperienceStore>((set, get) => ({
@@ -61,6 +63,7 @@ export const useExperienceStore = create<ExperienceStore>((set, get) => ({
       selectedSignalId: signalId,
       currentObservationId: `observation-${signalId.slice(-2)}`,
       observationVisualStatus: 'loading',
+      animateApproachRecord: true,
       lastInteractionTime: Date.now(),
     })
   },
@@ -93,6 +96,7 @@ export const useExperienceStore = create<ExperienceStore>((set, get) => ({
       sequenceProgress: 0,
       effectActive: false,
       observationVisualStatus: 'loading',
+      animateApproachRecord: false,
       lastInteractionTime: Date.now(),
     })
     else if (transition === 'returnToHub') set({ stage: 'hub', ...resetExperience, lastInteractionTime: Date.now() })

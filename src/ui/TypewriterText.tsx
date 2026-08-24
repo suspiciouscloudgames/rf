@@ -6,6 +6,7 @@ interface TypewriterTextProps {
   characterDelay?: number
   sentenceDelay?: number
   autoScroll?: boolean
+  instant?: boolean
 }
 
 const delayForCharacter = (character: string, characterDelay: number, sentenceDelay: number) => {
@@ -21,13 +22,14 @@ export function TypewriterText({
   characterDelay = 38,
   sentenceDelay = 220,
   autoScroll = false,
+  instant = false,
 }: TypewriterTextProps) {
-  const [visibleLength, setVisibleLength] = useState(0)
+  const [visibleLength, setVisibleLength] = useState(instant ? text.length : 0)
   const paragraphRef = useRef<HTMLParagraphElement>(null)
 
   useEffect(() => {
-    setVisibleLength(0)
-  }, [text])
+    setVisibleLength(instant ? text.length : 0)
+  }, [instant, text])
 
   useEffect(() => {
     if (visibleLength >= text.length) return
