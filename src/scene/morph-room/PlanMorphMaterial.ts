@@ -241,32 +241,49 @@ const fragmentShader = /* glsl */ `
     const float treeScale = 1.02;
     vec3 localPoint = (point - vec3(-1.100, FLOOR_Y, 1.990)) / treeScale;
     float treeBounds = sdEllipsoid(
-      localPoint - vec3(0.0, 1.18 * activation, 0.0),
-      mix(vec3(0.12), vec3(0.56, 2.36, 0.54), activation)
+      localPoint - vec3(0.0, 1.22 * activation, 0.0),
+      mix(vec3(0.12), vec3(0.68, 2.48, 0.58), activation)
     );
     if (treeBounds > 0.34) return (treeBounds + (1.0 - activation) * 0.28) * treeScale;
 
-    float trunkHeight = mix(0.08, 1.64, activation);
-    float trunkRadius = mix(0.024, 0.080, activation);
+    float lowerRadius = mix(0.024, 0.145, activation);
     float tree = sdCapsule(
       localPoint,
-      vec3(0.0, 0.045 * activation, 0.0),
-      vec3(0.018 * activation, trunkHeight, -0.012 * activation),
-      trunkRadius
+      vec3(-0.012, -0.060, 0.018) * activation,
+      vec3(0.006, 0.700, 0.004) * activation,
+      lowerRadius
     );
-    vec3 baseRadius = mix(vec3(0.026), vec3(0.220, 0.135, 0.195), activation);
-    float trunkBase = sdEllipsoid(
-      localPoint - vec3(-0.008, 0.055, 0.012) * activation,
-      baseRadius
+    float middleTrunk = sdCapsule(
+      localPoint,
+      vec3(0.004, 0.420, 0.006) * activation,
+      vec3(0.020, 1.220, -0.010) * activation,
+      mix(0.022, 0.105, activation)
     );
-    tree = smoothUnion(tree, trunkBase, 0.055 * activation + 0.006);
+    tree = smoothUnion(tree, middleTrunk, 0.085 * activation + 0.006);
+    float upperTrunk = sdCapsule(
+      localPoint,
+      vec3(0.018, 0.940, -0.008) * activation,
+      vec3(-0.015, 1.690, 0.010) * activation,
+      mix(0.020, 0.073, activation)
+    );
+    tree = smoothUnion(tree, upperTrunk, 0.070 * activation + 0.006);
 
-    vec3 crownRadius = mix(vec3(0.055), vec3(0.46, 0.51, 0.44), activation);
+    vec3 crownRadius = mix(vec3(0.055), vec3(0.41, 0.61, 0.35), activation);
     float crown = sdEllipsoid(
-      localPoint - vec3(-0.015, 1.92, 0.0) * activation,
+      localPoint - vec3(-0.025, 2.030, 0.0) * activation,
       crownRadius
     );
-    tree = smoothUnion(tree, crown, 0.12 * activation + 0.008);
+    float lowerCrown = sdEllipsoid(
+      localPoint - vec3(-0.245, 1.830, 0.060) * activation,
+      mix(vec3(0.050), vec3(0.300, 0.365, 0.300), activation)
+    );
+    crown = smoothUnion(crown, lowerCrown, 0.150 * activation + 0.008);
+    float sideCrown = sdEllipsoid(
+      localPoint - vec3(0.235, 1.900, -0.045) * activation,
+      mix(vec3(0.048), vec3(0.270, 0.340, 0.270), activation)
+    );
+    crown = smoothUnion(crown, sideCrown, 0.140 * activation + 0.008);
+    tree = smoothUnion(tree, crown, 0.110 * activation + 0.008);
     return (tree + (1.0 - activation) * 0.28) * treeScale;
   }
 
