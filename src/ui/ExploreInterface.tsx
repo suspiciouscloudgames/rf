@@ -22,10 +22,10 @@ export function ExploreInterface({ sequentialReveal = false }: ExploreInterfaceP
   const language = useExperienceStore((store) => store.language)
   const selectedItemId = useExperienceStore((store) => store.selectedExploreItemId)
   const selectedSignalId = useExperienceStore((store) => store.selectedSignalId)
-  const transition = useExperienceStore((store) => store.transition)
   const zoomDuration = useTuningStore((store) => store.approachToObservationSeconds)
   const setSelectedItem = useExperienceStore((store) => store.setSelectedExploreItem)
   const copy = localeCopy[language]
+  const openRecordLabel = language === 'ko' ? '기록 열기' : language === 'ja' ? '記録を開く' : 'OPEN RECORD'
   const residentMemos = getObservationMemos(language, selectedSignalId)
   const items = residentMemos?.map((memo) => ({
     id: memo.id,
@@ -70,7 +70,7 @@ export function ExploreInterface({ sequentialReveal = false }: ExploreInterfaceP
     if (!selectedItemId) return
     const closeOutsideMemo = (event: PointerEvent) => {
       const target = event.target
-      if (target instanceof Element && target.closest('.explore-panel, .explore-trace')) return
+      if (target instanceof Element && target.closest('.explore-panel, .explore-trace, .memo-cluster')) return
       setSelectedItem(null)
     }
     document.addEventListener('pointerdown', closeOutsideMemo)
@@ -79,7 +79,6 @@ export function ExploreInterface({ sequentialReveal = false }: ExploreInterfaceP
 
   return (
     <div className="explore-interface" lang={language}>
-      <p className="explore-hint">{copy.exploreHint}</p>
       <div className="explore-traces">
         {items.map((item, index) => {
           const button = (
@@ -95,16 +94,21 @@ export function ExploreInterface({ sequentialReveal = false }: ExploreInterfaceP
           )
           if (!sequentialReveal) return <div key={item.id} className={`memo-cluster trace-${index + 1}`}>{button}</div>
           return (
-            <div
+            <button
               key={item.id}
+              type="button"
               className={`memo-cluster memo-reveal trace-${index + 1}`}
               style={{ '--memo-delay': `${0.3 + index * revealStep}s` } as RevealStyle}
+              onClick={() => setSelectedItem(selectedItemId === item.id ? null : item.id)}
+              aria-pressed={selectedItemId === item.id}
             >
-              {button}
-              {transition === 'approachToObservation' ? (
-                <p className="resident-introduction">{getResidentProfile(language, item.id)}</p>
-              ) : null}
-            </div>
+              <span className={`explore-trace ${selectedItemId === item.id ? 'active' : ''}`}>
+                <span>{String(index + 1).padStart(2, '0')}</span>
+                {item.label}
+                <small>{openRecordLabel} →</small>
+              </span>
+              <span className="resident-introduction">{getResidentProfile(language, item.id)}</span>
+            </button>
           )
         })}
       </div>
