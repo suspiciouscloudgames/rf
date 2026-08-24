@@ -551,12 +551,22 @@ const fragmentShader = /* glsl */ `
     return color;
   }
 
-  vec3 applyFurnitureRim(vec3 color, vec3 point, vec3 normal) {
-    float furnitureProximity = 1.0 - smoothstep(
+  float furnitureSurfaceMask(vec3 point) {
+    return 1.0 - smoothstep(
       0.012,
       0.070,
       abs(furnitureField(deformedScenePoint(point)))
     );
+  }
+
+  vec3 applyFurnitureTone(vec3 color, vec3 point) {
+    float furnitureMask = furnitureSurfaceMask(point);
+    vec3 liftedFurnitureColor = color * 1.18 + vec3(0.006, 0.028, 0.024);
+    return mix(color, liftedFurnitureColor, furnitureMask * 0.92);
+  }
+
+  vec3 applyFurnitureRim(vec3 color, vec3 point, vec3 normal) {
+    float furnitureProximity = furnitureSurfaceMask(point);
     vec3 viewDirection = normalize(uCameraLocal - point);
     float grazingAngle = 1.0 - abs(dot(normal, viewDirection));
     float rim = smoothstep(0.52, 0.94, grazingAngle) * furnitureProximity;
@@ -675,7 +685,10 @@ const fragmentShader = /* glsl */ `
       firstWallInfluence = max(firstWallInfluence, firstWallProximity);
     }
     vec3 firstColor = applyFurnitureRim(
-      shadeSurface(firstPoint, firstNormal, firstWallInfluence),
+      applyFurnitureTone(
+        shadeSurface(firstPoint, firstNormal, firstWallInfluence),
+        firstPoint
+      ),
       firstPoint,
       firstNormal
     );
@@ -744,7 +757,10 @@ const fragmentShader = /* glsl */ `
         openingFrameDistance = min(openingFrameDistance, abs(secondField.w));
         vec3 secondNormal = estimateNormal(secondPoint);
         vec3 secondColor = applyFurnitureRim(
-          shadeSurface(secondPoint, secondNormal, secondField.y),
+          applyFurnitureTone(
+            shadeSurface(secondPoint, secondNormal, secondField.y),
+            secondPoint
+          ),
           secondPoint,
           secondNormal
         );
