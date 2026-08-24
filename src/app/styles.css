@@ -579,13 +579,13 @@ button:focus-visible {
   margin: 0;
   padding: 0;
   border: 0;
-  color: #286fca;
+  color: #3850ff;
   background: transparent;
   cursor: pointer;
   font: inherit;
   line-height: inherit;
   text-decoration: underline;
-  text-decoration-color: rgba(40, 111, 202, .9);
+  text-decoration-color: rgba(56, 80, 255, .9);
   text-decoration-thickness: 1px;
   text-underline-offset: 2px;
   transition: color 150ms ease, text-decoration-color 150ms ease;
