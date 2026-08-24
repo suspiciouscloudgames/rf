@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { localeCopy } from '../locales'
 import { useExperienceStore } from '../store/experienceStore'
+import { getObservationMemos } from '../content/observationMemos'
 
 const exploreItems = [
   { id: 'trace-text', label: 'traceText', title: 'traceTextTitle', body: 'traceTextBody', type: 'text' },
@@ -11,11 +12,27 @@ const exploreItems = [
 export function ExploreInterface() {
   const language = useExperienceStore((store) => store.language)
   const selectedItemId = useExperienceStore((store) => store.selectedExploreItemId)
+  const selectedSignalId = useExperienceStore((store) => store.selectedSignalId)
   const setSelectedItem = useExperienceStore((store) => store.setSelectedExploreItem)
   const copy = localeCopy[language]
+  const residentMemos = getObservationMemos(language, selectedSignalId)
+  const items = residentMemos?.map((memo) => ({
+    id: memo.id,
+    label: memo.resident,
+    title: memo.title,
+    body: memo.body,
+    type: 'text' as const,
+    resident: memo.resident,
+  })) ?? exploreItems.map((item) => ({
+    ...item,
+    label: copy[item.label],
+    title: copy[item.title],
+    body: copy[item.body],
+    resident: null,
+  }))
   const videoRef = useRef<HTMLVideoElement>(null)
-  const selectedItem = exploreItems.find((item) => item.id === selectedItemId) ?? null
-  const selectedItemNumber = selectedItem ? exploreItems.findIndex((item) => item.id === selectedItem.id) + 1 : 0
+  const selectedItem = items.find((item) => item.id === selectedItemId) ?? null
+  const selectedItemNumber = selectedItem ? items.findIndex((item) => item.id === selectedItem.id) + 1 : 0
 
   useEffect(() => {
     const video = videoRef.current
@@ -40,7 +57,7 @@ export function ExploreInterface() {
     <div className="explore-interface" lang={language}>
       <p className="explore-hint">{copy.exploreHint}</p>
       <div className="explore-traces">
-        {exploreItems.map((item, index) => (
+        {items.map((item, index) => (
           <button
             key={item.id}
             type="button"
@@ -49,19 +66,19 @@ export function ExploreInterface() {
             aria-pressed={selectedItemId === item.id}
           >
             <span>{String(index + 1).padStart(2, '0')}</span>
-            {copy[item.label]}
+            {item.label}
           </button>
         ))}
       </div>
       {selectedItem ? (
         <aside className="explore-panel">
           <button type="button" className="explore-close" onClick={() => setSelectedItem(null)} aria-label={copy.closeTrace}>×</button>
-          <span className="narration-index">{copy.trace} / {String(selectedItemNumber).padStart(2, '0')}</span>
-          <h2>{copy[selectedItem.title]}</h2>
+          <span className="narration-index">{selectedItem.resident ?? `${copy.trace} / ${String(selectedItemNumber).padStart(2, '0')}`}</span>
+          <h2>{selectedItem.title}</h2>
           {selectedItem.type === 'video' ? (
             <video ref={videoRef} src="/assets/archive-signal.mp4" muted loop playsInline preload="auto" />
           ) : null}
-          <p>{copy[selectedItem.body]}</p>
+          <p>{selectedItem.body}</p>
         </aside>
       ) : null}
     </div>

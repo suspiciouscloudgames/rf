@@ -9,6 +9,7 @@ import { ObservationSubtitles } from './ObservationSubtitles'
 import { useTuningStore } from '../store/tuningStore'
 import { ResearchDrawer } from './ResearchDrawer'
 import { getApproachContent } from '../content/approachContent'
+import { ObservationMemoSequence } from './ObservationMemoSequence'
 
 export function Interface() {
   const [isWelcomeOpen, setIsWelcomeOpen] = useState(false)
@@ -27,6 +28,11 @@ export function Interface() {
   const focusCopy = getFocusContent(language, selectedSignalId)
   const approachRecord = getApproachContent(language, selectedSignalId)
   const portalObservation = hasDepthPortal(selectedSignalId)
+  const residentMemoObservation = selectedSignalId === 'signal-01'
+  const showResidentMemoSequence = residentMemoObservation && (
+    transition === 'approachToObservation'
+    || (stage === 'observation' && transition === 'none' && observationMode === 'guided')
+  )
 
   useEffect(() => {
     document.documentElement.lang = language
@@ -107,9 +113,11 @@ export function Interface() {
         </button>
       ) : null}
 
+      {showResidentMemoSequence ? <ObservationMemoSequence /> : null}
+
       {stage === 'observation' ? (
         <>
-          {transition === 'none' && observationMode === 'guided' && !portalObservation ? (
+          {transition === 'none' && observationMode === 'guided' && !portalObservation && !residentMemoObservation ? (
             <aside className="narration-panel" lang={language}>
               <span className="narration-index">{copy.transmission} / {String(Math.round(progress * sequenceDuration)).padStart(2, '0')}:{sequenceDuration}</span>
               <h1>{focusCopy.title}</h1>
