@@ -7,6 +7,17 @@ export type Language = 'ja' | 'ko' | 'en'
 export type SignalId = 'signal-01' | 'signal-02' | 'signal-03' | 'signal-04' | 'signal-05'
 export type ObservationVisualStatus = 'idle' | 'loading' | 'ready' | 'fallback'
 
+const LANGUAGE_STORAGE_KEY = 'entries-from-here-language'
+
+const getInitialLanguage = (): Language => {
+  if (typeof window === 'undefined') return 'ja'
+
+  const storedLanguage = window.sessionStorage.getItem(LANGUAGE_STORAGE_KEY)
+  return storedLanguage === 'ko' || storedLanguage === 'en' || storedLanguage === 'ja'
+    ? storedLanguage
+    : 'ja'
+}
+
 interface ExperienceStore {
   stage: ExperienceStage
   transition: TransitionKind
@@ -50,7 +61,7 @@ const resetExperience = {
 
 export const useExperienceStore = create<ExperienceStore>((set, get) => ({
   stage: 'loading',
-  language: 'ja',
+  language: getInitialLanguage(),
   isAudioEnabled: false,
   lastInteractionTime: Date.now(),
   ...resetExperience,
@@ -103,7 +114,10 @@ export const useExperienceStore = create<ExperienceStore>((set, get) => ({
   },
   setObservationMode: (observationMode) => set({ observationMode }),
   setSelectedExploreItem: (selectedExploreItemId) => set({ selectedExploreItemId, lastInteractionTime: Date.now() }),
-  setLanguage: (language) => set({ language, lastInteractionTime: Date.now() }),
+  setLanguage: (language) => {
+    window.sessionStorage.setItem(LANGUAGE_STORAGE_KEY, language)
+    set({ language, lastInteractionTime: Date.now() })
+  },
   setProgress: (sequenceProgress) => set({ sequenceProgress }),
   setEffectActive: (effectActive) => set({ effectActive }),
   setObservationVisualStatus: (observationVisualStatus) => set({ observationVisualStatus }),
