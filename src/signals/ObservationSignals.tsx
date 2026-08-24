@@ -71,10 +71,13 @@ function ObservationSignal({ signal }: { signal: ObservationSignalConfig }) {
     }
     if (inApproach && transition === 'none') {
       const driftTime = clock.elapsedTime
-      const driftRadius = 0.022
-      group.current.position.x += Math.sin(driftTime * 0.43 + signal.phase) * driftRadius
-      group.current.position.y += Math.sin(driftTime * 0.31 + signal.phase * 0.73) * driftRadius * 0.55
-      group.current.position.z += Math.cos(driftTime * 0.37 + signal.phase * 1.11) * driftRadius
+      const driftRadius = 0.072
+      const secondaryDrift = 0.014
+      group.current.position.x += Math.sin(driftTime * 0.31 + signal.phase) * driftRadius
+        + Math.sin(driftTime * 0.67 + signal.phase * 1.37) * secondaryDrift
+      group.current.position.y += Math.sin(driftTime * 0.24 + signal.phase * 0.73) * driftRadius * 0.42
+      group.current.position.z += Math.cos(driftTime * 0.27 + signal.phase * 1.11) * driftRadius * 0.88
+        + Math.cos(driftTime * 0.59 + signal.phase * 0.81) * secondaryDrift
     }
     const apertureProgress = transition === 'approachToObservation' && isSelected ? transitionProgress : 0
     const targetScale = apertureProgress > 0 ? 1.2 + apertureProgress * 5.8 : isSelected && transition !== 'none' ? 1.24 : 1
