@@ -923,15 +923,18 @@ button:focus-visible {
 }
 .explore-panel {
   position: absolute;
-  top: 18%;
+  top: auto;
   right: 4.5%;
+  bottom: 8%;
   width: min(390px, 32vw);
+  max-height: 50vh;
   padding: 22px;
   border-left: 1px solid rgba(220,141,58,.55);
   color: rgba(240,236,228,.78);
   background: rgba(4,7,9,.82);
   backdrop-filter: blur(11px);
   pointer-events: auto;
+  overflow-y: auto;
 }
 .explore-panel h2 { margin: 14px 0; color: #f0ece4; font-size: 16px; font-weight: 500; }
 .explore-panel p { font-size: 13px; line-height: 1.7; }
