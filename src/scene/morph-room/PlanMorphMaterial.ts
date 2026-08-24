@@ -168,7 +168,7 @@ const fragmentShader = /* glsl */ `
     const float doorCenter = 1.459;
     const float doorHalfWidth = 0.338;
     const float doorTop = 0.700;
-    const float wallJoin = 0.12;
+    const float wallJoin = 0.075;
 
     float backLeftEnd = windowOneCenter - windowOneHalfWidth;
     float backRightStart = windowOneCenter + windowOneHalfWidth;
