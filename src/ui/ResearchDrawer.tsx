@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { researchSubtitles } from '../content/researchSubtitles'
-import { researchArticleBodyAliases, researchArticleCueMap, researchArticleLinkPhrases, researchArticles, type ResearchArticleId } from '../content/researchArticles'
+import { researchArticleBodyAliases, researchArticleCueMap, researchArticleCuePhrases, researchArticleLinkPhrases, researchArticles, type ResearchArticleId } from '../content/researchArticles'
 import { researchArticleTranslations } from '../content/researchArticleTranslations'
 import { useExperienceStore } from '../store/experienceStore'
 import { localeCopy } from '../locales'
@@ -17,7 +17,7 @@ export function ResearchDrawer() {
   const cues = researchSubtitles[language]
   const copy = localeCopy[language]
   const linkedArticleId = researchArticleCueMap[cueIndex]
-  const linkedPhrase = linkedArticleId ? researchArticleLinkPhrases[linkedArticleId][language] : null
+  const linkedPhrase = linkedArticleId ? researchArticleCuePhrases[cueIndex]?.[language] ?? null : null
   const cueText = cueIndex < cues.length ? cues[cueIndex] : ''
   const linkedPhraseIndex = linkedPhrase ? cueText.toLocaleLowerCase().indexOf(linkedPhrase.toLocaleLowerCase()) : -1
   const selectedArticle = researchArticles.find((article) => article.id === selectedArticleId) ?? researchArticles[0]
@@ -72,7 +72,7 @@ export function ResearchDrawer() {
     }
     setCueIndex(0)
     const timer = window.setInterval(() => {
-      setCueIndex((current) => current >= cues.length ? 0 : current + 1)
+      setCueIndex((current) => current >= cues.length - 1 ? 0 : current + 1)
     }, CUE_DURATION_MS)
     return () => window.clearInterval(timer)
   }, [isOpen, cues.length])
