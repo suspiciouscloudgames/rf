@@ -27,9 +27,11 @@ const memoCharacterDelay = (character: string) => {
 
 function MemoTypewriterText({ text, startDelay }: { text: string; startDelay: number }) {
   const [visibleLength, setVisibleLength] = useState(0)
+  const [showCursor, setShowCursor] = useState(true)
 
   useEffect(() => {
     setVisibleLength(0)
+    setShowCursor(true)
   }, [text])
 
   useEffect(() => {
@@ -44,7 +46,15 @@ function MemoTypewriterText({ text, startDelay }: { text: string; startDelay: nu
   return (
     <span className="resident-introduction">
       {text.slice(0, visibleLength)}
-      <span className="memo-type-cursor" aria-hidden="true" />
+      {showCursor && (
+        <span
+          className={`memo-type-cursor ${visibleLength >= text.length ? 'typing-complete' : ''}`}
+          aria-hidden="true"
+          onAnimationEnd={() => {
+            if (visibleLength >= text.length) setShowCursor(false)
+          }}
+        />
+      )}
     </span>
   )
 }
