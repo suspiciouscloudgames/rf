@@ -168,6 +168,7 @@ const fragmentShader = /* glsl */ `
     const float doorCenter = 1.459;
     const float doorHalfWidth = 0.338;
     const float doorTop = 0.700;
+    const float wallJoin = 0.12;
 
     float backLeftEnd = windowOneCenter - windowOneHalfWidth;
     float backRightStart = windowOneCenter + windowOneHalfWidth;
@@ -179,21 +180,21 @@ const fragmentShader = /* glsl */ `
     float leftBackEnd = windowTwoCenter - windowTwoHalfWidth;
     float leftFrontStart = windowTwoCenter + windowTwoHalfWidth;
     float leftWall = verticalWall(point, (-HALF_DEPTH + leftBackEnd) * 0.5, (leftBackEnd + HALF_DEPTH) * 0.5, 0.0, HALF_HEIGHT, -HALF_WIDTH);
-    leftWall = smoothUnion(leftWall, verticalWall(point, (leftFrontStart + HALF_DEPTH) * 0.5, (HALF_DEPTH - leftFrontStart) * 0.5, 0.0, HALF_HEIGHT, -HALF_WIDTH), 0.065);
+    leftWall = smoothUnion(leftWall, verticalWall(point, (leftFrontStart + HALF_DEPTH + wallJoin) * 0.5, (HALF_DEPTH + wallJoin - leftFrontStart) * 0.5, 0.0, HALF_HEIGHT, -HALF_WIDTH), 0.065);
     leftWall = smoothUnion(leftWall, verticalWall(point, windowTwoCenter, windowTwoHalfWidth, (-HALF_HEIGHT - windowHalfHeight) * 0.5, (HALF_HEIGHT - windowHalfHeight) * 0.5, -HALF_WIDTH), 0.065);
     leftWall = smoothUnion(leftWall, verticalWall(point, windowTwoCenter, windowTwoHalfWidth, (HALF_HEIGHT + windowHalfHeight) * 0.5, (HALF_HEIGHT - windowHalfHeight) * 0.5, -HALF_WIDTH), 0.065);
 
     float distance = min(backWall, leftWall);
 
-    distance = min(distance, verticalWall(point, (-HALF_DEPTH + EXTENSION_END_Z) * 0.5, (EXTENSION_END_Z + HALF_DEPTH) * 0.5, 0.0, HALF_HEIGHT, HALF_WIDTH));
-    distance = min(distance, horizontalWall(point, (-HALF_WIDTH + EXTENSION_START_X) * 0.5, (EXTENSION_START_X + HALF_WIDTH) * 0.5, 0.0, HALF_HEIGHT, HALF_DEPTH));
-    distance = min(distance, verticalWall(point, (HALF_DEPTH + EXTENSION_END_Z) * 0.5, EXTENSION_DEPTH * 0.5, 0.0, HALF_HEIGHT, EXTENSION_START_X));
+    distance = min(distance, verticalWall(point, (-HALF_DEPTH + EXTENSION_END_Z) * 0.5, (EXTENSION_END_Z + HALF_DEPTH) * 0.5 + wallJoin, 0.0, HALF_HEIGHT, HALF_WIDTH));
+    distance = min(distance, horizontalWall(point, (-HALF_WIDTH + EXTENSION_START_X) * 0.5, (EXTENSION_START_X + HALF_WIDTH) * 0.5 + wallJoin, 0.0, HALF_HEIGHT, HALF_DEPTH));
+    distance = min(distance, verticalWall(point, (HALF_DEPTH + EXTENSION_END_Z) * 0.5, EXTENSION_DEPTH * 0.5 + wallJoin, 0.0, HALF_HEIGHT, EXTENSION_START_X));
     distance = min(distance, verticalWall(point, (HALF_DEPTH + EXTENSION_END_Z) * 0.5, EXTENSION_DEPTH * 0.5, 0.0, HALF_HEIGHT, CLOSET_DIVIDER_X));
 
     float doorLeftEnd = doorCenter - doorHalfWidth;
     float doorRightStart = doorCenter + doorHalfWidth;
-    float doorWall = horizontalWall(point, (EXTENSION_START_X + doorLeftEnd) * 0.5, (doorLeftEnd - EXTENSION_START_X) * 0.5, 0.0, HALF_HEIGHT, EXTENSION_END_Z);
-    doorWall = smoothUnion(doorWall, horizontalWall(point, (doorRightStart + HALF_WIDTH) * 0.5, (HALF_WIDTH - doorRightStart) * 0.5, 0.0, HALF_HEIGHT, EXTENSION_END_Z), 0.065);
+    float doorWall = horizontalWall(point, (EXTENSION_START_X - wallJoin + doorLeftEnd) * 0.5, (doorLeftEnd - EXTENSION_START_X + wallJoin) * 0.5, 0.0, HALF_HEIGHT, EXTENSION_END_Z);
+    doorWall = smoothUnion(doorWall, horizontalWall(point, (doorRightStart + HALF_WIDTH + wallJoin) * 0.5, (HALF_WIDTH + wallJoin - doorRightStart) * 0.5, 0.0, HALF_HEIGHT, EXTENSION_END_Z), 0.065);
     doorWall = smoothUnion(doorWall, horizontalWall(point, doorCenter, doorHalfWidth, (doorTop + HALF_HEIGHT) * 0.5, (HALF_HEIGHT - doorTop) * 0.5, EXTENSION_END_Z), 0.065);
     distance = min(distance, doorWall);
     return distance;
