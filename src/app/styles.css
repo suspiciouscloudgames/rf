@@ -740,7 +740,14 @@ button:focus-visible {
   background: transparent;
   pointer-events: all;
   cursor: pointer;
+  opacity: 1;
+  transition: opacity .45s ease;
   -webkit-tap-highlight-color: transparent;
+}
+
+.scene-signal-button.observation-hidden {
+  opacity: 0;
+  pointer-events: none;
 }
 
 .scene-signal-button::before,

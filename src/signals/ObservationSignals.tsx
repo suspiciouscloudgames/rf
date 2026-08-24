@@ -30,8 +30,11 @@ function ObservationSignal({ signal }: { signal: ObservationSignalConfig }) {
   const isSelected = selectedSignalId === signal.id
   const inHub = stage === 'hub'
   const inApproach = stage === 'approach'
+  const observationLayerHidden = stage === 'observation'
+    || transition === 'approachToObservation'
+    || transition === 'returnToApproach'
   const isActionable = transition === 'none' && (inHub || (inApproach && isSelected))
-  const visuallyActive = inHub || preserveFullHub || isSelected
+  const visuallyActive = !observationLayerHidden && (inHub || preserveFullHub || isSelected)
   const copy = localeCopy[language]
   const actionLabel = inApproach ? copy.approachAction : copy.hubAction
 
@@ -77,13 +80,15 @@ function ObservationSignal({ signal }: { signal: ObservationSignalConfig }) {
         <icosahedronGeometry args={[0.055, 1]} />
         <meshBasicMaterial color={accent} transparent opacity={0.98} wireframe depthWrite={false} />
       </mesh>
-      <pointLight intensity={isSelected ? 3.2 : 1.25} distance={0.9} color={accent} />
+      <pointLight intensity={observationLayerHidden ? 0 : isSelected ? 3.2 : 1.25} distance={0.9} color={accent} />
       <Html center transform={false} zIndexRange={[8, 3]}>
         <button
           type="button"
-          className={`scene-signal-button ${isSelected ? 'selected' : ''}`}
+          className={`scene-signal-button ${isSelected ? 'selected' : ''} ${observationLayerHidden ? 'observation-hidden' : ''}`}
           data-signal-id={signal.id}
           aria-label={`${actionLabel} ${signal.id.slice(-2)}`}
+          aria-hidden={observationLayerHidden}
+          tabIndex={observationLayerHidden ? -1 : 0}
           disabled={!isActionable}
           onClick={selectSignal}
         >
