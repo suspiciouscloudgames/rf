@@ -845,23 +845,32 @@ button:focus-visible {
 .explore-trace {
   display: block;
   position: relative;
-  width: 118px;
-  min-height: 58px;
-  padding: 10px;
-  border: 1px solid rgba(225,153,72,.4);
-  color: rgba(239,231,215,.82);
-  background: rgba(5,8,10,.55);
-  backdrop-filter: blur(7px);
+  width: 154px;
+  min-height: 46px;
+  padding: 12px 38px 12px 14px;
+  border: 0;
+  border-radius: 2px;
+  color: rgba(246,240,227,.94);
+  background: linear-gradient(110deg, rgba(15,31,27,.82), rgba(5,12,12,.58));
+  box-shadow: inset 0 1px rgba(239,224,194,.14), 0 8px 24px rgba(0,0,0,.18);
+  backdrop-filter: blur(8px);
   pointer-events: auto;
   cursor: pointer;
-  font-size: 9px;
-  letter-spacing: .08em;
+  font-family: "Noto Sans KR", "Hiragino Kaku Gothic ProN", ui-sans-serif, sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.35;
+  letter-spacing: .035em;
+  text-align: left;
 }
-.explore-trace span { display: block; margin-bottom: 5px; color: #df9848; font-family: ui-monospace, monospace; }
-.explore-trace.active { border-color: #e6a45a; box-shadow: 0 0 24px rgba(222,145,63,.14); }
+.explore-trace.active {
+  color: #fff8e9;
+  background: linear-gradient(110deg, rgba(46,47,31,.9), rgba(12,25,21,.7));
+  box-shadow: inset 3px 0 #e2a05d, inset 0 1px rgba(255,237,205,.18), 0 9px 28px rgba(0,0,0,.24);
+}
 .memo-cluster {
   position: absolute;
-  width: 118px;
+  width: 154px;
   padding: 0;
   border: 0;
   color: inherit;
@@ -885,12 +894,15 @@ button:focus-visible {
 
 .explore-trace .memo-open-symbol {
   position: absolute;
-  top: 7px;
-  right: 8px;
+  top: 50%;
+  right: 13px;
+  display: block;
+  transform: translateY(-52%);
   margin: 0;
-  color: #e8a45d;
+  color: #e4a15f;
   font-family: ui-sans-serif, sans-serif;
-  font-size: 14px;
+  font-size: 17px;
+  font-weight: 300;
   line-height: 1;
 }
 
