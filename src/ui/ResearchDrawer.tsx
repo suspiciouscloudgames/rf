@@ -162,7 +162,8 @@ export function ResearchDrawer() {
           aria-expanded={isOpen}
           aria-label={isOpen ? copy.closeResearchArchive : copy.openResearchArchive}
         >
-          <span aria-hidden="true">{isOpen ? '←' : '→'}</span>
+          <span className="research-drawer-handle-arrow" aria-hidden="true">{isOpen ? '←' : '→'}</span>
+          <span className="research-drawer-handle-label">{copy.researchMaterials}</span>
         </button>
       </aside>
     </div>
