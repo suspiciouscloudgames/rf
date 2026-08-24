@@ -861,7 +861,7 @@ button:focus-visible {
 .explore-trace.active { border-color: #e6a45a; box-shadow: 0 0 24px rgba(222,145,63,.14); }
 .explore-trace.memo-reveal {
   opacity: 0;
-  animation: memo-marker-reveal .62s ease var(--memo-delay, 0s) forwards;
+  animation: memo-marker-reveal .42s ease-out var(--memo-delay, 0s) forwards;
 }
 .trace-1 { left: 22%; top: 32%; }
 .trace-2 { left: 42%; top: 62%; }

@@ -3,6 +3,7 @@ import type { CSSProperties } from 'react'
 import { localeCopy } from '../locales'
 import { useExperienceStore } from '../store/experienceStore'
 import { getObservationMemos } from '../content/observationMemos'
+import { useTuningStore } from '../store/tuningStore'
 
 const exploreItems = [
   { id: 'trace-text', label: 'traceText', title: 'traceTextTitle', body: 'traceTextBody', type: 'text' },
@@ -20,6 +21,7 @@ export function ExploreInterface({ sequentialReveal = false }: ExploreInterfaceP
   const language = useExperienceStore((store) => store.language)
   const selectedItemId = useExperienceStore((store) => store.selectedExploreItemId)
   const selectedSignalId = useExperienceStore((store) => store.selectedSignalId)
+  const zoomDuration = useTuningStore((store) => store.approachToObservationSeconds)
   const setSelectedItem = useExperienceStore((store) => store.setSelectedExploreItem)
   const copy = localeCopy[language]
   const residentMemos = getObservationMemos(language, selectedSignalId)
@@ -40,6 +42,8 @@ export function ExploreInterface({ sequentialReveal = false }: ExploreInterfaceP
   const videoRef = useRef<HTMLVideoElement>(null)
   const selectedItem = items.find((item) => item.id === selectedItemId) ?? null
   const selectedItemNumber = selectedItem ? items.findIndex((item) => item.id === selectedItem.id) + 1 : 0
+  const revealSpan = Math.max(zoomDuration - 0.65, 0.8)
+  const revealStep = items.length > 1 ? revealSpan / (items.length - 1) : 0
 
   useEffect(() => {
     const video = videoRef.current
@@ -80,7 +84,7 @@ export function ExploreInterface({ sequentialReveal = false }: ExploreInterfaceP
             key={item.id}
             type="button"
             className={`explore-trace trace-${index + 1} ${sequentialReveal ? 'memo-reveal' : ''} ${selectedItemId === item.id ? 'active' : ''}`}
-            style={sequentialReveal ? { '--memo-delay': `${0.2 + index * 0.78}s` } as RevealStyle : undefined}
+            style={sequentialReveal ? { '--memo-delay': `${0.3 + index * revealStep}s` } as RevealStyle : undefined}
             onClick={() => setSelectedItem(selectedItemId === item.id ? null : item.id)}
             aria-pressed={selectedItemId === item.id}
           >
