@@ -7,6 +7,7 @@ import { useExperienceStore } from '../store/experienceStore'
 import { observationSignals, type ObservationSignalConfig } from './signalData'
 import { consumeSignalTapSuppression } from '../interaction/orbitGesture'
 import { useTuningStore } from '../store/tuningStore'
+import { useRoomVisualModeStore } from '../store/roomVisualModeStore'
 
 const forward = new Vector3(0, 0, 1)
 
@@ -18,10 +19,14 @@ function ObservationSignal({ signal }: { signal: ObservationSignalConfig }) {
   const enterApproach = useExperienceStore((store) => store.enterApproach)
   const enterObservation = useExperienceStore((store) => store.enterObservation)
   const preserveFullHub = useTuningStore((store) => store.hubPersistenceMode === 'fullHub')
+  const roomVisualMode = useRoomVisualModeStore((store) => store.mode)
   const group = useRef<Group>(null)
   const ring = useRef<Mesh>(null)
   const core = useRef<Mesh>(null)
   const targetScaleVector = useRef(new Vector3(1, 1, 1))
+  const hubPosition = useMemo(() => new Vector3(...signal.hubAnchor), [signal.hubAnchor])
+  const approachPosition = useMemo(() => new Vector3(), [])
+  const approachOrientation = useMemo(() => new Quaternion(), [])
   const orientation = useMemo(() => {
     const normal = new Vector3(...signal.normal).normalize()
     return new Quaternion().setFromUnitVectors(forward, normal)
@@ -38,10 +43,32 @@ function ObservationSignal({ signal }: { signal: ObservationSignalConfig }) {
   const copy = localeCopy[language]
   const actionLabel = inApproach ? copy.approachAction : copy.hubAction
 
-  useFrame(({ clock, camera }, delta) => {
+  useFrame(({ clock, camera, scene }, delta) => {
     if (!group.current || !ring.current || !core.current) return
     const pulse = 1 + Math.sin(clock.elapsedTime * 2.05 + signal.phase) * 0.1
     const transitionProgress = Number(camera.userData.transitionProgress ?? 0)
+    const planRoom = roomVisualMode === 'morph-plan'
+      ? scene.getObjectByName('plan-morph-approach-room')
+      : null
+    approachPosition.set(...signal.anchor)
+    approachOrientation.copy(orientation)
+    if (planRoom) {
+      approachPosition.applyQuaternion(planRoom.quaternion)
+      approachOrientation.premultiply(planRoom.quaternion)
+    }
+    if (transition === 'hubToApproach') {
+      group.current.position.lerpVectors(hubPosition, approachPosition, transitionProgress)
+      group.current.quaternion.copy(orientation).slerp(approachOrientation, transitionProgress)
+    } else if (transition === 'returnToHub') {
+      group.current.position.lerpVectors(approachPosition, hubPosition, transitionProgress)
+      group.current.quaternion.copy(approachOrientation).slerp(orientation, transitionProgress)
+    } else if (stage === 'hub') {
+      group.current.position.copy(hubPosition)
+      group.current.quaternion.copy(orientation)
+    } else {
+      group.current.position.copy(approachPosition)
+      group.current.quaternion.copy(approachOrientation)
+    }
     const apertureProgress = transition === 'approachToObservation' && isSelected ? transitionProgress : 0
     const targetScale = apertureProgress > 0 ? 1.2 + apertureProgress * 5.8 : isSelected && transition !== 'none' ? 1.24 : 1
     group.current.scale.lerp(targetScaleVector.current.setScalar(targetScale), Math.min(delta * 5, 1))
@@ -68,7 +95,7 @@ function ObservationSignal({ signal }: { signal: ObservationSignalConfig }) {
     <group
       ref={group}
       name={signal.id}
-      position={signal.anchor}
+      position={signal.hubAnchor}
       quaternion={orientation}
       userData={{ signalId: signal.id, observationId: signal.observationId }}
     >

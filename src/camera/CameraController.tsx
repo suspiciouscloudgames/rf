@@ -112,6 +112,16 @@ const resolveSignalFrame = (worldDepth = useTuningStore.getState().worldDepth) =
     tempFarObservationPosition.z = selectedSignal.focusPosition[2] + worldDepth
   }
   if (house) {
+    const planRoom = useRoomVisualModeStore.getState().mode === 'morph-plan'
+      ? house.getObjectByName('plan-morph-approach-room')
+      : null
+    if (planRoom) {
+      tempAnchor.applyQuaternion(planRoom.quaternion)
+      tempNormal.applyQuaternion(planRoom.quaternion)
+      tempFocus.applyQuaternion(planRoom.quaternion)
+      tempNearObservationPosition.applyQuaternion(planRoom.quaternion)
+      tempFarObservationPosition.applyQuaternion(planRoom.quaternion)
+    }
     house.updateWorldMatrix(true, false)
     tempAnchor.applyMatrix4(house.matrixWorld)
     tempNormal.transformDirection(house.matrixWorld)

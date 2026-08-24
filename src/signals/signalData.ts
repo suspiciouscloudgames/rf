@@ -4,6 +4,7 @@ import { constructionSpacePortal, type DepthPortalConfig } from '../scene/depth-
 export interface ObservationSignalConfig {
   id: SignalId
   observationId: string
+  hubAnchor: [number, number, number]
   anchor: [number, number, number]
   normal: [number, number, number]
   approachDistance: number
@@ -27,6 +28,7 @@ export const observationSignals: ObservationSignalConfig[] = [
   {
     id: 'signal-01',
     observationId: 'observation-01',
+    hubAnchor: [-0.62, -0.18, 0.82],
     anchor: [-1.46, -0.54, -0.78],
     normal: [0, 1, 1],
     approachDistance: 3.55,
@@ -39,6 +41,7 @@ export const observationSignals: ObservationSignalConfig[] = [
   {
     id: 'signal-02',
     observationId: 'observation-02',
+    hubAnchor: [0.92, -0.12, 0.82],
     anchor: [0.10, -0.18, -1.28],
     normal: [0, 0, 1],
     approachDistance: 3.4,
@@ -51,6 +54,7 @@ export const observationSignals: ObservationSignalConfig[] = [
   {
     id: 'signal-03',
     observationId: 'observation-03',
+    hubAnchor: [1.46, 0.12, -0.48],
     anchor: [1.06, -0.50, -1.06],
     normal: [0, 1, 0],
     approachDistance: 3.45,
@@ -63,6 +67,7 @@ export const observationSignals: ObservationSignalConfig[] = [
   {
     id: 'signal-04',
     observationId: 'observation-04',
+    hubAnchor: [-0.78, 0.46, -1.05],
     anchor: [0.10, -0.46, 1.70],
     normal: [0, 1, 0],
     approachDistance: 3.65,
@@ -81,6 +86,7 @@ export const observationSignals: ObservationSignalConfig[] = [
   {
     id: 'signal-05',
     observationId: 'observation-05',
+    hubAnchor: [0.78, 0.46, -1.05],
     anchor: [-1.10, -0.48, 2.28],
     normal: [0, 0, -1],
     approachDistance: 3.5,
