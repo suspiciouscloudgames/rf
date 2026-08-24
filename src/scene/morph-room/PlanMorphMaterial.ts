@@ -201,37 +201,37 @@ const fragmentShader = /* glsl */ `
 
   float openingFrameField(vec3 point) {
     float activation = uArchitectureActivation;
-    float frameThickness = mix(0.025, 0.085, activation);
-    float frameDepth = mix(WALL_HALF, 0.155, activation);
+    float frameThickness = mix(0.018, 0.060, activation);
+    float frameDepth = mix(WALL_HALF, 0.095, activation);
     float retreat = (1.0 - activation) * 0.16;
     const float windowHalfHeight = ROOM_HEIGHT / 6.0;
 
     const float windowOneCenter = -1.234;
     const float windowOneHalfWidth = ROOM_WIDTH / 6.0;
-    float windowOneZ = -HALF_DEPTH + 0.045 * activation;
-    float frame = sdRoundBox(point - vec3(windowOneCenter - windowOneHalfWidth, 0.0, windowOneZ), vec3(frameThickness, windowHalfHeight + frameThickness, frameDepth), 0.055);
-    frame = smoothUnion(frame, sdRoundBox(point - vec3(windowOneCenter + windowOneHalfWidth, 0.0, windowOneZ), vec3(frameThickness, windowHalfHeight + frameThickness, frameDepth), 0.055), 0.045);
-    frame = smoothUnion(frame, sdRoundBox(point - vec3(windowOneCenter, -windowHalfHeight, windowOneZ), vec3(windowOneHalfWidth, frameThickness, frameDepth), 0.055), 0.045);
-    frame = smoothUnion(frame, sdRoundBox(point - vec3(windowOneCenter, windowHalfHeight, windowOneZ), vec3(windowOneHalfWidth, frameThickness, frameDepth), 0.055), 0.045);
+    float windowOneZ = -HALF_DEPTH;
+    float frame = sdRoundBox(point - vec3(windowOneCenter - windowOneHalfWidth, 0.0, windowOneZ), vec3(frameThickness, windowHalfHeight + frameThickness, frameDepth), 0.035);
+    frame = smoothUnion(frame, sdRoundBox(point - vec3(windowOneCenter + windowOneHalfWidth, 0.0, windowOneZ), vec3(frameThickness, windowHalfHeight + frameThickness, frameDepth), 0.035), 0.030);
+    frame = smoothUnion(frame, sdRoundBox(point - vec3(windowOneCenter, -windowHalfHeight, windowOneZ), vec3(windowOneHalfWidth, frameThickness, frameDepth), 0.035), 0.030);
+    frame = smoothUnion(frame, sdRoundBox(point - vec3(windowOneCenter, windowHalfHeight, windowOneZ), vec3(windowOneHalfWidth, frameThickness, frameDepth), 0.035), 0.030);
 
     const float windowTwoCenter = -0.425;
     const float windowTwoHalfWidth = ROOM_DEPTH / 6.0;
-    float windowTwoX = -HALF_WIDTH + 0.045 * activation;
-    float secondFrame = sdRoundBox(point - vec3(windowTwoX, 0.0, windowTwoCenter - windowTwoHalfWidth), vec3(frameDepth, windowHalfHeight + frameThickness, frameThickness), 0.055);
-    secondFrame = smoothUnion(secondFrame, sdRoundBox(point - vec3(windowTwoX, 0.0, windowTwoCenter + windowTwoHalfWidth), vec3(frameDepth, windowHalfHeight + frameThickness, frameThickness), 0.055), 0.045);
-    secondFrame = smoothUnion(secondFrame, sdRoundBox(point - vec3(windowTwoX, -windowHalfHeight, windowTwoCenter), vec3(frameDepth, frameThickness, windowTwoHalfWidth), 0.055), 0.045);
-    secondFrame = smoothUnion(secondFrame, sdRoundBox(point - vec3(windowTwoX, windowHalfHeight, windowTwoCenter), vec3(frameDepth, frameThickness, windowTwoHalfWidth), 0.055), 0.045);
+    float windowTwoX = -HALF_WIDTH;
+    float secondFrame = sdRoundBox(point - vec3(windowTwoX, 0.0, windowTwoCenter - windowTwoHalfWidth), vec3(frameDepth, windowHalfHeight + frameThickness, frameThickness), 0.035);
+    secondFrame = smoothUnion(secondFrame, sdRoundBox(point - vec3(windowTwoX, 0.0, windowTwoCenter + windowTwoHalfWidth), vec3(frameDepth, windowHalfHeight + frameThickness, frameThickness), 0.035), 0.030);
+    secondFrame = smoothUnion(secondFrame, sdRoundBox(point - vec3(windowTwoX, -windowHalfHeight, windowTwoCenter), vec3(frameDepth, frameThickness, windowTwoHalfWidth), 0.035), 0.030);
+    secondFrame = smoothUnion(secondFrame, sdRoundBox(point - vec3(windowTwoX, windowHalfHeight, windowTwoCenter), vec3(frameDepth, frameThickness, windowTwoHalfWidth), 0.035), 0.030);
     frame = min(frame, secondFrame);
 
     const float doorCenter = 1.459;
     const float doorHalfWidth = 0.338;
     const float doorTop = 0.700;
-    float doorZ = EXTENSION_END_Z - 0.045 * activation;
+    float doorZ = EXTENSION_END_Z;
     float doorCenterY = (FLOOR_Y + doorTop) * 0.5;
     float doorHalfHeight = (doorTop - FLOOR_Y) * 0.5;
-    float doorFrame = sdRoundBox(point - vec3(doorCenter - doorHalfWidth, doorCenterY, doorZ), vec3(frameThickness, doorHalfHeight + frameThickness, frameDepth), 0.05);
-    doorFrame = smoothUnion(doorFrame, sdRoundBox(point - vec3(doorCenter + doorHalfWidth, doorCenterY, doorZ), vec3(frameThickness, doorHalfHeight + frameThickness, frameDepth), 0.05), 0.04);
-    doorFrame = smoothUnion(doorFrame, sdRoundBox(point - vec3(doorCenter, doorTop, doorZ), vec3(doorHalfWidth, frameThickness, frameDepth), 0.05), 0.04);
+    float doorFrame = sdRoundBox(point - vec3(doorCenter - doorHalfWidth, doorCenterY, doorZ), vec3(frameThickness, doorHalfHeight + frameThickness, frameDepth), 0.035);
+    doorFrame = smoothUnion(doorFrame, sdRoundBox(point - vec3(doorCenter + doorHalfWidth, doorCenterY, doorZ), vec3(frameThickness, doorHalfHeight + frameThickness, frameDepth), 0.035), 0.030);
+    doorFrame = smoothUnion(doorFrame, sdRoundBox(point - vec3(doorCenter, doorTop, doorZ), vec3(doorHalfWidth, frameThickness, frameDepth), 0.035), 0.030);
     frame = min(frame, doorFrame);
     return frame + retreat;
   }
