@@ -400,10 +400,15 @@ const fragmentShader = /* glsl */ `
     meltedPoint.y += meltHeight * meltFlow * uWaverAmount * 3.15;
     meltedPoint.x += sin(point.y * 2.1 + point.z * 1.35) * meltHeight * uWaverAmount * 0.42;
 
-    float floorDistance = buildingFloorField(meltedPoint);
-    float wallDistance = buildingWallField(meltedPoint);
-    float frameDistance = openingFrameField(meltedPoint);
-    float treeDistance = detachedTreeField(meltedPoint);
+    float architectureHeight = mix(0.065, 1.0, uArchitectureActivation);
+    vec3 collapsedPoint = meltedPoint;
+    collapsedPoint.y = FLOOR_Y + (meltedPoint.y - FLOOR_Y) / architectureHeight;
+
+    float floorDistance = buildingFloorField(meltedPoint)
+      + (1.0 - uArchitectureActivation) * 0.105;
+    float wallDistance = buildingWallField(collapsedPoint) * architectureHeight;
+    float frameDistance = openingFrameField(collapsedPoint) * architectureHeight;
+    float treeDistance = detachedTreeField(collapsedPoint) * architectureHeight;
     float furnitureDistance = furnitureField(meltedPoint);
     if (cutawayNearWalls > 0.5) {
       vec2 cameraDirection = normalize(uCameraLocal.xz + vec2(0.0001, 0.0));

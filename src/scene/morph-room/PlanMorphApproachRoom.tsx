@@ -7,7 +7,8 @@ import { useMorphStabilityExperimentStore } from '../../store/morphStabilityExpe
 import { PlanMorphMaterial } from './PlanMorphMaterial'
 import { useMorphNightOpticsStore } from '../../store/morphNightOpticsStore'
 
-const observationEntryRetractPortion = 0.72
+const observationEntryRetractPortion = 0.94
+const observationResidueReveal = 0.18
 
 export function PlanMorphApproachRoom() {
   const stage = useExperienceStore((store) => store.stage)
@@ -105,21 +106,31 @@ export function PlanMorphApproachRoom() {
       : transition === 'returnToHub'
         ? 1 - transitionProgress
       : transition === 'returnToApproach'
-        ? transitionProgress
+        ? MathUtils.lerp(observationResidueReveal, 1, transitionProgress)
       : stage === 'approach'
-        ? transition === 'approachToObservation' ? 1 - transitionProgress : 1
-        : 0
+        ? transition === 'approachToObservation'
+          ? MathUtils.lerp(1, observationResidueReveal, MathUtils.smoothstep(transitionProgress, 0.34, 1))
+          : 1
+        : stage === 'observation'
+          ? observationResidueReveal
+          : 0
     const observationEntryActive = transition === 'approachToObservation'
     const architectureActivation = observationEntryActive
       ? 1 - MathUtils.smoothstep(transitionProgress, 0, observationEntryRetractPortion)
       : transition === 'hubToApproach'
         ? MathUtils.smoothstep(transitionProgress, 0, 0.82)
-        : transition === 'returnToApproach'
+      : transition === 'returnToApproach'
           ? MathUtils.smoothstep(transitionProgress, 0, 0.82)
-        : 1
+        : stage === 'observation'
+          ? 0
+          : 1
     const furnitureSinkProgress = observationEntryActive
-      ? MathUtils.smoothstep(transitionProgress, 0.08, 0.68)
-      : 0
+      ? MathUtils.smoothstep(transitionProgress, 0.10, 0.93)
+      : transition === 'returnToApproach'
+        ? 1 - MathUtils.smoothstep(transitionProgress, 0.04, 0.88)
+        : stage === 'observation'
+          ? 1
+          : 0
     proxy.current.visible = reveal > 0.002
 
     const tuning = useTuningStore.getState()
