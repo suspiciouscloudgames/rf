@@ -641,7 +641,7 @@ button:focus-visible {
   box-sizing: border-box;
   overflow: auto;
   padding: 20px 22px 24px;
-  border-left: 1px solid rgba(216, 145, 63, .46);
+  border-left: 0;
   color: #c9c3b8;
   background: linear-gradient(90deg, rgba(5, 7, 8, .82), rgba(5, 7, 8, .26));
   backdrop-filter: blur(9px);
@@ -663,7 +663,7 @@ button:focus-visible {
   letter-spacing: .045em;
 }
 
-.approach-record p {
+.approach-record-text {
   margin: 0;
   color: #c5beb2;
   font-size: clamp(12px, 1.02vw, 14.5px);

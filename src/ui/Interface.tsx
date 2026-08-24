@@ -90,7 +90,13 @@ export function Interface() {
       {stage === 'approach' && transition === 'none' ? (
         <aside className="approach-record" lang={language}>
           <h1>{approachRecord.title}</h1>
-          <p>{approachRecord.body}</p>
+          <TypewriterText
+            text={approachRecord.body}
+            className="approach-record-text"
+            characterDelay={22}
+            sentenceDelay={620}
+            autoScroll
+          />
         </aside>
       ) : null}
 
