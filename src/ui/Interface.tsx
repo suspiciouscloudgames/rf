@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
-import en from '../locales/en.json'
 import ja from '../locales/ja.json'
-import { useExperienceStore } from '../store/experienceStore'
+import { localeCopy } from '../locales'
+import { useExperienceStore, type Language } from '../store/experienceStore'
 import { TypewriterText } from './TypewriterText'
 import { ExploreInterface } from './ExploreInterface'
 import { getFocusContent } from '../content/focusContent'
@@ -119,8 +119,9 @@ export function Interface() {
   const observationMode = useExperienceStore((store) => store.observationMode)
   const selectedSignalId = useExperienceStore((store) => store.selectedSignalId)
   const beginReturn = useExperienceStore((store) => store.beginReturn)
+  const setLanguage = useExperienceStore((store) => store.setLanguage)
   const sequenceDuration = useTuningStore((store) => store.guidedObservationSeconds)
-  const copy = language === 'en' ? en : ja
+  const copy = localeCopy[language]
   const focusCopy = getFocusContent(language, selectedSignalId)
   const portalObservation = hasDepthPortal(selectedSignalId)
 
@@ -141,6 +142,25 @@ export function Interface() {
     <div className={`interface state-${stage} transition-${transition} ${effectActive ? 'effect-active' : ''}`}>
       {stage === 'hub' && transition === 'none' ? (
         <>
+          <div className="hub-controls">
+            <div className="language-switch" role="group" aria-label="Language">
+              {([
+                ['ja', 'JP'],
+                ['en', 'EN'],
+                ['ko', 'KO'],
+              ] as Array<[Language, string]>).map(([option, label]) => (
+                <button
+                  key={option}
+                  type="button"
+                  className={language === option ? 'active' : ''}
+                  aria-pressed={language === option}
+                  onClick={() => setLanguage(option)}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
           <HubFullscreenControl copy={copy} />
           <div className="stage-copy hub-copy">
             <p>{copy.hubHint}</p>
