@@ -591,6 +591,21 @@ button:focus-visible {
   transition: color 150ms ease, text-decoration-color 150ms ease;
 }
 
+.research-cycle-link {
+  display: inline;
+  margin: 0 0 0 .38em;
+  padding: 0;
+  border: 0;
+  color: #3850ff;
+  background: transparent;
+  cursor: pointer;
+  font: inherit;
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: 1.18em;
+  line-height: inherit;
+  vertical-align: -.03em;
+}
+
 .research-subtitle[lang="ko"] p { word-break: keep-all; }
 .research-subtitle[lang="ja"] p { line-height: 1.62; letter-spacing: .025em; line-break: strict; }
 

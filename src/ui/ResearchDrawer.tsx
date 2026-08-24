@@ -24,6 +24,10 @@ export function ResearchDrawer() {
   const selectedArticleBody = language === 'ko'
     ? selectedArticle.body
     : researchArticleTranslations[language][selectedArticle.id]
+  const cycleTargetId: ResearchArticleId = selectedArticle.id === 'end-of-solitude'
+    ? 'observation-patterns'
+    : 'end-of-solitude'
+  const cycleTarget = researchArticles.find((article) => article.id === cycleTargetId) ?? researchArticles[0]
 
   const selectArticle = (articleId: ResearchArticleId) => {
     setSelectedArticleId(articleId)
@@ -129,7 +133,17 @@ export function ResearchDrawer() {
           </div>
           <article ref={articlePanelRef} className="research-article-panel" lang={language}>
             <h2>{selectedArticle.title[language]}</h2>
-            <p>{renderArticleBody()}</p>
+            <p>
+              {renderArticleBody()}
+              <button
+                type="button"
+                className="research-cycle-link"
+                onClick={() => selectArticle(cycleTargetId)}
+                aria-label={cycleTarget.title[language]}
+              >
+                ◌
+              </button>
+            </p>
           </article>
         </div>
         <button
