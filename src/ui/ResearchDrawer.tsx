@@ -148,7 +148,9 @@ export function ResearchDrawer() {
                 onClick={() => selectArticle(cycleTargetId)}
                 aria-label={cycleTarget.title[language]}
               >
-                ◌
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <circle cx="12" cy="12" r="8.5" pathLength="1" />
+                </svg>
               </button>
             </p>
           </article>

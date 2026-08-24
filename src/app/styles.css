@@ -592,19 +592,37 @@ button:focus-visible {
 }
 
 .research-cycle-link {
-  display: inline;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   margin: 0 0 0 .38em;
   padding: 0;
   border: 0;
   color: #3850ff;
   background: transparent;
   cursor: pointer;
-  font: inherit;
-  font-family: "Helvetica Neue", Arial, sans-serif;
-  font-size: 1.18em;
-  line-height: inherit;
-  vertical-align: -.03em;
-  animation: research-cycle-signal 1.8s steps(1) infinite;
+  width: 27px;
+  height: 27px;
+  vertical-align: -.48em;
+}
+
+.research-cycle-link svg {
+  display: block;
+  width: 27px;
+  height: 27px;
+  overflow: visible;
+}
+
+.research-cycle-link circle {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.45;
+  stroke-linecap: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  transform: rotate(-90deg);
+  transform-origin: center;
+  animation: research-cycle-draw 2.5s ease-in-out infinite;
 }
 
 .research-subtitle[lang="ko"] p { word-break: keep-all; }
@@ -1335,9 +1353,11 @@ button:focus-visible {
   0%, 49% { opacity: 1; }
   50%, 100% { opacity: 0; }
 }
-@keyframes research-cycle-signal {
-  0%, 18%, 36%, 100% { opacity: 1; text-shadow: 0 0 8px rgba(56, 80, 255, .7); }
-  19%, 35% { opacity: .24; text-shadow: none; }
+@keyframes research-cycle-draw {
+  0% { opacity: .22; stroke-dashoffset: 1; }
+  68% { opacity: 1; stroke-dashoffset: 0; }
+  84% { opacity: 1; stroke-dashoffset: 0; }
+  100% { opacity: 0; stroke-dashoffset: 0; }
 }
 @keyframes noise-shift { 0% { transform: translate(0); } 25% { transform: translate(-1%,1%); } 50% { transform: translate(1%,-1%); } 75% { transform: translate(1%,1%); } }
 @keyframes chromatic-shiver { 0%, 100% { text-shadow: none; } 48% { text-shadow: 2px 0 rgba(255,0,0,.2), -2px 0 rgba(0,255,255,.2); } }
@@ -1378,7 +1398,7 @@ button:focus-visible {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .noise, .morph-film-overlay, .interface.effect-active, .scene-signal-button, .observation-subtitle-line, .observation-subtitle-cursor, .research-cycle-link { animation: none; }
+  .noise, .morph-film-overlay, .interface.effect-active, .scene-signal-button, .observation-subtitle-line, .observation-subtitle-cursor, .research-cycle-link circle { animation: none; stroke-dashoffset: 0; }
   .hub-video-background { transition-duration: 100ms !important; }
   .research-drawer { transition-duration: 100ms; }
 }
