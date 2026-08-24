@@ -69,6 +69,13 @@ function ObservationSignal({ signal }: { signal: ObservationSignalConfig }) {
       group.current.position.copy(approachPosition)
       group.current.quaternion.copy(approachOrientation)
     }
+    if (inApproach && transition === 'none') {
+      const driftTime = clock.elapsedTime
+      const driftRadius = 0.022
+      group.current.position.x += Math.sin(driftTime * 0.43 + signal.phase) * driftRadius
+      group.current.position.y += Math.sin(driftTime * 0.31 + signal.phase * 0.73) * driftRadius * 0.55
+      group.current.position.z += Math.cos(driftTime * 0.37 + signal.phase * 1.11) * driftRadius
+    }
     const apertureProgress = transition === 'approachToObservation' && isSelected ? transitionProgress : 0
     const targetScale = apertureProgress > 0 ? 1.2 + apertureProgress * 5.8 : isSelected && transition !== 'none' ? 1.24 : 1
     group.current.scale.lerp(targetScaleVector.current.setScalar(targetScale), Math.min(delta * 5, 1))
