@@ -60,6 +60,17 @@ export function ExploreInterface({ sequentialReveal = false }: ExploreInterfaceP
     }
   }, [])
 
+  useEffect(() => {
+    if (!selectedItemId) return
+    const closeOutsideMemo = (event: PointerEvent) => {
+      const target = event.target
+      if (target instanceof Element && target.closest('.explore-panel, .explore-trace')) return
+      setSelectedItem(null)
+    }
+    document.addEventListener('pointerdown', closeOutsideMemo)
+    return () => document.removeEventListener('pointerdown', closeOutsideMemo)
+  }, [selectedItemId, setSelectedItem])
+
   return (
     <div className="explore-interface" lang={language}>
       <p className="explore-hint">{copy.exploreHint}</p>
