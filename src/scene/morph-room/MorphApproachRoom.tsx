@@ -139,6 +139,8 @@ export function MorphApproachRoom() {
     const transitionProgress = Number(camera.userData.transitionProgress ?? 0)
     const reveal = transition === 'hubToApproach'
       ? transitionProgress
+      : transition === 'returnToHub'
+        ? 1 - transitionProgress
       : transition === 'returnToApproach'
         ? transitionProgress
       : stage === 'approach'
