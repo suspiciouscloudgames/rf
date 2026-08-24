@@ -145,12 +145,18 @@ const fragmentShader = /* glsl */ `
     );
     float extensionHalfWidth = (HALF_WIDTH - EXTENSION_START_X) * 0.5;
     float extensionCenterX = (HALF_WIDTH + EXTENSION_START_X) * 0.5;
+    // Carry the extension underneath the main slab. Two coplanar slabs that
+    // merely touch at HALF_DEPTH can expose their SDF transition as a hairline.
+    const float floorOverlap = 0.16;
+    float extensionStartZ = HALF_DEPTH - floorOverlap;
+    float extensionHalfDepth = (EXTENSION_END_Z - extensionStartZ) * 0.5;
+    float extensionCenterZ = (EXTENSION_END_Z + extensionStartZ) * 0.5;
     float extensionFloor = sdRoundBox(
-      point - vec3(extensionCenterX, FLOOR_Y - WALL_HALF, HALF_DEPTH + EXTENSION_DEPTH * 0.5),
-      vec3(extensionHalfWidth, WALL_HALF, EXTENSION_DEPTH * 0.5),
+      point - vec3(extensionCenterX, FLOOR_Y - WALL_HALF, extensionCenterZ),
+      vec3(extensionHalfWidth, WALL_HALF, extensionHalfDepth),
       0.045
     );
-    return smoothUnion(mainFloor, extensionFloor, 0.055);
+    return min(mainFloor, extensionFloor);
   }
 
   float buildingWallField(vec3 point) {
