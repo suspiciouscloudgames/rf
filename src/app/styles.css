@@ -464,9 +464,11 @@ button:focus-visible {
   width: 90%;
   display: block;
   transform: translateX(-50%);
-  color: rgba(221, 216, 205, .9);
+  color: #f4f4f2;
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-weight: 500;
   text-align: center;
-  text-shadow: 0 2px 12px rgba(0, 0, 0, .9);
+  text-shadow: none;
   z-index: 2;
 }
 
@@ -485,25 +487,31 @@ button:focus-visible {
 .research-subtitle p {
   min-height: 0;
   margin: 0;
+  display: inline;
+  padding: 3px 6px 4px;
+  color: #f4f4f2;
+  background: rgba(2, 3, 8, .94);
   font-size: clamp(14px, 1.3vw, 18px);
-  line-height: 1.55;
+  line-height: 1.65;
   letter-spacing: .015em;
   text-wrap: balance;
   overflow-wrap: break-word;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
   animation: research-subtitle-in 520ms ease both;
 }
 
 .research-subtitle-link {
   margin: 0;
-  padding: 1px 4px 2px;
+  padding: 3px 5px 4px;
   border: 0;
-  color: #dbeaff;
-  background: rgba(18, 72, 164, .72);
+  color: #fff;
+  background: #251ee8;
   cursor: pointer;
   font-size: inherit;
   line-height: inherit;
   text-align: inherit;
-  text-shadow: 0 2px 12px rgba(0, 0, 0, .9);
+  text-shadow: none;
   box-decoration-break: clone;
   -webkit-box-decoration-break: clone;
   transition: color 160ms ease, border-color 160ms ease, background 160ms ease;
@@ -512,7 +520,7 @@ button:focus-visible {
 .research-subtitle-link span {
   display: inline-block;
   margin-left: 5px;
-  color: #8ebcff;
+  color: #fff;
   font-family: "Helvetica Neue", Arial, sans-serif;
   font-size: 1em;
   font-weight: 300;
