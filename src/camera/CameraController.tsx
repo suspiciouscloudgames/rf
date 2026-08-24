@@ -15,7 +15,7 @@ import {
 } from './morphCameraPresets'
 
 interface ActiveTransition {
-  kind: 'hubToApproach' | 'approachToObservation' | 'returnToHub'
+  kind: 'hubToApproach' | 'approachToObservation' | 'returnToApproach' | 'returnToHub'
   fromPosition: Vector3
   fromTarget: Vector3
   fromFov: number
@@ -246,6 +246,8 @@ export function CameraController() {
         ? tuning.hubToApproachSeconds
         : transitionKind === 'approachToObservation'
           ? tuning.approachToObservationSeconds
+          : transitionKind === 'returnToApproach'
+            ? tuning.approachToObservationSeconds
           : 4.3,
     } as ActiveTransition
 
@@ -254,6 +256,25 @@ export function CameraController() {
       const control1 = camera.position.clone().addScaledVector(exitDirection, 1.1).add(new Vector3(0, 0.25, 0))
       const control2 = hubPosition.clone().lerp(camera.position, 0.28).add(new Vector3(0, 0.42, 0))
       base.curve = new CubicBezierCurve3(camera.position.clone(), control1, control2, hubPosition.clone())
+    } else if (transitionKind === 'returnToApproach') {
+      const roomMode = useRoomVisualModeStore.getState().mode
+      const planMorphActive = roomMode === 'morph-plan'
+      const planMorphFrame = planMorphActive
+        ? resolvePlanMorphCameraFrame(resolvePlanMorphCameraPreset())
+        : null
+      const house = getHouseRoot()
+      const approachPosition = tempPosition.copy(planMorphFrame?.position ?? tempMorphApproachPosition)
+      const approachTarget = tempTarget.copy(planMorphFrame?.target ?? tempMorphApproachTarget)
+      if (!planMorphActive && house) {
+        house.updateWorldMatrix(true, false)
+        approachPosition.applyMatrix4(house.matrixWorld)
+        approachTarget.applyMatrix4(house.matrixWorld)
+      }
+      const control1 = camera.position.clone().lerp(approachPosition, 0.3)
+      const control2 = camera.position.clone().lerp(approachPosition, 0.72)
+      base.curve = new CubicBezierCurve3(camera.position.clone(), control1, control2, approachPosition.clone())
+      base.endTarget = approachTarget.clone()
+      base.endFov = planMorphFrame?.fov ?? 40
     } else if (transitionKind === 'approachToObservation') {
       const { signal, anchor, focus, nearObservationPosition, farObservationPosition } = resolveSignalFrame(
         tuning.worldDepth,
@@ -360,7 +381,7 @@ export function CameraController() {
         target.current.lerpVectors(active.fromTarget, anchor, progress)
         camera.fov = MathUtils.lerp(active.fromFov, 33, progress)
       }
-    } else if (active.kind === 'approachToObservation' && active.curve && active.endTarget) {
+    } else if ((active.kind === 'approachToObservation' || active.kind === 'returnToApproach') && active.curve && active.endTarget) {
       active.curve.getPoint(progress, camera.position)
       const targetDelay = active.targetRotationDelay ?? 0
       const targetRawProgress = MathUtils.clamp((rawProgress - targetDelay) / Math.max(1 - targetDelay, 0.001), 0, 1)

@@ -59,7 +59,8 @@ export function ObservationLayer() {
         darkenSeconds,
       )
       : 0
-    const reveal = transition === 'returnToHub'
+    const returning = transition === 'returnToHub' || transition === 'returnToApproach'
+    const reveal = returning
       ? (stage === 'observation' ? 1 : 0.58) * (1 - progress)
       : transition === 'hubToApproach'
       ? progress * 0.58
@@ -75,7 +76,7 @@ export function ObservationLayer() {
       : transition === 'approachToObservation'
         ? progress
         : stage === 'observation'
-          ? transition === 'returnToHub' ? 1 - progress : 1
+          ? returning ? 1 - progress : 1
           : 0
     room.current.visible = reveal * surroundingVisibility * classicVisibility > 0.002
     room.current.scale.setScalar(MathUtils.lerp(0.92, 1, reveal))

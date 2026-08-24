@@ -10,7 +10,7 @@
   "approachAction": "信号に入る",
   "observationLabel": "内側の層",
   "returningLabel": "距離を復元中",
-  "home": "最初の場所へ戻る",
+  "home": "戻る",
   "fullscreen": "全画面で見る",
   "exitFullscreen": "全画面を終了",
   "fullscreenInstallHint": "iPadでは共有 → ホーム画面に追加 → Webアプリとして開くを選択してください。",
