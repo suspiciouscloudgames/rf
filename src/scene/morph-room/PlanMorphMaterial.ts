@@ -250,10 +250,16 @@ const fragmentShader = /* glsl */ `
     float trunkRadius = mix(0.024, 0.080, activation);
     float tree = sdCapsule(
       localPoint,
-      vec3(0.0, 0.0, 0.0),
+      vec3(0.0, 0.045 * activation, 0.0),
       vec3(0.018 * activation, trunkHeight, -0.012 * activation),
       trunkRadius
     );
+    vec3 baseRadius = mix(vec3(0.026), vec3(0.155, 0.105, 0.142), activation);
+    float trunkBase = sdEllipsoid(
+      localPoint - vec3(-0.008, 0.055, 0.012) * activation,
+      baseRadius
+    );
+    tree = smoothUnion(tree, trunkBase, 0.055 * activation + 0.006);
 
     vec3 crownRadius = mix(vec3(0.055), vec3(0.46, 0.51, 0.44), activation);
     float crown = sdEllipsoid(
