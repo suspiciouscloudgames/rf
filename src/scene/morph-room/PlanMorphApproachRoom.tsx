@@ -200,7 +200,7 @@ export function PlanMorphApproachRoom() {
     gl.domElement.dataset.planMorphDimensions = '4.128,2.832,2.640'
     gl.domElement.dataset.planMorphWindowRatio = '0.333'
     gl.domElement.dataset.planMorphTreeConnection = 'detached'
-    gl.domElement.dataset.planMorphTreeDetail = 'branched-canopy-v2'
+    gl.domElement.dataset.planMorphTreeDetail = 'simple-soft-canopy'
     gl.domElement.dataset.planMorphFurnitureGroups = 'flowerpot,desk-chair,cat-bed,bed,cabinet'
     gl.domElement.dataset.planMorphFurnitureDetail = 'recognizable-sdf-v1'
     gl.domElement.dataset.planMorphFurnitureSink = furnitureSinkProgress.toFixed(3)
