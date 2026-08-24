@@ -69,6 +69,9 @@ export function Interface() {
                 </button>
               ))}
             </div>
+            <button className="welcome-message-button" type="button" onClick={() => setIsWelcomeOpen(true)}>
+              <span aria-hidden="true">＋</span>{copy.welcomeMessageButton}
+            </button>
           </div>
           <div className="stage-copy hub-copy">
             <p>{copy.hubHint}</p>
