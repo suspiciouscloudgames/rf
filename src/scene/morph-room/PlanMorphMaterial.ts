@@ -169,19 +169,24 @@ const fragmentShader = /* glsl */ `
     const float doorHalfWidth = 0.338;
     const float doorTop = 0.700;
 
-    float backLeftEnd = windowOneCenter - windowOneHalfWidth;
-    float backRightStart = windowOneCenter + windowOneHalfWidth;
-    float backWall = horizontalWall(point, (-HALF_WIDTH + backLeftEnd) * 0.5, (backLeftEnd + HALF_WIDTH) * 0.5, 0.0, HALF_HEIGHT, -HALF_DEPTH);
-    backWall = smoothUnion(backWall, horizontalWall(point, (backRightStart + HALF_WIDTH) * 0.5, (HALF_WIDTH - backRightStart) * 0.5, 0.0, HALF_HEIGHT, -HALF_DEPTH), 0.065);
-    backWall = smoothUnion(backWall, horizontalWall(point, windowOneCenter, windowOneHalfWidth, (-HALF_HEIGHT - windowHalfHeight) * 0.5, (HALF_HEIGHT - windowHalfHeight) * 0.5, -HALF_DEPTH), 0.065);
-    backWall = smoothUnion(backWall, horizontalWall(point, windowOneCenter, windowOneHalfWidth, (HALF_HEIGHT + windowHalfHeight) * 0.5, (HALF_HEIGHT - windowHalfHeight) * 0.5, -HALF_DEPTH), 0.065);
+    // Build each facade as one continuous wall and subtract its opening. This
+    // avoids the normal discontinuities created by stitching four wall strips
+    // around every window.
+    float backWall = horizontalWall(point, 0.0, HALF_WIDTH, 0.0, HALF_HEIGHT, -HALF_DEPTH);
+    float backWindowOpening = sdRoundBox(
+      point - vec3(windowOneCenter, 0.0, -HALF_DEPTH),
+      vec3(windowOneHalfWidth, windowHalfHeight, WALL_HALF + 0.10),
+      0.025
+    );
+    backWall = max(backWall, -backWindowOpening);
 
-    float leftBackEnd = windowTwoCenter - windowTwoHalfWidth;
-    float leftFrontStart = windowTwoCenter + windowTwoHalfWidth;
-    float leftWall = verticalWall(point, (-HALF_DEPTH + leftBackEnd) * 0.5, (leftBackEnd + HALF_DEPTH) * 0.5, 0.0, HALF_HEIGHT, -HALF_WIDTH);
-    leftWall = smoothUnion(leftWall, verticalWall(point, (leftFrontStart + HALF_DEPTH) * 0.5, (HALF_DEPTH - leftFrontStart) * 0.5, 0.0, HALF_HEIGHT, -HALF_WIDTH), 0.065);
-    leftWall = smoothUnion(leftWall, verticalWall(point, windowTwoCenter, windowTwoHalfWidth, (-HALF_HEIGHT - windowHalfHeight) * 0.5, (HALF_HEIGHT - windowHalfHeight) * 0.5, -HALF_WIDTH), 0.065);
-    leftWall = smoothUnion(leftWall, verticalWall(point, windowTwoCenter, windowTwoHalfWidth, (HALF_HEIGHT + windowHalfHeight) * 0.5, (HALF_HEIGHT - windowHalfHeight) * 0.5, -HALF_WIDTH), 0.065);
+    float leftWall = verticalWall(point, 0.0, HALF_DEPTH, 0.0, HALF_HEIGHT, -HALF_WIDTH);
+    float leftWindowOpening = sdRoundBox(
+      point - vec3(-HALF_WIDTH, 0.0, windowTwoCenter),
+      vec3(WALL_HALF + 0.10, windowHalfHeight, windowTwoHalfWidth),
+      0.025
+    );
+    leftWall = max(leftWall, -leftWindowOpening);
 
     float distance = min(backWall, leftWall);
 
@@ -190,11 +195,19 @@ const fragmentShader = /* glsl */ `
     distance = min(distance, verticalWall(point, (HALF_DEPTH + EXTENSION_END_Z) * 0.5, EXTENSION_DEPTH * 0.5, 0.0, HALF_HEIGHT, EXTENSION_START_X));
     distance = min(distance, verticalWall(point, (HALF_DEPTH + EXTENSION_END_Z) * 0.5, EXTENSION_DEPTH * 0.5, 0.0, HALF_HEIGHT, CLOSET_DIVIDER_X));
 
-    float doorLeftEnd = doorCenter - doorHalfWidth;
-    float doorRightStart = doorCenter + doorHalfWidth;
-    float doorWall = horizontalWall(point, (EXTENSION_START_X + doorLeftEnd) * 0.5, (doorLeftEnd - EXTENSION_START_X) * 0.5, 0.0, HALF_HEIGHT, EXTENSION_END_Z);
-    doorWall = smoothUnion(doorWall, horizontalWall(point, (doorRightStart + HALF_WIDTH) * 0.5, (HALF_WIDTH - doorRightStart) * 0.5, 0.0, HALF_HEIGHT, EXTENSION_END_Z), 0.065);
-    doorWall = smoothUnion(doorWall, horizontalWall(point, doorCenter, doorHalfWidth, (doorTop + HALF_HEIGHT) * 0.5, (HALF_HEIGHT - doorTop) * 0.5, EXTENSION_END_Z), 0.065);
+    float doorWallHalfWidth = (HALF_WIDTH - EXTENSION_START_X) * 0.5;
+    float doorWallCenter = (HALF_WIDTH + EXTENSION_START_X) * 0.5;
+    float doorWall = horizontalWall(point, doorWallCenter, doorWallHalfWidth, 0.0, HALF_HEIGHT, EXTENSION_END_Z);
+    const float doorCutBelowFloor = 0.14;
+    float doorOpeningBottom = FLOOR_Y - doorCutBelowFloor;
+    float doorOpeningCenterY = (doorOpeningBottom + doorTop) * 0.5;
+    float doorOpeningHalfHeight = (doorTop - doorOpeningBottom) * 0.5;
+    float doorOpening = sdRoundBox(
+      point - vec3(doorCenter, doorOpeningCenterY, EXTENSION_END_Z),
+      vec3(doorHalfWidth, doorOpeningHalfHeight, WALL_HALF + 0.10),
+      0.025
+    );
+    doorWall = max(doorWall, -doorOpening);
     distance = min(distance, doorWall);
     return distance;
   }
