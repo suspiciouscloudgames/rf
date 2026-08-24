@@ -195,7 +195,7 @@ const fragmentShader = /* glsl */ `
     float doorRightStart = doorCenter + doorHalfWidth;
     float doorWall = horizontalWall(point, (EXTENSION_START_X - wallJoin + doorLeftEnd) * 0.5, (doorLeftEnd - EXTENSION_START_X + wallJoin) * 0.5, 0.0, HALF_HEIGHT, EXTENSION_END_Z);
     doorWall = smoothUnion(doorWall, horizontalWall(point, (doorRightStart + HALF_WIDTH + wallJoin) * 0.5, (HALF_WIDTH + wallJoin - doorRightStart) * 0.5, 0.0, HALF_HEIGHT, EXTENSION_END_Z), 0.065);
-    doorWall = smoothUnion(doorWall, horizontalWall(point, doorCenter, doorHalfWidth, (doorTop + HALF_HEIGHT) * 0.5, (HALF_HEIGHT - doorTop) * 0.5, EXTENSION_END_Z), 0.065);
+    doorWall = smoothUnion(doorWall, horizontalWall(point, doorCenter, doorHalfWidth + wallJoin, (doorTop + HALF_HEIGHT) * 0.5, (HALF_HEIGHT - doorTop) * 0.5, EXTENSION_END_Z), 0.065);
     distance = min(distance, doorWall);
     return distance;
   }
