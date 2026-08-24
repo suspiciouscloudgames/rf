@@ -161,7 +161,7 @@ export function ExploreInterface({ sequentialReveal = false }: ExploreInterfaceP
         })}
       </div>
       {selectedItem ? (
-        <aside className="explore-panel">
+        <aside className={`explore-panel panel-trace-${selectedItemNumber}`}>
           <button type="button" className="explore-close" onClick={() => setSelectedItem(null)} aria-label={copy.closeTrace}>×</button>
           <span className="narration-index">{selectedItem.resident ?? `${copy.trace} / ${String(selectedItemNumber).padStart(2, '0')}`}</span>
           {selectedItem.type === 'video' ? (

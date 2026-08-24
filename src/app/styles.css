@@ -995,9 +995,6 @@ button:focus-visible {
 }
 .explore-panel {
   position: absolute;
-  top: auto;
-  right: 4.5%;
-  bottom: 11%;
   width: min(390px, 32vw);
   max-height: 50vh;
   padding: 22px;
@@ -1008,6 +1005,30 @@ button:focus-visible {
   backdrop-filter: blur(11px) saturate(.7) contrast(.94);
   pointer-events: auto;
   overflow-y: auto;
+}
+.explore-panel.panel-trace-1 {
+  top: 18%;
+  left: calc(22% + clamp(190px, 17vw, 230px));
+}
+.explore-panel.panel-trace-2 {
+  left: calc(42% + clamp(178px, 16vw, 215px));
+  bottom: 7%;
+}
+.explore-panel.panel-trace-3 {
+  top: 16%;
+  left: calc(58% - min(420px, 36vw));
+}
+.explore-panel.panel-trace-4 {
+  left: calc(72% - min(420px, 36vw));
+  bottom: 7%;
+}
+.explore-panel .narration-index {
+  display: block;
+  padding-right: 44px;
+  color: rgba(230, 167, 99, .94);
+  font-size: 15px;
+  line-height: 1.4;
+  letter-spacing: .06em;
 }
 .explore-panel h2 { margin: 14px 0; color: #f0ece4; font-size: 16px; font-weight: 500; }
 .explore-panel p { font-size: 13px; line-height: 1.7; }
