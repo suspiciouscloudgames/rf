@@ -7,7 +7,7 @@
   "hubAction": "신호 찾기",
   "approachLabel": "표면의 흔적",
   "approachHint": "표면이 무언가를 전송하고 있습니다. 더 가까이 다가가세요.",
-  "approachAction": "신호 안으로 들어가기",
+  "approachAction": "기록 조각 보기",
   "observationLabel": "내부 층위",
   "returningLabel": "거리를 복원하고 있습니다",
   "home": "돌아가기",

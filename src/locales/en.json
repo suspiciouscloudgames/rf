@@ -7,7 +7,7 @@
   "hubAction": "Locate signal",
   "approachLabel": "SURFACE TRACE",
   "approachHint": "The surface is transmitting. Look closer.",
-  "approachAction": "Enter signal",
+  "approachAction": "View record fragments",
   "observationLabel": "INNER LAYER",
   "returningLabel": "RESTORING DISTANCE",
   "home": "Back",
