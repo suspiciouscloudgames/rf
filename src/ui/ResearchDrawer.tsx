@@ -46,9 +46,11 @@ export function ResearchDrawer() {
     const escapedAliases = aliases.map((alias) => alias.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
     const pattern = new RegExp(`(${escapedAliases.join('|')})`, 'giu')
     const parts = selectedArticleBody.split(pattern)
+    const linkedTargets = new Set<ResearchArticleId>()
     return parts.map((part, index) => {
       const targetId = aliasTargets.get(part.toLocaleLowerCase())
-      if (!targetId) return part
+      if (!targetId || linkedTargets.has(targetId)) return part
+      linkedTargets.add(targetId)
       return (
         <button
           key={`${targetId}-${index}`}
