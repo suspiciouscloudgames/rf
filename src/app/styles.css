@@ -461,16 +461,23 @@ button:focus-visible {
   position: absolute;
   bottom: 44px;
   left: 50%;
-  width: 90%;
+  width: 86%;
   display: block;
+  box-sizing: border-box;
+  padding: 9px 14px 11px;
   transform: translateX(-50%);
-  color: #f4f4f2;
-  font-family: "Helvetica Neue", Arial, sans-serif;
-  font-weight: 500;
+  color: rgba(225, 220, 210, .94);
+  background: linear-gradient(90deg, rgba(12, 15, 15, .18), rgba(12, 15, 15, .68) 18%, rgba(12, 15, 15, .68) 82%, rgba(12, 15, 15, .18));
+  backdrop-filter: blur(3px);
+  font-family: "Nanum Myeongjo", AppleMyungjo, "Noto Serif KR", serif;
+  font-weight: 400;
   text-align: center;
-  text-shadow: none;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, .72);
   z-index: 2;
 }
+
+.research-subtitle[lang="ja"] { font-family: "Yu Mincho", "Hiragino Mincho ProN", "Noto Serif JP", serif; }
+.research-subtitle[lang="en"] { font-family: Georgia, "Times New Roman", serif; }
 
 .research-countdown {
   position: absolute;
@@ -487,13 +494,13 @@ button:focus-visible {
 .research-subtitle p {
   min-height: 0;
   margin: 0;
-  display: inline;
-  padding: 3px 6px 4px;
-  color: #f4f4f2;
-  background: rgba(2, 3, 8, .94);
-  font-size: clamp(16px, 1.55vw, 21px);
-  line-height: 1.65;
-  letter-spacing: .015em;
+  display: block;
+  padding: 0;
+  color: inherit;
+  background: transparent;
+  font-size: clamp(15px, 1.42vw, 19px);
+  line-height: 1.72;
+  letter-spacing: .02em;
   text-wrap: balance;
   overflow-wrap: break-word;
   box-decoration-break: clone;
@@ -503,10 +510,11 @@ button:focus-visible {
 
 .research-subtitle-link {
   margin: 0;
-  padding: 3px 5px 4px;
+  padding: 0 1px 1px;
   border: 0;
-  color: #fff;
-  background: #251ee8;
+  border-bottom: 1px solid rgba(61, 108, 169, .82);
+  color: #4f83c4;
+  background: transparent;
   cursor: pointer;
   font-size: inherit;
   line-height: inherit;
@@ -520,9 +528,9 @@ button:focus-visible {
 .research-subtitle-link span {
   display: inline-block;
   margin-left: 5px;
-  color: #fff;
+  color: #5d8fc9;
   font-family: "Helvetica Neue", Arial, sans-serif;
-  font-size: 1em;
+  font-size: .78em;
   font-weight: 300;
   line-height: 1;
   vertical-align: -.04em;
