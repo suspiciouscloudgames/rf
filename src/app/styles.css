@@ -604,6 +604,7 @@ button:focus-visible {
   font-size: 1.18em;
   line-height: inherit;
   vertical-align: -.03em;
+  animation: research-cycle-signal 1.8s steps(1) infinite;
 }
 
 .research-subtitle[lang="ko"] p { word-break: keep-all; }
@@ -1334,6 +1335,10 @@ button:focus-visible {
   0%, 49% { opacity: 1; }
   50%, 100% { opacity: 0; }
 }
+@keyframes research-cycle-signal {
+  0%, 18%, 36%, 100% { opacity: 1; text-shadow: 0 0 8px rgba(56, 80, 255, .7); }
+  19%, 35% { opacity: .24; text-shadow: none; }
+}
 @keyframes noise-shift { 0% { transform: translate(0); } 25% { transform: translate(-1%,1%); } 50% { transform: translate(1%,-1%); } 75% { transform: translate(1%,1%); } }
 @keyframes chromatic-shiver { 0%, 100% { text-shadow: none; } 48% { text-shadow: 2px 0 rgba(255,0,0,.2), -2px 0 rgba(0,255,255,.2); } }
 @keyframes subtitle-breathe-in { from { opacity: 0; transform: translateY(7px); filter: blur(2px); } to { opacity: 1; transform: translateY(0); filter: blur(0); } }
@@ -1373,7 +1378,7 @@ button:focus-visible {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .noise, .morph-film-overlay, .interface.effect-active, .scene-signal-button, .observation-subtitle-line, .observation-subtitle-cursor { animation: none; }
+  .noise, .morph-film-overlay, .interface.effect-active, .scene-signal-button, .observation-subtitle-line, .observation-subtitle-cursor, .research-cycle-link { animation: none; }
   .hub-video-background { transition-duration: 100ms !important; }
   .research-drawer { transition-duration: 100ms; }
 }
