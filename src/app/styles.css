@@ -1070,10 +1070,10 @@ button:focus-visible {
   min-width: 64px;
   height: 36px;
   margin-left: auto;
-  border: 1px solid rgba(229, 157, 78, .48);
-  color: rgba(245, 222, 191, .84);
-  background: rgba(5, 8, 9, .82);
-  backdrop-filter: blur(12px);
+  border: 1px solid rgba(190, 190, 184, .16);
+  color: rgba(205, 205, 198, .36);
+  background: rgba(12, 14, 14, .38);
+  backdrop-filter: blur(8px);
   pointer-events: auto;
   cursor: pointer;
   font-size: 9px;
