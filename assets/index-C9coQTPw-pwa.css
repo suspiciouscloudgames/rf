@@ -33,3 +33,13 @@
   .explore-panel h2{font-size:30px}
   .explore-panel p{font-size:25px}
 }
+/* Keep resident cards clear of the lower edge and their popups clear of the typed copy. */
+.trace-1{top:27%}
+.trace-2{top:55%}
+.trace-3{top:25%}
+.trace-4{top:51%}
+.explore-panel{max-width:min(390px,31vw);max-height:46vh}
+.explore-panel.panel-trace-1{top:15%;left:calc(22% + clamp(235px,19vw,285px))}
+.explore-panel.panel-trace-2{bottom:13%;left:calc(42% + clamp(225px,18vw,270px))}
+.explore-panel.panel-trace-3{top:13%;left:calc(58% - min(480px,39vw))}
+.explore-panel.panel-trace-4{bottom:13%;left:calc(72% - min(480px,39vw))}
