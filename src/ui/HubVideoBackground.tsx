@@ -1,6 +1,7 @@
 import { useEffect, useRef, type CSSProperties } from 'react'
 import { useExperienceStore } from '../store/experienceStore'
 import { useTuningStore } from '../store/tuningStore'
+import { assetUrl } from '../lib/assetUrl'
 
 type HubVideoStyle = CSSProperties & {
   '--hub-video-brightness': number
@@ -48,7 +49,7 @@ export function HubVideoBackground() {
     >
       <video
         ref={videoRef}
-        src="/assets/hub-background.mp4"
+        src={assetUrl('assets/hub-background.mp4')}
         muted
         loop
         playsInline

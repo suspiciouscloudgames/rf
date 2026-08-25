@@ -1,5 +1,6 @@
 import type { SignalId } from '../store/experienceStore'
 import { constructionSpacePortal, type DepthPortalConfig } from '../scene/depth-portal/depthPortalConfig'
+import { assetUrl } from '../lib/assetUrl'
 
 export interface ObservationSignalConfig {
   id: SignalId
@@ -77,7 +78,7 @@ export const observationSignals: ObservationSignalConfig[] = [
     accent: '#d4b76d',
     phase: 3.45,
     observationModel: {
-      assetUrl: '/assets/models/observations/observation-04/feed-projection-01.glb',
+      assetUrl: assetUrl('assets/models/observations/observation-04/feed-projection-01.glb'),
       position: [0.10, -0.58, 1.58],
       rotation: [0, 0, 0],
       maxSize: 0.26,

@@ -9,6 +9,7 @@ import {
   type Texture,
 } from 'three'
 import type { DepthPortalConfig } from './depthPortalConfig'
+import { assetUrl } from '../../lib/assetUrl'
 
 interface DepthPortalAssetPaths {
   color: string
@@ -31,13 +32,13 @@ export interface DepthPortalTextures {
 
 const assetManifest: Record<DepthPortalConfig['assetId'], DepthPortalAssetPaths> = {
   'construction-space': {
-    color: '/assets/depth-portal/construction-space/color.webp',
-    depth: '/assets/depth-portal/construction-space/depth.png',
-    foregroundColor: '/assets/depth-portal/construction-space/foreground-color.webp',
-    foregroundMask: '/assets/depth-portal/construction-space/foreground-mask.png',
-    midgroundColor: '/assets/depth-portal/construction-space/midground-color.webp',
-    midgroundMask: '/assets/depth-portal/construction-space/midground-mask.png',
-    fallback: '/assets/depth-portal/construction-space/fallback.webp',
+    color: assetUrl('assets/depth-portal/construction-space/color.webp'),
+    depth: assetUrl('assets/depth-portal/construction-space/depth.png'),
+    foregroundColor: assetUrl('assets/depth-portal/construction-space/foreground-color.webp'),
+    foregroundMask: assetUrl('assets/depth-portal/construction-space/foreground-mask.png'),
+    midgroundColor: assetUrl('assets/depth-portal/construction-space/midground-color.webp'),
+    midgroundMask: assetUrl('assets/depth-portal/construction-space/midground-mask.png'),
+    fallback: assetUrl('assets/depth-portal/construction-space/fallback.webp'),
   },
 }
 

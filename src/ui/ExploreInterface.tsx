@@ -5,6 +5,7 @@ import { useExperienceStore } from '../store/experienceStore'
 import { getObservationMemos } from '../content/observationMemos'
 import { useTuningStore } from '../store/tuningStore'
 import { getResidentProfile } from '../content/residentProfiles'
+import { assetUrl } from '../lib/assetUrl'
 
 const exploreItems = [
   { id: 'trace-text', label: 'traceText', title: 'traceTextTitle', body: 'traceTextBody', type: 'text' },
@@ -165,7 +166,7 @@ export function ExploreInterface({ sequentialReveal = false }: ExploreInterfaceP
           <button type="button" className="explore-close" onClick={() => setSelectedItem(null)} aria-label={copy.closeTrace}>×</button>
           <span className="narration-index">{selectedItem.resident ?? `${copy.trace} / ${String(selectedItemNumber).padStart(2, '0')}`}</span>
           {selectedItem.type === 'video' ? (
-            <video ref={videoRef} src="/assets/archive-signal.mp4" muted loop playsInline preload="auto" />
+            <video ref={videoRef} src={assetUrl('assets/archive-signal.mp4')} muted loop playsInline preload="auto" />
           ) : null}
           <p>{selectedItem.body}</p>
         </aside>
