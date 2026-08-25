@@ -1433,6 +1433,85 @@ button:focus-visible {
   .tuning-panel { max-height: calc(100svh - 60px); }
 }
 
+/*
+ * The installation runs on a 13-inch tablet (roughly 1024–1376 CSS pixels
+ * wide in landscape). The original micro-type was calibrated for a desktop
+ * monitor viewed at close range, so keep the spatial composition while using
+ * a legible, touch-distance type scale on the tablet.
+ */
+@media (min-width: 821px) and (max-width: 1400px) and (orientation: landscape) {
+  .archive-id { font-size: 14px; }
+  .project-title { font-size: 12px; }
+
+  .hub-controls { gap: 10px; }
+  .language-switch { min-height: 46px; }
+  .language-switch button {
+    min-width: 46px;
+    min-height: 42px;
+    font-size: 14px;
+  }
+  .welcome-message-button {
+    min-height: 48px;
+    padding-inline: 17px;
+    font-size: 16px;
+  }
+  .welcome-message-button span { font-size: 18px; }
+  .welcome-modal { width: min(590px, calc(100vw - 60px)); }
+  .welcome-modal h1 { font-size: 25px; }
+  .welcome-modal-copy p { font-size: 18px; line-height: 1.78; }
+
+  .telemetry { font-size: 12px; }
+  .stage-copy p {
+    max-width: 340px;
+    font-size: 18px;
+    line-height: 1.62;
+  }
+  .stage-copy span { font-size: 11px; }
+
+  .research-subtitle p { font-size: 22px; line-height: 1.65; }
+  .research-countdown { font-size: 12px; }
+  .research-article-panel { padding: 34px 36px 40px; }
+  .research-article-panel h2 { font-size: 27px; }
+  .research-article-panel p { font-size: 18px; line-height: 1.92; }
+  .research-drawer-handle-label { font-size: 16px; }
+  .research-drawer-handle-arrow { font-size: 27px; }
+
+  .approach-record {
+    width: min(440px, 34vw);
+    padding: 25px 27px 29px;
+  }
+  .approach-record h1 { font-size: 25px; }
+  .approach-record-text { font-size: 18px; line-height: 1.9; }
+
+  .scene-signal-label { font-size: 16px; }
+  .home-button {
+    min-width: 174px;
+    min-height: 58px;
+    font-size: 15px;
+  }
+
+  .narration-index { font-size: 12px; }
+  .narration-panel h1 { font-size: 22px; }
+  .narration-text { font-size: 18px; }
+  .observation-subtitle-line { font-size: 21px; }
+
+  .explore-hint,
+  .return-message { font-size: 14px; }
+  .explore-trace {
+    min-height: 64px;
+    font-size: 18px;
+  }
+  .explore-trace .memo-open-symbol { font-size: 18px; }
+  .resident-introduction { font-size: 16px; line-height: 1.7; }
+  .resident-record-title { font-size: 18px; }
+  .explore-panel .narration-index { font-size: 18px; }
+  .explore-panel h2 { font-size: 21px; }
+  .explore-panel p { font-size: 17px; line-height: 1.78; }
+
+  .tuning-toggle { font-size: 11px; }
+  .loader { font-size: 12px; }
+}
+
 @media (orientation: portrait) {
   .orientation-warning {
     position: absolute;
