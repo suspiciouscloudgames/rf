@@ -3,3 +3,33 @@
 @media (orientation:landscape){.archive-id{font-size:13px}.project-title{font-size:11px}.language-switch button{font-size:13px}.welcome-message-button{font-size:15px}.welcome-message-button span{font-size:17px}.welcome-modal h1{font-size:23px}.welcome-modal-copy p{font-size:17px}.telemetry{font-size:11px}.stage-copy p{font-size:17px}.stage-copy span{font-size:10px}.research-subtitle p{font-size:20px}.research-countdown{font-size:11px}.research-article-panel h2{font-size:25px}.research-article-panel p{font-size:17px}.research-drawer-handle-label{font-size:15px}.research-drawer-handle-arrow{font-size:25px}.approach-record h1{font-size:23px}.approach-record-text{font-size:17px}.scene-signal-label{font-size:15px}.home-button{font-size:14px}.narration-index{font-size:11px}.narration-panel h1{font-size:20px}.narration-text{font-size:17px}.observation-subtitle-line{font-size:19px}.explore-hint,.return-message{font-size:13px}.explore-trace{font-size:17px}.explore-trace .memo-open-symbol{font-size:17px}.resident-introduction{font-size:15px}.resident-record-title{font-size:17px}.explore-panel .narration-index{font-size:17px}.explore-panel h2{font-size:19px}.explore-panel p{font-size:16px}.tuning-toggle{font-size:10px}.loader{font-size:11px}}
 @media (min-width:1800px) and (orientation:landscape){.language-switch button{font-size:23px}.welcome-message-button{font-size:27px}.welcome-message-button span{font-size:29px}.welcome-modal h1{font-size:39px}.welcome-modal-copy p{font-size:28px}.telemetry{font-size:19px}.stage-copy p{font-size:29px}.stage-copy span{font-size:17px}.research-drawer-handle-label{font-size:26px}.research-drawer-handle-arrow{font-size:42px}.research-subtitle p{font-size:35px}.research-countdown{font-size:19px}.research-article-panel h2{font-size:42px}.research-article-panel p{font-size:28px}.approach-record h1{font-size:39px}.approach-record-text{font-size:28px}.scene-signal-label{font-size:25px}.home-button{font-size:24px}.narration-index{font-size:19px}.narration-panel h1{font-size:35px}.narration-text{font-size:28px}.observation-subtitle-line{font-size:33px}.explore-hint,.return-message{font-size:22px}.explore-trace{font-size:28px}.explore-trace .memo-open-symbol{font-size:28px}.resident-introduction{font-size:26px}.resident-record-title{font-size:28px}.explore-panel .narration-index{font-size:28px}.explore-panel h2{font-size:33px}.explore-panel p{font-size:27px}.tuning-toggle{font-size:17px}.loader{font-size:19px}}
 @media (display-mode:standalone){.tuning-ui{display:none!important}}
+/* One-step type reduction for notes, resident copy, and welcome message. */
+.welcome-modal h1{font-size:clamp(16px,1.4vw,19px)}
+.welcome-modal-copy p{font-size:clamp(12px,.98vw,14px)}
+.explore-trace{font-size:14px}
+.explore-trace .memo-open-symbol{font-size:13px}
+.resident-introduction{font-size:12px}
+.resident-record-title{font-size:13px}
+.explore-panel .narration-index{font-size:14px}
+.explore-panel h2{font-size:15px}
+.explore-panel p{font-size:12px}
+@media (orientation:landscape){
+  .welcome-modal h1{font-size:22px}
+  .welcome-modal-copy p{font-size:16px}
+  .explore-trace{font-size:16px}
+  .explore-trace .memo-open-symbol{font-size:16px}
+  .resident-introduction{font-size:14px}
+  .resident-record-title,.explore-panel .narration-index{font-size:16px}
+  .explore-panel h2{font-size:18px}
+  .explore-panel p{font-size:15px}
+}
+@media (min-width:1800px) and (orientation:landscape){
+  .welcome-modal h1{font-size:36px}
+  .welcome-modal-copy p{font-size:26px}
+  .explore-trace{font-size:26px}
+  .explore-trace .memo-open-symbol{font-size:26px}
+  .resident-introduction{font-size:24px}
+  .resident-record-title,.explore-panel .narration-index{font-size:26px}
+  .explore-panel h2{font-size:30px}
+  .explore-panel p{font-size:25px}
+}
