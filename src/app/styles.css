@@ -1439,7 +1439,7 @@ button:focus-visible {
  * monitor viewed at close range, so keep the spatial composition while using
  * a legible, touch-distance type scale on the tablet.
  */
-@media (min-width: 821px) and (max-width: 1400px) and (orientation: landscape) {
+@media (orientation: landscape) {
   .archive-id { font-size: 14px; }
   .project-title { font-size: 12px; }
 
