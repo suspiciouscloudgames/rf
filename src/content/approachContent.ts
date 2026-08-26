@@ -9,7 +9,7 @@ const approachContent: Record<Language, Record<SignalId, ApproachRecord>> = {
   ko: {
     'signal-01': {
       title: '01 창가',
-      body: 'A에 대해서는 별다른 기록이 남아 있지 않다. B의 친구였던 E는 이사를 도와주러 이 집에 왔다가 B가 가지고 있던 검출기를 처음 경험했다. 창가에는 이전 거주자인 A가 남긴 화분 하나가 있었다. 화분은 이미 죽은 것처럼 보였지만, 그 부근에서 반복형 반려체를 발견했다. B는 반복형이 거듭되는 기다림과 자주 겹치는 유형이라고 설명해주었다. 이 반려체가 언제부터 있었고 얼마나 오래 지속되었는지는 알 수 없었다. 몇 년 뒤 D가 이곳에 살던 시기에는 고양이가 창가의 받침대에 자주 머물렀다. 고양이가 죽은 뒤, 같은 자리에서는 한곳에 오래 머무는 고정형 반려체가 관측되었다. 고정형은 애착과 신뢰, 오래된 상실과 연관된 유형이었다. 이사를 나간 뒤 D는 이 반려체가 아직 남아 있는지 다음 거주자인 E에게 확인을 부탁했다. E도 그 자리에 반려체가 있다는 것을 알고 있었다. 서로 다른 감응이 겹치고 반복해서 관측되면서 처음부터 같은 반려체가 변화를 거치며 남아 있었던 것인지, 거주자들이 서로 다른 종류의 반려체들을 불러들인 것인지 알고 싶어졌다.',
+      body: 'A에 대해서는 별다른 기록이 남아 있지 않다. B의 친구였던 E는 이사를 도와주러 이 집에 왔다가 B가 가지고 있던 검출기를 처음 경험했다. 창가에는 이전 거주자인 A가 남긴 화분 하나가 있었다. 화분은 이미 죽은 것처럼 보였지만, 그 부근에서 반복형 반려체를 발견했다. B는 반복형이 거듭되는 기다림과 자주 겹치는 유형이라고 설명해주었다. 이 반려체가 언제부터 있었고 얼마나 오래 지속되었는지는 알 수 없었다.\n\n몇 년 뒤 D가 이곳에 살던 시기에는 고양이가 창가의 받침대에 자주 머물렀다. 고양이가 죽은 뒤, 같은 자리에서는 한곳에 오래 머무는 고정형 반려체가 관측되었다. 고정형은 애착과 신뢰, 오래된 상실과 연관된 유형이었다. 이사를 나간 뒤 D는 이 반려체가 아직 남아 있는지 다음 거주자인 E에게 확인을 부탁했다. E도 그 자리에 반려체가 있다는 것을 알고 있었다. 서로 다른 감응이 겹치고 반복해서 관측되면서 처음부터 같은 반려체가 변화를 거치며 남아 있었던 것인지, 거주자들이 서로 다른 종류의 반려체들을 불러들인 것인지 알고 싶어졌다.',
     },
     'signal-02': {
       title: '02 벽',
@@ -31,7 +31,7 @@ const approachContent: Record<Language, Record<SignalId, ApproachRecord>> = {
   ja: {
     'signal-01': {
       title: '01 窓辺',
-      body: 'Aについては、特に記録が残されていない。Bの友人だったEは、引っ越しを手伝うためにこの家を訪れ、Bが持っていた検出器を初めて体験した。窓辺には、以前の居住者であるAが残した鉢植えが一つあった。鉢植えはすでに枯れているように見えたが、その付近で反復型の伴侶体が発見された。Bは、反復型は繰り返される待ちの感情としばしば重なる型だと説明した。この伴侶体がいつから存在し、どれほど長く持続していたのかは分からなかった。数年後、Dがここに住んでいた頃、猫は窓辺の台の上によく留まっていた。猫が死んだ後、同じ場所では一か所に長く留まる固定型の伴侶体が観測された。固定型は、愛着や信頼、長く残る喪失と関わる型だった。引っ越した後、Dはこの伴侶体がまだ残っているかどうか、次の居住者であるEに確認を頼んだ。Eも、その場所に伴侶体がいることを知っていた。異なる感応が重なり、繰り返し観測されるなかで、初めから同じ伴侶体が変化を経ながら残っていたのか、それとも居住者たちがそれぞれ異なる種類の伴侶体を呼び寄せたのか、知りたくなった。',
+      body: 'Aについては、特に記録が残されていない。Bの友人だったEは、引っ越しを手伝うためにこの家を訪れ、Bが持っていた検出器を初めて体験した。窓辺には、以前の居住者であるAが残した鉢植えが一つあった。鉢植えはすでに枯れているように見えたが、その付近で反復型の伴侶体が発見された。Bは、反復型は繰り返される待ちの感情としばしば重なる型だと説明した。この伴侶体がいつから存在し、どれほど長く持続していたのかは分からなかった。\n\n数年後、Dがここに住んでいた頃、猫は窓辺の台の上によく留まっていた。猫が死んだ後、同じ場所では一か所に長く留まる固定型の伴侶体が観測された。固定型は、愛着や信頼、長く残る喪失と関わる型だった。引っ越した後、Dはこの伴侶体がまだ残っているかどうか、次の居住者であるEに確認を頼んだ。Eも、その場所に伴侶体がいることを知っていた。異なる感応が重なり、繰り返し観測されるなかで、初めから同じ伴侶体が変化を経ながら残っていたのか、それとも居住者たちがそれぞれ異なる種類の伴侶体を呼び寄せたのか、知りたくなった。',
     },
     'signal-02': {
       title: '02 壁',
@@ -53,7 +53,7 @@ const approachContent: Record<Language, Record<SignalId, ApproachRecord>> = {
   en: {
     'signal-01': {
       title: '01 Window',
-      body: 'Very little record of A remains. E, who was B’s friend, came to help with the move and encountered the detector B owned for the first time. A single potted plant left by the previous resident, A, stood by the window. It looked as though it had already died, yet a repetitive-type companion was discovered nearby. B explained that the repetitive type often overlaps with a recurring sense of waiting. No one knew when this companion had first appeared or how long it had persisted. Several years later, while D lived here, a cat often stayed on the window ledge. After the cat died, a fixed-type companion was observed lingering in that same place. The fixed type was associated with attachment, trust, and long-held loss. After moving out, D asked the next resident, E, to check whether the companion was still there. E already knew that a companion occupied the spot. As different resonances overlapped and observations were repeated, E began to wonder whether the same companion had remained from the beginning and changed over time, or whether the residents had drawn in different kinds of companions.',
+      body: 'Very little record of A remains. E, who was B’s friend, came to help with the move and encountered the detector B owned for the first time. A single potted plant left by the previous resident, A, stood by the window. It looked as though it had already died, yet a repetitive-type companion was discovered nearby. B explained that the repetitive type often overlaps with a recurring sense of waiting. No one knew when this companion had first appeared or how long it had persisted.\n\nSeveral years later, while D lived here, a cat often stayed on the window ledge. After the cat died, a fixed-type companion was observed lingering in that same place. The fixed type was associated with attachment, trust, and long-held loss. After moving out, D asked the next resident, E, to check whether the companion was still there. E already knew that a companion occupied the spot. As different resonances overlapped and observations were repeated, E began to wonder whether the same companion had remained from the beginning and changed over time, or whether the residents had drawn in different kinds of companions.',
     },
     'signal-02': {
       title: '02 Wall',

@@ -738,6 +738,7 @@ button:focus-visible {
   line-height: 1.9;
   letter-spacing: .012em;
   word-break: keep-all;
+  white-space: pre-line;
 }
 
 .scene-signal-button {
