@@ -251,6 +251,7 @@ button:focus-visible {
 }
 
 .welcome-modal {
+  --welcome-copy-font-size: clamp(12px, .98vw, 14px);
   position: absolute;
   top: max(126px, calc(env(safe-area-inset-top) + 98px));
   left: max(30px, env(safe-area-inset-left));
@@ -274,7 +275,7 @@ button:focus-visible {
   margin: 0 0 15px;
   padding-right: 42px;
   color: rgba(239, 235, 224, .92);
-  font-size: clamp(12px, .98vw, 14px);
+  font-size: var(--welcome-copy-font-size);
   font-weight: 430;
   letter-spacing: .035em;
 }
@@ -287,7 +288,7 @@ button:focus-visible {
 .welcome-modal-copy p {
   margin: 0;
   color: rgba(225, 221, 211, .82);
-  font-size: clamp(12px, .98vw, 14px);
+  font-size: var(--welcome-copy-font-size);
   line-height: 1.72;
   letter-spacing: .018em;
 }
@@ -1466,9 +1467,11 @@ button:focus-visible {
     font-size: 15px;
   }
   .welcome-message-button span { font-size: 17px; }
-  .welcome-modal { width: min(590px, calc(100vw - 60px)); }
-  .welcome-modal h1 { font-size: 15px; }
-  .welcome-modal-copy p { font-size: 15px; line-height: 1.78; }
+  .welcome-modal {
+    --welcome-copy-font-size: 15px;
+    width: min(590px, calc(100vw - 60px));
+  }
+  .welcome-modal-copy p { line-height: 1.78; }
 
   .telemetry { font-size: 11px; }
   .stage-copy p {
@@ -1545,14 +1548,13 @@ button:focus-visible {
   }
   .welcome-message-button span { margin-right: 13px; font-size: 29px; }
   .welcome-modal {
+    --welcome-copy-font-size: 25px;
     top: max(240px, calc(env(safe-area-inset-top) + 190px));
     left: max(58px, env(safe-area-inset-left));
     width: min(980px, calc(100vw - 116px));
     max-height: min(760px, calc(100vh - 290px));
     padding: 46px 52px 50px;
   }
-  .welcome-modal h1 { font-size: 25px; }
-  .welcome-modal-copy p { font-size: 25px; }
 
   .telemetry { left: max(52px, env(safe-area-inset-left)); font-size: 19px; }
   .stage-copy p { max-width: 600px; font-size: 29px; }
