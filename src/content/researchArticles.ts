@@ -143,36 +143,36 @@ export const researchArticleCueMap: Partial<Record<number, ResearchArticleId>> =
 
 export const researchArticleCuePhrases: Partial<Record<number, Record<Language, string>>> = {
   1: {
-    ko: '설명되지 않는 패턴',
-    ja: '説明できないパターン',
-    en: 'a pattern that could not be explained',
+    ko: '패턴',
+    ja: 'パターン',
+    en: 'pattern',
   },
   2: {
-    ko: '강한 감정 변화',
-    ja: '激しい感情変化',
-    en: 'intense changes in human emotion',
+    ko: '감정',
+    ja: '感情',
+    en: 'emotion',
   },
   4: { ko: '감응장', ja: '感応場', en: 'resonant field' },
-  6: { ko: '미지의 출현체', ja: '未知の出現体', en: 'Unknown emergent entities' },
+  6: { ko: '출현체', ja: '出現体', en: 'emergent entities' },
   7: {
-    ko: '서로 다른 유형의 출현체',
-    ja: '異なる種類の出現体',
-    en: 'Different types of emergent entities',
+    ko: '유형',
+    ja: '種類',
+    en: 'types',
   },
   11: { ko: '검출기', ja: '検出器', en: 'detector' },
   15: { ko: '반려체', ja: '伴侶体', en: 'companions' },
   16: { ko: '서비스 앱', ja: 'サービスアプリ', en: 'Service apps' },
   19: {
-    ko: '반려체에 이름을 붙이고 상태 변화를 기록',
-    ja: '伴侶体に名前をつけ、状態の変化を記録',
-    en: 'named their companions, recorded changes in their condition',
+    ko: '반려체',
+    ja: '伴侶体',
+    en: 'companions',
   },
   21: {
-    ko: '부동산과 서비스의 영역',
-    ja: '不動産とサービスの領域',
-    en: 'real estate and commercial services',
+    ko: '부동산',
+    ja: '不動産',
+    en: 'real estate',
   },
-  32: { ko: '고독의 종말', ja: '孤独の終わり', en: 'the end of solitude' },
+  32: { ko: '고독의 종말', ja: '孤独', en: 'the end of solitude' },
 }
 
 export const researchArticleLinkPhrases: Record<ResearchArticleId, Record<Language, string>> = {
