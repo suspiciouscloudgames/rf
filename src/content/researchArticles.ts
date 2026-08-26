@@ -132,31 +132,47 @@ export const researchArticleCueMap: Partial<Record<number, ResearchArticleId>> =
   2: 'emotion',
   4: 'affective-field',
   6: 'emergent-entities',
+  7: 'classification',
   11: 'detector',
   15: 'companions',
   16: 'service-app',
+  19: 'characteristics',
   21: 'real-estate',
   32: 'end-of-solitude',
 }
 
 export const researchArticleCuePhrases: Partial<Record<number, Record<Language, string>>> = {
   1: {
-    ko: '은하에서 온 빛의 미세한 굴절',
-    ja: '銀河から届く光の微細な屈折',
-    en: 'minute refraction of light arriving from galaxies',
+    ko: '설명되지 않는 패턴',
+    ja: '説明できないパターン',
+    en: 'a pattern that could not be explained',
   },
   2: {
     ko: '강한 감정 변화',
     ja: '激しい感情変化',
     en: 'intense changes in human emotion',
   },
-  4: { ko: '감응장', ja: '感応場', en: 'affective field' },
+  4: { ko: '감응장', ja: '感応場', en: 'resonant field' },
   6: { ko: '미지의 출현체', ja: '未知の出現体', en: 'Unknown emergent entities' },
+  7: {
+    ko: '서로 다른 유형의 출현체',
+    ja: '異なる種類の出現体',
+    en: 'Different types of emergent entities',
+  },
   11: { ko: '검출기', ja: '検出器', en: 'detector' },
   15: { ko: '반려체', ja: '伴侶体', en: 'companions' },
   16: { ko: '서비스 앱', ja: 'サービスアプリ', en: 'Service apps' },
-  21: { ko: '부동산과 서비스', ja: '不動産とサービス', en: 'real estate and commercial services' },
-  32: { ko: '고독의 종말', ja: '孤独の終焉', en: 'the end of solitude' },
+  19: {
+    ko: '반려체에 이름을 붙이고 상태 변화를 기록',
+    ja: '伴侶体に名前をつけ、状態の変化を記録',
+    en: 'named their companions, recorded changes in their condition',
+  },
+  21: {
+    ko: '부동산과 서비스의 영역',
+    ja: '不動産とサービスの領域',
+    en: 'real estate and commercial services',
+  },
+  32: { ko: '고독의 종말', ja: '孤独の終わり', en: 'the end of solitude' },
 }
 
 export const researchArticleLinkPhrases: Record<ResearchArticleId, Record<Language, string>> = {

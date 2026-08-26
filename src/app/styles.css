@@ -1440,76 +1440,76 @@ button:focus-visible {
  * a legible, touch-distance type scale on the tablet.
  */
 @media (orientation: landscape) {
-  .archive-id { font-size: 14px; }
-  .project-title { font-size: 12px; }
+  .archive-id { font-size: 13px; }
+  .project-title { font-size: 11px; }
 
   .hub-controls { gap: 10px; }
   .language-switch { min-height: 46px; }
   .language-switch button {
     min-width: 46px;
     min-height: 42px;
-    font-size: 14px;
+    font-size: 13px;
   }
   .welcome-message-button {
     min-height: 48px;
     padding-inline: 17px;
-    font-size: 16px;
+    font-size: 15px;
   }
-  .welcome-message-button span { font-size: 18px; }
+  .welcome-message-button span { font-size: 17px; }
   .welcome-modal { width: min(590px, calc(100vw - 60px)); }
-  .welcome-modal h1 { font-size: 25px; }
-  .welcome-modal-copy p { font-size: 18px; line-height: 1.78; }
+  .welcome-modal h1 { font-size: 22px; }
+  .welcome-modal-copy p { font-size: 16px; line-height: 1.78; }
 
-  .telemetry { font-size: 12px; }
+  .telemetry { font-size: 11px; }
   .stage-copy p {
     max-width: 340px;
-    font-size: 18px;
+    font-size: 17px;
     line-height: 1.62;
   }
-  .stage-copy span { font-size: 11px; }
+  .stage-copy span { font-size: 10px; }
 
-  .research-subtitle p { font-size: 22px; line-height: 1.65; }
-  .research-countdown { font-size: 12px; }
+  .research-subtitle p { font-size: 20px; line-height: 1.65; }
+  .research-countdown { font-size: 11px; }
   .research-article-panel { padding: 34px 36px 40px; }
-  .research-article-panel h2 { font-size: 27px; }
-  .research-article-panel p { font-size: 18px; line-height: 1.92; }
-  .research-drawer-handle-label { font-size: 16px; }
-  .research-drawer-handle-arrow { font-size: 27px; }
+  .research-article-panel h2 { font-size: 25px; }
+  .research-article-panel p { font-size: 17px; line-height: 1.92; }
+  .research-drawer-handle-label { font-size: 15px; }
+  .research-drawer-handle-arrow { font-size: 25px; }
 
   .approach-record {
     width: min(440px, 34vw);
     padding: 25px 27px 29px;
   }
-  .approach-record h1 { font-size: 25px; }
-  .approach-record-text { font-size: 18px; line-height: 1.9; }
+  .approach-record h1 { font-size: 23px; }
+  .approach-record-text { font-size: 17px; line-height: 1.9; }
 
-  .scene-signal-label { font-size: 16px; }
+  .scene-signal-label { font-size: 15px; }
   .home-button {
     min-width: 174px;
     min-height: 58px;
-    font-size: 15px;
+    font-size: 14px;
   }
 
-  .narration-index { font-size: 12px; }
-  .narration-panel h1 { font-size: 22px; }
-  .narration-text { font-size: 18px; }
-  .observation-subtitle-line { font-size: 21px; }
+  .narration-index { font-size: 11px; }
+  .narration-panel h1 { font-size: 20px; }
+  .narration-text { font-size: 17px; }
+  .observation-subtitle-line { font-size: 19px; }
 
   .explore-hint,
-  .return-message { font-size: 14px; }
+  .return-message { font-size: 13px; }
   .explore-trace {
     min-height: 64px;
-    font-size: 18px;
+    font-size: 16px;
   }
-  .explore-trace .memo-open-symbol { font-size: 18px; }
-  .resident-introduction { font-size: 16px; line-height: 1.7; }
-  .resident-record-title { font-size: 18px; }
-  .explore-panel .narration-index { font-size: 18px; }
-  .explore-panel h2 { font-size: 21px; }
-  .explore-panel p { font-size: 17px; line-height: 1.78; }
+  .explore-trace .memo-open-symbol { font-size: 16px; }
+  .resident-introduction { font-size: 14px; line-height: 1.7; }
+  .resident-record-title { font-size: 16px; }
+  .explore-panel .narration-index { font-size: 16px; }
+  .explore-panel h2 { font-size: 18px; }
+  .explore-panel p { font-size: 15px; line-height: 1.78; }
 
-  .tuning-toggle { font-size: 11px; }
-  .loader { font-size: 12px; }
+  .tuning-toggle { font-size: 10px; }
+  .loader { font-size: 11px; }
 }
 
 /* Chrome's iPad Pro M4 profile exposes the full 2752 × 2064 pixel canvas. */
@@ -1526,14 +1526,14 @@ button:focus-visible {
   .language-switch button {
     min-width: 80px;
     min-height: 72px;
-    font-size: 25px;
+    font-size: 23px;
   }
   .welcome-message-button {
     min-height: 84px;
     padding-inline: 28px;
-    font-size: 29px;
+    font-size: 27px;
   }
-  .welcome-message-button span { margin-right: 13px; font-size: 32px; }
+  .welcome-message-button span { margin-right: 13px; font-size: 29px; }
   .welcome-modal {
     top: max(240px, calc(env(safe-area-inset-top) + 190px));
     left: max(58px, env(safe-area-inset-left));
@@ -1541,53 +1541,69 @@ button:focus-visible {
     max-height: min(760px, calc(100vh - 290px));
     padding: 46px 52px 50px;
   }
-  .welcome-modal h1 { font-size: 42px; }
-  .welcome-modal-copy p { font-size: 31px; }
+  .welcome-modal h1 { font-size: 36px; }
+  .welcome-modal-copy p { font-size: 26px; }
 
-  .telemetry { left: max(52px, env(safe-area-inset-left)); font-size: 21px; }
-  .stage-copy p { max-width: 600px; font-size: 32px; }
-  .stage-copy span { font-size: 19px; }
+  .telemetry { left: max(52px, env(safe-area-inset-left)); font-size: 19px; }
+  .stage-copy p { max-width: 600px; font-size: 29px; }
+  .stage-copy span { font-size: 17px; }
   .hub-copy { left: 9%; bottom: 9%; }
 
   .research-drawer { width: min(1940px, calc(100vw - 88px), 177.777vh); }
   .research-drawer-content { height: min(875px, calc((100vw - 88px) * .45), 80vh); }
   .research-drawer-handle { right: -88px; width: 88px; }
-  .research-drawer-handle-label { font-size: 28px; }
-  .research-drawer-handle-arrow { font-size: 46px; }
-  .research-subtitle p { font-size: 38px; }
-  .research-countdown { bottom: 22px; left: 25px; font-size: 21px; }
+  .research-drawer-handle-label { font-size: 26px; }
+  .research-drawer-handle-arrow { font-size: 42px; }
+  .research-subtitle p { font-size: 35px; }
+  .research-countdown { bottom: 22px; left: 25px; font-size: 19px; }
   .research-article-panel { padding: 58px 62px 68px; }
-  .research-article-panel h2 { margin-bottom: 34px; font-size: 46px; }
-  .research-article-panel p { font-size: 31px; line-height: 1.82; }
+  .research-article-panel h2 { margin-bottom: 34px; font-size: 42px; }
+  .research-article-panel p { font-size: 28px; line-height: 1.82; }
 
   .approach-record {
     width: min(760px, 35vw);
     padding: 42px 46px 50px;
   }
-  .approach-record h1 { font-size: 43px; }
-  .approach-record-text { font-size: 31px; line-height: 1.82; }
-  .scene-signal-label { font-size: 27px; }
-  .home-button { min-width: 300px; min-height: 94px; font-size: 26px; }
+  .approach-record h1 { font-size: 39px; }
+  .approach-record-text { font-size: 28px; line-height: 1.82; }
+  .scene-signal-label { font-size: 25px; }
+  .home-button { min-width: 300px; min-height: 94px; font-size: 24px; }
 
-  .narration-index { font-size: 21px; }
-  .narration-panel h1 { font-size: 38px; }
-  .narration-text { font-size: 31px; }
-  .observation-subtitle-line { font-size: 36px; }
+  .narration-index { font-size: 19px; }
+  .narration-panel h1 { font-size: 35px; }
+  .narration-text { font-size: 28px; }
+  .observation-subtitle-line { font-size: 33px; }
 
   .explore-hint,
-  .return-message { font-size: 24px; }
+  .return-message { font-size: 22px; }
   .memo-cluster.memo-reveal { width: clamp(310px, 16vw, 380px); }
-  .explore-trace { width: 274px; min-height: 106px; padding: 20px 58px 20px 20px; font-size: 31px; }
-  .explore-trace .memo-open-symbol { font-size: 31px; }
-  .resident-introduction { font-size: 28px; }
-  .resident-record-title { font-size: 31px; }
+  .explore-trace { width: 274px; min-height: 106px; padding: 20px 58px 20px 20px; font-size: 26px; }
+  .explore-trace .memo-open-symbol { font-size: 26px; }
+  .resident-introduction { font-size: 24px; }
+  .resident-record-title { font-size: 26px; }
   .explore-panel { width: min(680px, 34vw); padding: 38px; }
-  .explore-panel .narration-index { font-size: 31px; }
-  .explore-panel h2 { font-size: 36px; }
-  .explore-panel p { font-size: 29px; }
+  .explore-panel .narration-index { font-size: 26px; }
+  .explore-panel h2 { font-size: 30px; }
+  .explore-panel p { font-size: 25px; }
 
-  .tuning-toggle { min-width: 110px; height: 62px; font-size: 18px; }
-  .loader { font-size: 21px; }
+  .tuning-toggle { min-width: 110px; height: 62px; font-size: 17px; }
+  .loader { font-size: 19px; }
+}
+
+/* Keep resident records clear of the lower screen edge and their detail panels. */
+.trace-1 { top: 27%; }
+.trace-2 { top: 55%; }
+.trace-3 { top: 25%; }
+.trace-4 { top: 51%; }
+.explore-panel { max-width: min(390px, 31vw); max-height: 46vh; }
+.explore-panel.panel-trace-1 { top: 15%; left: calc(22% + clamp(235px, 19vw, 285px)); }
+.explore-panel.panel-trace-2 { bottom: 13%; left: calc(42% + clamp(225px, 18vw, 270px)); }
+.explore-panel.panel-trace-3 { top: 13%; left: calc(58% - min(480px, 39vw)); }
+.explore-panel.panel-trace-4 { bottom: 13%; left: calc(72% - min(480px, 39vw)); }
+
+/* Installed exhibition web app: hide author-only tuning controls. */
+@media (display-mode: standalone) {
+  .tuning-ui { display: none !important; }
 }
 
 @media (orientation: portrait) {
