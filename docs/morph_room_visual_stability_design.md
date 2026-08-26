@@ -177,7 +177,7 @@ Near-miss 구간 픽셀에만 Subpixel Offset Ray를 하나 더 발사한다.
 목표 예산:
 
 - 데스크톱 GPU frame time 증가 10% 이하
-- iPad M2 GPU frame time 증가 15% 이하
+- iPad Pro 13-inch(2752 × 2064) GPU frame time 증가 15% 이하
 - 2step에서 안정적인 30fps 이상
 - 30분 회전 테스트 중 WebGL context loss 없음
 
@@ -216,7 +216,7 @@ Near-miss 구간 픽셀에만 Subpixel Offset Ray를 하나 더 발사한다.
 4. Edge Coverage 디버그 표시 추가
 5. Edge Coverage 본 적용
 6. 필요 시 윤곽 후보 2-sample 실험
-7. iPad M2 성능·회귀 검증
+7. iPad Pro 13-inch(2752 × 2064) 성능·회귀 검증
 
 각 단계는 별도 커밋 또는 최소한 독립된 Diff로 유지해 시각 문제가 생기면 한 단계만 되돌릴 수 있게 한다.
 
@@ -493,7 +493,7 @@ A와 B를 각각 별도 페이지 실행으로 측정한다. Live Toggle 직후�
 ### Performance
 
 - 데스크톱 GPU 비용 증가 10% 이하
-- iPad M2 GPU 비용 증가 15% 이하
+- iPad Pro 13-inch(2752 × 2064) GPU 비용 증가 15% 이하
 - 2step 안정적 30fps 이상
 
 기준을 만족하지 못하면 B를 전시 기본값으로 승격하지 않는다.
