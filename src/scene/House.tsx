@@ -10,6 +10,7 @@ import { DepthPortalLayer } from './depth-portal/DepthPortalLayer'
 import { hasDepthPortal } from '../signals/signalData'
 import { ApproachRoomSwitcher } from './ApproachRoomSwitcher'
 import { useRoomVisualModeStore } from '../store/roomVisualModeStore'
+import { ObservationPhotoSequence } from './ObservationPhotoSequence'
 
 export function House() {
   const group = useRef<Group>(null)
@@ -47,6 +48,7 @@ export function House() {
         <DepthPortalLayer />
       </DepthPortalBoundary>
       <ObservationSignals />
+      <ObservationPhotoSequence />
     </group>
   )
 }

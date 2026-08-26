@@ -49,6 +49,7 @@ const tempFocus = new Vector3()
 const tempNearObservationPosition = new Vector3()
 const tempFarObservationPosition = new Vector3()
 const tempObservationOffset = new Vector3()
+const tempPhotoFarDirection = new Vector3()
 const tempApproachLift = new Vector3(0, 0.16, 0)
 const tempMorphApproachPosition = new Vector3(4.2, 2.75, 5.15)
 const tempMorphApproachTarget = new Vector3(0, -0.08, 0)
@@ -214,10 +215,12 @@ export function CameraController() {
       observationElapsed.current = 0
       guidedObservationDuration.current = useTuningStore.getState().guidedObservationSeconds
       camera.userData.observationElapsed = 0
+      camera.userData.photoDollyProgress = 0
     }
     if (stage === 'hub' && transitionKind === 'none') {
       observationElapsed.current = 0
       camera.userData.observationElapsed = 0
+      camera.userData.photoDollyProgress = 0
     }
     observationWasActive.current = observationActive
   }, [camera, stage, transitionKind])
@@ -289,24 +292,26 @@ export function CameraController() {
       const { signal, anchor, focus, nearObservationPosition, farObservationPosition } = resolveSignalFrame(
         tuning.worldDepth,
       )
-      const desiredPosition = signal.depthPortal ? farObservationPosition : nearObservationPosition
+      // Reuse the long photographic dolly from the earlier observation test for
+      // every signal. 05 keeps its authored portal frame; the other locations
+      // begin 6.2 units out along their own observation axis.
+      const desiredPosition = signal.depthPortal
+        ? farObservationPosition
+        : tempPhotoFarDirection
+          .copy(nearObservationPosition)
+          .sub(focus)
+          .normalize()
+          .multiplyScalar(6.2)
+          .add(focus)
       const startPosition = camera.position.clone()
-      const entryDirection = desiredPosition.clone().sub(startPosition)
-      const entryDistance = Math.min(tuning.entryTravelDistance, entryDirection.length())
-      const observationPosition = startPosition.clone().add(entryDirection.normalize().multiplyScalar(entryDistance))
-      const midpoint = startPosition.clone().lerp(observationPosition, 0.5)
-      const pathDirection = observationPosition.clone().sub(startPosition).normalize()
-      const curveOffset = anchor.clone().sub(midpoint)
-      curveOffset.addScaledVector(pathDirection, -curveOffset.dot(pathDirection))
-      curveOffset.clampLength(0, entryDistance * 0.28).multiplyScalar(tuning.entryCurveStrength)
-      const control1 = startPosition.clone().lerp(observationPosition, 0.33).add(curveOffset)
-      const control2 = startPosition.clone().lerp(observationPosition, 0.67).add(curveOffset)
-      base.curve = new CubicBezierCurve3(startPosition, control1, control2, observationPosition.clone())
+      const control1 = startPosition.clone().lerp(anchor, 0.42).add(new Vector3(0, 0.18, 0))
+      const control2 = anchor.clone().lerp(desiredPosition, 0.62).add(new Vector3(0, 0.08, 0))
+      base.curve = new CubicBezierCurve3(startPosition, control1, control2, desiredPosition.clone())
       base.endTarget = focus.clone()
-      base.endFov = tuning.entryFov
+      base.endFov = 44
       base.targetRotationDelay = tuning.targetRotationDelay / 100
-      guidedStartPosition.current.copy(observationPosition)
-      guidedStartFov.current = tuning.entryFov
+      guidedStartPosition.current.copy(desiredPosition)
+      guidedStartFov.current = 44
     }
     transition.current = base
   }, [camera, hubPosition, hubTarget, transitionKind])
@@ -334,24 +339,27 @@ export function CameraController() {
       if (presetTransition) cameraPresetTransition.current = null
       if (stage === 'observation' && transitionKind === 'none') {
         const { signal, focus, nearObservationPosition } = resolveSignalFrame()
-        if (signal.depthPortal) {
-          observationElapsed.current = Math.min(
-            observationElapsed.current + delta,
-            guidedObservationDuration.current,
-          )
-          const rawDollyProgress = observationElapsed.current / guidedObservationDuration.current
-          const dollyProgress = smootherStep(rawDollyProgress)
-          camera.position.lerpVectors(guidedStartPosition.current, nearObservationPosition, dollyProgress)
-          target.current.copy(focus)
-          camera.fov = MathUtils.lerp(guidedStartFov.current, signal.depthPortal.nearFov, dollyProgress)
-          camera.updateProjectionMatrix()
-          camera.userData.observationElapsed = observationElapsed.current
-          gl.domElement.dataset.observationElapsed = observationElapsed.current.toFixed(2)
-          gl.domElement.dataset.cameraDollyProgress = rawDollyProgress.toFixed(3)
-          gl.domElement.dataset.cameraPosition = camera.position.toArray().map((value) => value.toFixed(2)).join(',')
-          gl.domElement.dataset.cameraTarget = target.current.toArray().map((value) => value.toFixed(2)).join(',')
-          gl.domElement.dataset.cameraFov = camera.fov.toFixed(2)
-        }
+        observationElapsed.current = Math.min(
+          observationElapsed.current + delta,
+          guidedObservationDuration.current,
+        )
+        const rawDollyProgress = observationElapsed.current / guidedObservationDuration.current
+        const dollyProgress = smootherStep(rawDollyProgress)
+        camera.position.lerpVectors(guidedStartPosition.current, nearObservationPosition, dollyProgress)
+        target.current.copy(focus)
+        camera.fov = MathUtils.lerp(
+          guidedStartFov.current,
+          signal.depthPortal?.nearFov ?? 25.5,
+          dollyProgress,
+        )
+        camera.updateProjectionMatrix()
+        camera.userData.observationElapsed = observationElapsed.current
+        camera.userData.photoDollyProgress = rawDollyProgress
+        gl.domElement.dataset.observationElapsed = observationElapsed.current.toFixed(2)
+        gl.domElement.dataset.cameraDollyProgress = rawDollyProgress.toFixed(3)
+        gl.domElement.dataset.cameraPosition = camera.position.toArray().map((value) => value.toFixed(2)).join(',')
+        gl.domElement.dataset.cameraTarget = target.current.toArray().map((value) => value.toFixed(2)).join(',')
+        gl.domElement.dataset.cameraFov = camera.fov.toFixed(2)
       }
       camera.lookAt(target.current)
       return
