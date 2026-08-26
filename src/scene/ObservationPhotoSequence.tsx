@@ -29,6 +29,7 @@ type PhotoPlacement = {
 }
 
 const ENTRY_SHARE = 0.14
+const PHOTO_DISPLAY_SCALE = 0.7
 
 const photoSequences: Record<SignalId, PhotoPlacement[]> = {
   'signal-01': [
@@ -107,7 +108,12 @@ function PhotoCard({ placement, index }: { placement: PhotoPlacement; index: num
 
   return (
     <mesh ref={mesh} visible={false} renderOrder={34}>
-      <planeGeometry args={[placement.width, placement.width / aspect]} />
+      <planeGeometry
+        args={[
+          placement.width * PHOTO_DISPLAY_SCALE,
+          (placement.width / aspect) * PHOTO_DISPLAY_SCALE,
+        ]}
+      />
       <meshBasicMaterial
         ref={material}
         map={texture}

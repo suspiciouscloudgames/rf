@@ -20,13 +20,13 @@ interface ExploreInterfaceProps {
 type RevealStyle = CSSProperties & { '--memo-delay'?: string }
 
 const memoCharacterDelay = (character: string) => {
-  if (/[.!?。！？]/.test(character)) return 190
-  if (/[,、]/.test(character)) return 85
-  if (/\s/.test(character)) return 18
-  return 28
+  if (/[.!?。！？]/.test(character)) return 300
+  if (/[,、]/.test(character)) return 130
+  if (/\s/.test(character)) return 28
+  return 44
 }
 
-function MemoTypewriterText({ title, text, startDelay }: { title: string; text: string; startDelay: number }) {
+function MemoTypewriterText({ text, startDelay }: { text: string; startDelay: number }) {
   const [visibleLength, setVisibleLength] = useState(0)
   const [showCursor, setShowCursor] = useState(true)
 
@@ -46,7 +46,6 @@ function MemoTypewriterText({ title, text, startDelay }: { title: string; text: 
 
   return (
     <span className="resident-introduction">
-      <span className="resident-record-title">{title}</span>
       <span className="resident-record-body">
         {text.slice(0, visibleLength)}
         {showCursor && (
@@ -156,7 +155,7 @@ export function ExploreInterface({ sequentialReveal = false }: ExploreInterfaceP
                 {item.label}
                 <span className="memo-open-symbol" aria-hidden="true">↗</span>
               </span>
-              <MemoTypewriterText title={item.title} text={item.previewBody} startDelay={memoDelay * 1000} />
+              <MemoTypewriterText text={item.previewBody} startDelay={memoDelay * 1000} />
             </button>
           )
         })}
