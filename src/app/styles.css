@@ -274,15 +274,9 @@ button:focus-visible {
 }
 
 .welcome-modal-title {
-  margin: 0 0 15px;
-  padding-right: 42px;
   color: rgba(239, 235, 224, .92);
-  /* Chrome/iPad text autosizing enlarges this short standalone line even
-     when it shares the body's declared size. Counter that visual scaling. */
-  font-size: 11px;
+  font-size: inherit;
   font-weight: 400;
-  line-height: 1.72;
-  letter-spacing: .018em;
 }
 
 .welcome-modal-copy {
@@ -1476,7 +1470,6 @@ button:focus-visible {
     --welcome-copy-font-size: 15px;
     width: min(590px, calc(100vw - 60px));
   }
-  .welcome-modal-title { font-size: 12px; }
   .welcome-modal-copy p { line-height: 1.78; }
 
   .telemetry { font-size: 11px; }
@@ -1561,7 +1554,6 @@ button:focus-visible {
     max-height: min(760px, calc(100vh - 290px));
     padding: 46px 52px 50px;
   }
-  .welcome-modal-title { font-size: 20px; }
 
   .telemetry { left: max(52px, env(safe-area-inset-left)); font-size: 19px; }
   .stage-copy p { max-width: 600px; font-size: 29px; }

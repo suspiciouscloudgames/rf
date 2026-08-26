@@ -86,9 +86,14 @@ export function Interface() {
             >
               <section className="welcome-modal" role="dialog" aria-modal="true" aria-labelledby="welcome-message-title" lang={language}>
                 <button className="welcome-modal-close" type="button" aria-label={copy.closeTrace} onClick={() => setIsWelcomeOpen(false)}>×</button>
-                <p id="welcome-message-title" className="welcome-modal-title">{copy.welcomeMessageTitle}</p>
                 <div className="welcome-modal-copy">
-                  {copy.welcomeMessageParagraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
+                  <p id="welcome-message-title">
+                    <span className="welcome-modal-title">{copy.welcomeMessageTitle}</span>
+                    <br />
+                    <br />
+                    {copy.welcomeMessageParagraphs[0]}
+                  </p>
+                  {copy.welcomeMessageParagraphs.slice(1).map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
                 </div>
               </section>
             </div>
