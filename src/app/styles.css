@@ -590,26 +590,36 @@ button:focus-visible {
   color: #3850ff;
   background: transparent;
   cursor: pointer;
-  width: 27px;
-  height: 27px;
+  width: 34px;
+  height: 34px;
   vertical-align: -.48em;
 }
 
 .research-cycle-link svg {
   display: block;
-  width: 27px;
-  height: 27px;
+  width: 34px;
+  height: 34px;
   overflow: visible;
 }
 
+.research-cycle-guide,
 .research-cycle-dots {
   fill: none;
   stroke: currentColor;
-  stroke-width: 1.65;
   stroke-linecap: round;
   stroke-dasharray: .001 .057;
   transform: rotate(-90deg);
   transform-origin: center;
+}
+
+.research-cycle-guide {
+  opacity: .34;
+  stroke-width: 1.45;
+}
+
+.research-cycle-dots {
+  stroke-width: 1.9;
+  filter: drop-shadow(0 0 3px rgba(56, 80, 255, .45));
 }
 
 .research-cycle-mask {

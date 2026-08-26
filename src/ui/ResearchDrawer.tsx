@@ -154,6 +154,7 @@ export function ResearchDrawer() {
                       <circle className="research-cycle-mask" cx="12" cy="12" r="8.5" pathLength="1" />
                     </mask>
                   </defs>
+                  <circle className="research-cycle-guide" cx="12" cy="12" r="8.5" pathLength="1" />
                   <circle className="research-cycle-dots" cx="12" cy="12" r="8.5" pathLength="1" mask="url(#research-cycle-reveal)" />
                 </svg>
               </button>
