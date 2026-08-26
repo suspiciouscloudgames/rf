@@ -5,7 +5,12 @@ import { VitePWA } from 'vite-plugin-pwa'
 const runtimeProcess = (globalThis as typeof globalThis & {
   process?: { env?: Record<string, string | undefined> }
 }).process
-const base = runtimeProcess?.env?.GITHUB_PAGES === 'true' ? '/ResonantField/' : '/'
+const requestedBase = runtimeProcess?.env?.VITE_BASE_PATH
+const base = requestedBase
+  ? `/${requestedBase.replace(/^\/+|\/+$/g, '')}/`
+  : runtimeProcess?.env?.GITHUB_PAGES === 'true'
+    ? '/ResonantField/'
+    : '/'
 
 export default defineConfig({
   base,
