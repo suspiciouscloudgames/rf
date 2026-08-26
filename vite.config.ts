@@ -9,7 +9,7 @@ const requestedBase = runtimeProcess?.env?.VITE_BASE_PATH
 const base = requestedBase
   ? `/${requestedBase.replace(/^\/+|\/+$/g, '')}/`
   : runtimeProcess?.env?.GITHUB_PAGES === 'true'
-    ? '/ResonantField/'
+    ? '/rf/'
     : '/'
 
 export default defineConfig({
