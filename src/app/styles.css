@@ -141,6 +141,13 @@ button:focus-visible {
   transition: filter 180ms ease;
 }
 
+.interface.state-hub {
+  --hub-key: #192c20;
+  --hub-key-bright: #789481;
+  --hub-key-deep: #102017;
+  --hub-key-shadow: #07120c;
+}
+
 .interface.effect-active {
   filter: contrast(1.18) saturate(0.82);
   animation: chromatic-shiver 1.6s steps(2, end) infinite;
@@ -194,7 +201,7 @@ button:focus-visible {
   padding: 0 14px;
   border: 0;
   color: rgba(220, 218, 209, .74);
-  background: linear-gradient(105deg, rgba(129, 133, 124, .16), rgba(19, 23, 22, .32));
+  background: linear-gradient(105deg, rgba(25, 44, 32, .3), rgba(7, 18, 12, .44));
   box-shadow: inset 0 0 0 1px rgba(235, 232, 220, .07);
   backdrop-filter: blur(10px) saturate(.7);
   cursor: pointer;
@@ -205,7 +212,7 @@ button:focus-visible {
 .welcome-message-button span {
   display: inline-block;
   margin-right: 7px;
-  color: rgba(198, 202, 192, .62);
+  color: rgba(120, 148, 129, .82);
   font-size: 15px;
   font-weight: 400;
 }
@@ -236,9 +243,9 @@ button:focus-visible {
 }
 
 .language-switch button.active {
-  border-bottom-color: rgba(225, 154, 76, .82);
-  color: #dca05d;
-  background: linear-gradient(0deg, rgba(216, 145, 63, .08), transparent 58%);
+  border-bottom-color: rgba(76, 106, 83, .94);
+  color: var(--hub-key-bright);
+  background: linear-gradient(0deg, rgba(25, 44, 32, .3), transparent 58%);
 }
 .language-switch span { color: rgba(255,255,255,.2); }
 
@@ -351,8 +358,8 @@ button:focus-visible {
 
 .fullscreen-control:focus-visible,
 .fullscreen-control.is-active {
-  border-color: rgba(240, 162, 81, .55);
-  color: #f1aa56;
+  border-color: rgba(76, 106, 83, .78);
+  color: var(--hub-key-bright);
 }
 
 .fullscreen-control-icon {
@@ -387,7 +394,7 @@ button:focus-visible {
   transform: rotate(180deg);
 }
 
-.telemetry-line { width: 1px; height: 64px; background: rgba(216,145,63,.35); }
+.telemetry-line { width: 1px; height: 64px; background: rgba(76, 106, 83, .55); }
 
 .research-drawer-layer {
   position: fixed;
@@ -471,7 +478,7 @@ button:focus-visible {
   position: absolute;
   bottom: 12px;
   left: 14px;
-  color: rgba(203, 147, 85, .54);
+  color: rgba(120, 148, 129, .7);
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: 9px;
   letter-spacing: .12em;
@@ -525,7 +532,7 @@ button:focus-visible {
   line-height: 1;
   vertical-align: -.04em;
   transform: translateY(-1px);
-  text-shadow: 0 0 7px rgba(218, 145, 63, .1);
+  text-shadow: 0 0 7px rgba(25, 44, 32, .28);
   transition: transform 160ms ease, color 160ms ease;
 }
 
@@ -539,7 +546,7 @@ button:focus-visible {
   border-left: 0;
   color: #beb7aa;
   background: linear-gradient(135deg, #111413, #0d100f 72%);
-  scrollbar-color: rgba(216, 145, 63, .38) transparent;
+  scrollbar-color: rgba(76, 106, 83, .56) transparent;
   scrollbar-width: thin;
   font-family: "Nanum Myeongjo", AppleMyungjo, "Noto Serif KR", "Times New Roman", serif;
 }
@@ -652,17 +659,17 @@ button:focus-visible {
   gap: 18px;
   padding: 18px 0;
   border: 0;
-  color: rgba(255, 238, 211, .98);
-  background: linear-gradient(90deg, rgba(96, 73, 46, .96), rgba(43, 45, 39, .95));
+  color: rgba(224, 235, 227, .96);
+  background: linear-gradient(90deg, rgba(25, 44, 32, .98), rgba(7, 18, 12, .97));
   backdrop-filter: blur(9px);
   cursor: pointer;
-  box-shadow: 8px 0 24px rgba(0, 0, 0, .28), inset 1px 0 rgba(255, 235, 202, .08);
+  box-shadow: 8px 0 24px rgba(0, 0, 0, .28), inset 1px 0 rgba(120, 148, 129, .2);
   text-shadow: 0 1px 8px rgba(0, 0, 0, .72);
   transition: color 180ms ease, background 180ms ease, width 180ms ease;
 }
 
 .research-drawer-handle-arrow {
-  color: rgba(255, 238, 211, .98);
+  color: rgba(205, 222, 212, .96);
   font-family: "Helvetica Neue", Arial, sans-serif;
   font-size: 22px;
   font-weight: 300;
@@ -670,7 +677,7 @@ button:focus-visible {
 }
 
 .research-drawer-handle-label {
-  color: rgba(236, 226, 207, .78);
+  color: rgba(177, 197, 185, .84);
   font-family: ui-sans-serif, "Noto Sans KR", sans-serif;
   font-size: 13px;
   font-weight: 500;
@@ -744,13 +751,15 @@ button:focus-visible {
 }
 
 .scene-signal-button {
+  --signal-phase: 0s;
   position: relative;
   width: 68px;
   height: 68px;
   padding: 0;
   border: 0;
   border-radius: 50%;
-  background: transparent;
+  background: radial-gradient(circle at 50% 50%, rgba(255, 232, 220, .2), rgba(255, 35, 24, .08) 18%, transparent 48%);
+  filter: drop-shadow(0 0 7px rgba(255, 20, 14, .28));
   pointer-events: all;
   cursor: pointer;
   opacity: 1;
@@ -766,15 +775,40 @@ button:focus-visible {
 .scene-signal-button::before,
 .scene-signal-button::after {
   position: absolute;
-  inset: 12px;
-  border: 1px solid rgba(222, 145, 65, .25);
+  inset: 13px 5px;
+  border: 1px solid rgba(255, 58, 45, .52);
   border-radius: 50%;
+  box-shadow: 0 0 8px rgba(255, 20, 16, .14), inset 0 0 7px rgba(255, 20, 16, .08);
   content: '';
+  pointer-events: none;
+  --ring-rotation: -28deg;
+  animation: hal-orbit-breathe 4.8s ease-in-out var(--signal-phase) infinite;
 }
 
-.scene-signal-button::after { inset: 19px 7px; transform: rotate(48deg); opacity: .48; }
-.scene-signal-button.selected::before { border-color: rgba(240, 162, 81, .7); animation: orbit 7s linear infinite; }
+.scene-signal-button::after {
+  inset: 19px 3px;
+  border-color: rgba(255, 42, 32, .35);
+  --ring-rotation: 52deg;
+  animation-duration: 5.9s;
+  animation-direction: reverse;
+}
+.scene-signal-button.selected::before,
+.scene-signal-button.selected::after { border-color: rgba(255, 92, 72, .82); }
 .scene-signal-button:disabled { cursor: default; }
+
+.scene-signal-lens {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 17px;
+  height: 17px;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(circle at 42% 38%, #fff7ef 0 5%, #ff9a78 10%, #ff2b1f 25%, #b40000 48%, rgba(74, 0, 0, .78) 67%, transparent 73%);
+  box-shadow: 0 0 4px rgba(255, 235, 220, .9), 0 0 10px rgba(255, 50, 34, .95), 0 0 24px rgba(226, 0, 0, .72), 0 0 42px rgba(190, 0, 0, .34);
+  pointer-events: none;
+  animation: hal-lens-breathe 3.7s ease-in-out var(--signal-phase) infinite;
+}
 
 .scene-signal-label {
   position: absolute;
@@ -1442,7 +1476,14 @@ button:focus-visible {
   letter-spacing: .08em;
 }
 
-@keyframes orbit { to { transform: rotate(360deg); } }
+@keyframes hal-orbit-breathe {
+  0%, 100% { opacity: .32; transform: rotate(var(--ring-rotation)) scale(.82); }
+  50% { opacity: .86; transform: rotate(var(--ring-rotation)) scale(1.16); }
+}
+@keyframes hal-lens-breathe {
+  0%, 100% { opacity: .76; transform: translate(-50%, -50%) scale(.88); filter: blur(.35px); }
+  50% { opacity: 1; transform: translate(-50%, -50%) scale(1.08); filter: blur(0); }
+}
 @keyframes pulse { 50% { opacity: .4; transform: scale(.84); } }
 @keyframes cursor-blink { 50% { opacity: 0; } }
 @keyframes memo-cursor-final-blinks {

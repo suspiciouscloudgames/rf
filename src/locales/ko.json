@@ -30,7 +30,7 @@
   "traceVideoBody": "원래의 신호가 끊어진 곳에서 움직이는 기록이 반복됩니다.",
   "closeTrace": "흔적 닫기",
   "rotateDevice": "기기를 가로 방향으로 돌려주세요.",
-  "location": "위치 35.6711° 북위 / 139.7039° 동경",
+  "location": "위치 35.6711° N / 139.7039° E",
   "transmission": "전송",
   "trace": "흔적",
   "sequenceProgress": "시퀀스 진행률",
