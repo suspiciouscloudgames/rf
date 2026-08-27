@@ -1,25 +1,68 @@
 import { useEffect, useRef, useState } from 'react'
-import { researchSubtitles } from '../content/researchSubtitles'
-import { researchArticleBodyAliases, researchArticleCueMap, researchArticleCuePhrases, researchArticleLinkPhrases, researchArticles, type ResearchArticleId } from '../content/researchArticles'
+import { researchArticleBodyAliases, researchArticleLinkPhrases, researchArticles, type ResearchArticleId } from '../content/researchArticles'
 import { researchArticleTranslations } from '../content/researchArticleTranslations'
 import { useExperienceStore } from '../store/experienceStore'
 import { localeCopy } from '../locales'
+import { assetUrl } from '../lib/assetUrl'
 
-const CUE_DURATION_MS = 8_000
+type FilmSubtitle = {
+  id: number
+  start: number
+  end: number
+  text: string
+}
+
+type FilmSubtitleFile = {
+  subtitles: FilmSubtitle[]
+}
+
+const FILM_VIDEO_URL = assetUrl('assets/video/resonant-field-film/resonant_field_picture.mp4')
+const FILM_SUBTITLE_URL = assetUrl('assets/video/resonant-field-film/resonant_field_subtitles.json')
+
+const filmCueArticleMap: Partial<Record<number, ResearchArticleId>> = {
+  2: 'observation-patterns',
+  3: 'emotion',
+  5: 'affective-field',
+  7: 'emergent-entities',
+  10: 'detector',
+  13: 'companions',
+  14: 'service-app',
+  19: 'characteristics',
+  20: 'real-estate',
+  28: 'end-of-solitude',
+}
+
+const filmCueArticlePhrases: Partial<Record<number, string>> = {
+  2: '패턴',
+  3: '감정',
+  5: '감응장',
+  7: '출현체',
+  10: '검출기',
+  13: '반려체',
+  14: '서비스 앱',
+  19: '반려체',
+  20: '부동산',
+  28: '고독의 종말',
+}
 
 export function ResearchDrawer() {
   const language = useExperienceStore((store) => store.language)
   const registerInteraction = useExperienceStore((store) => store.registerInteraction)
   const [isOpen, setIsOpen] = useState(false)
-  const [cueIndex, setCueIndex] = useState(0)
+  const [filmSubtitles, setFilmSubtitles] = useState<FilmSubtitle[]>([])
+  const [filmTime, setFilmTime] = useState(0)
   const [selectedArticleId, setSelectedArticleId] = useState<ResearchArticleId>('observation-patterns')
   const articlePanelRef = useRef<HTMLElement>(null)
-  const cues = researchSubtitles[language]
+  const videoRef = useRef<HTMLVideoElement>(null)
   const copy = localeCopy[language]
-  const linkedArticleId = researchArticleCueMap[cueIndex]
-  const linkedPhrase = linkedArticleId ? researchArticleCuePhrases[cueIndex]?.[language] ?? null : null
-  const cueText = cueIndex < cues.length ? cues[cueIndex] : ''
-  const linkedPhraseIndex = linkedPhrase ? cueText.toLocaleLowerCase().indexOf(linkedPhrase.toLocaleLowerCase()) : -1
+  const activeSubtitleIndex = filmSubtitles.findIndex((subtitle) => (
+    filmTime >= subtitle.start && filmTime < subtitle.end
+  ))
+  const activeSubtitle = activeSubtitleIndex >= 0 ? filmSubtitles[activeSubtitleIndex] : null
+  const linkedArticleId = activeSubtitle ? filmCueArticleMap[activeSubtitle.id] : undefined
+  const linkedPhrase = activeSubtitle ? filmCueArticlePhrases[activeSubtitle.id] ?? null : null
+  const cueText = activeSubtitle?.text ?? ''
+  const linkedPhraseIndex = linkedPhrase ? cueText.indexOf(linkedPhrase) : -1
   const selectedArticle = researchArticles.find((article) => article.id === selectedArticleId) ?? researchArticles[0]
   const selectedArticleBody = language === 'ko'
     ? selectedArticle.body
@@ -70,19 +113,37 @@ export function ResearchDrawer() {
   }
 
   useEffect(() => {
-    setCueIndex(0)
-  }, [language])
+    const controller = new AbortController()
+    void fetch(FILM_SUBTITLE_URL, { signal: controller.signal })
+      .then((response) => {
+        if (!response.ok) throw new Error(`Unable to load film subtitles: ${response.status}`)
+        return response.json() as Promise<FilmSubtitleFile>
+      })
+      .then((data) => {
+        const subtitles = Array.isArray(data.subtitles)
+          ? data.subtitles.filter((subtitle) => (
+            Number.isFinite(subtitle.id)
+            && Number.isFinite(subtitle.start)
+            && Number.isFinite(subtitle.end)
+            && subtitle.end > subtitle.start
+            && typeof subtitle.text === 'string'
+          ))
+          : []
+        setFilmSubtitles(subtitles)
+      })
+      .catch((error: unknown) => {
+        if (error instanceof DOMException && error.name === 'AbortError') return
+        setFilmSubtitles([])
+      })
+    return () => controller.abort()
+  }, [])
 
   useEffect(() => {
-    if (!isOpen) {
-      return
-    }
-    setCueIndex(0)
-    const timer = window.setInterval(() => {
-      setCueIndex((current) => current >= cues.length - 1 ? 0 : current + 1)
-    }, CUE_DURATION_MS)
-    return () => window.clearInterval(timer)
-  }, [isOpen, cues.length])
+    const video = videoRef.current
+    if (!video) return
+    if (isOpen) void video.play().catch(() => undefined)
+    else video.pause()
+  }, [isOpen])
 
   useEffect(() => {
     if (!isOpen) return
@@ -108,15 +169,25 @@ export function ResearchDrawer() {
       <aside className="research-drawer" aria-label={copy.researchArchive}>
         <div className="research-drawer-content">
           <div className="research-video-frame" aria-hidden={!isOpen}>
-            <div className="research-video-mock" aria-hidden="true">
-            </div>
-            <span className="research-countdown" aria-label={`${Math.max(0, cues.length - cueIndex)}`}>
-              {String(Math.max(0, cues.length - cueIndex)).padStart(2, '0')}
+            <video
+              ref={videoRef}
+              className="research-video"
+              src={FILM_VIDEO_URL}
+              muted
+              loop
+              playsInline
+              preload="metadata"
+              aria-hidden="true"
+              onTimeUpdate={(event) => setFilmTime(event.currentTarget.currentTime)}
+              onSeeked={(event) => setFilmTime(event.currentTarget.currentTime)}
+            />
+            <span className="research-countdown" aria-label={`${Math.max(0, filmSubtitles.length - Math.max(activeSubtitleIndex, 0))}`}>
+              {String(Math.max(0, filmSubtitles.length - Math.max(activeSubtitleIndex, 0))).padStart(2, '0')}
             </span>
-            <div className="research-subtitle" aria-live="polite" lang={language}>
-              {cueIndex < cues.length ? (
+            <div className="research-subtitle" aria-live="polite" lang="ko">
+              {activeSubtitle ? (
                 linkedArticleId && linkedPhrase && linkedPhraseIndex >= 0 ? (
-                  <p key={`${language}-${cueIndex}`}>
+                  <p key={`film-subtitle-${activeSubtitle.id}`}>
                     {cueText.slice(0, linkedPhraseIndex)}
                     <button
                       type="button"
@@ -128,8 +199,8 @@ export function ResearchDrawer() {
                     </button>
                     {cueText.slice(linkedPhraseIndex + linkedPhrase.length)}
                   </p>
-                ) : <p key={`${language}-${cueIndex}`}>{cues[cueIndex]}</p>
-              ) : <p>&nbsp;</p>}
+                ) : <p key={`film-subtitle-${activeSubtitle.id}`}>{activeSubtitle.text}</p>
+              ) : <p aria-hidden="true">&nbsp;</p>}
             </div>
           </div>
           <article ref={articlePanelRef} className="research-article-panel" lang={language}>
