@@ -22,7 +22,7 @@ type FilmSubtitleTranslationFile = {
 }
 
 const FILM_VIDEO_URL = import.meta.env.BASE_URL === '/rf/'
-  ? 'https://media.githubusercontent.com/media/suspiciouscloudgames/rf/main/public/assets/video/resonant-field-film/resonant_field_picture.mp4'
+  ? 'https://media.githubusercontent.com/media/suspiciouscloudgames/rf/main/public/assets/video/resonant-field-film/resonant_field_picture.mp4?v=7b502741'
   : assetUrl('assets/video/resonant-field-film/resonant_field_picture.mp4')
 const FILM_SUBTITLE_URL = assetUrl('assets/video/resonant-field-film/resonant_field_subtitles.json')
 const filmSubtitleTranslationUrls: Partial<Record<Language, string>> = {
