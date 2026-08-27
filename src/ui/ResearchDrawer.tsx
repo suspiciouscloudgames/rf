@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import type { ReactNode } from 'react'
 import { researchArticleBodyAliases, researchArticleLinkPhrases, researchArticles, type ResearchArticleId } from '../content/researchArticles'
 import { researchArticleTranslations } from '../content/researchArticleTranslations'
 import { useExperienceStore, type Language } from '../store/experienceStore'
@@ -27,30 +28,24 @@ const filmSubtitleTranslationUrls: Partial<Record<Language, string>> = {
   en: assetUrl('assets/video/resonant-field-film/resonant_field_subtitles_en.json'),
 }
 
-const filmCueArticleMap: Partial<Record<number, ResearchArticleId>> = {
-  2: 'observation-patterns',
-  3: 'emotion',
-  5: 'affective-field',
-  7: 'emergent-entities',
-  10: 'detector',
-  13: 'companions',
-  14: 'service-app',
-  19: 'characteristics',
-  20: 'real-estate',
-  28: 'end-of-solitude',
+type FilmCueArticleLink = {
+  articleId: ResearchArticleId
+  phrase: Record<Language, string>
 }
 
-const filmCueArticlePhrases: Partial<Record<number, Record<Language, string>>> = {
-  2: { ko: '패턴', ja: 'パターン', en: 'pattern' },
-  3: { ko: '감정', ja: '感情', en: 'emotion' },
-  5: { ko: '감응장', ja: '感応場', en: 'resonant field' },
-  7: { ko: '출현체', ja: '出現体', en: 'entities' },
-  10: { ko: '검출기', ja: '検出器', en: 'detector' },
-  13: { ko: '반려체', ja: '伴侶体', en: 'companion entities' },
-  14: { ko: '서비스 앱', ja: 'サービスアプリ', en: 'service apps' },
-  19: { ko: '반려체', ja: '反侶体', en: 'companion entity' },
-  20: { ko: '부동산', ja: '不動産', en: 'real estate' },
-  28: { ko: '고독의 종말', ja: '孤独の終焉', en: 'the end of solitude' },
+const filmCueArticleLinks: Partial<Record<number, FilmCueArticleLink[]>> = {
+  2: [{ articleId: 'observation-patterns', phrase: { ko: '패턴', ja: 'パターン', en: 'pattern' } }],
+  3: [{ articleId: 'emotion', phrase: { ko: '감정', ja: '感情', en: 'emotion' } }],
+  5: [{ articleId: 'affective-field', phrase: { ko: '감응장', ja: '感応場', en: 'resonant field' } }],
+  7: [
+    { articleId: 'classification', phrase: { ko: '유형', ja: 'タイプ', en: 'types' } },
+    { articleId: 'emergent-entities', phrase: { ko: '출현체', ja: '出現体', en: 'entities' } },
+  ],
+  10: [{ articleId: 'detector', phrase: { ko: '검출기', ja: '検出器', en: 'detector' } }],
+  13: [{ articleId: 'companions', phrase: { ko: '반려체라 부르기 시작했다', ja: '伴侶体と呼び始めた', en: 'companion entities' } }],
+  14: [{ articleId: 'service-app', phrase: { ko: '서비스 앱', ja: 'サービスアプリ', en: 'service apps' } }],
+  20: [{ articleId: 'real-estate', phrase: { ko: '부동산', ja: '不動産', en: 'real estate' } }],
+  28: [{ articleId: 'end-of-solitude', phrase: { ko: '고독의 종말', ja: '孤独の終焉', en: 'the end of solitude' } }],
 }
 
 export function ResearchDrawer() {
@@ -67,10 +62,6 @@ export function ResearchDrawer() {
     filmTime >= subtitle.start && filmTime < subtitle.end
   ))
   const activeSubtitle = activeSubtitleIndex >= 0 ? filmSubtitles[activeSubtitleIndex] : null
-  const linkedArticleId = activeSubtitle ? filmCueArticleMap[activeSubtitle.id] : undefined
-  const linkedPhrase = activeSubtitle ? filmCueArticlePhrases[activeSubtitle.id]?.[language] ?? null : null
-  const cueText = activeSubtitle?.text ?? ''
-  const linkedPhraseIndex = linkedPhrase ? cueText.indexOf(linkedPhrase) : -1
   const selectedArticle = researchArticles.find((article) => article.id === selectedArticleId) ?? researchArticles[0]
   const selectedArticleBody = language === 'ko'
     ? selectedArticle.body
@@ -84,6 +75,38 @@ export function ResearchDrawer() {
   const selectArticle = (articleId: ResearchArticleId) => {
     setSelectedArticleId(articleId)
     articlePanelRef.current?.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  const renderFilmSubtitle = (): ReactNode => {
+    if (!activeSubtitle) return '\u00a0'
+    const matches = (filmCueArticleLinks[activeSubtitle.id] ?? [])
+      .map((link) => {
+        const phrase = link.phrase[language]
+        return { ...link, phrase, index: activeSubtitle.text.indexOf(phrase) }
+      })
+      .filter((link) => link.index >= 0)
+      .sort((a, b) => a.index - b.index)
+    if (matches.length === 0) return activeSubtitle.text
+
+    const parts: ReactNode[] = []
+    let cursor = 0
+    matches.forEach((match) => {
+      parts.push(activeSubtitle.text.slice(cursor, match.index))
+      parts.push(
+        <button
+          key={`${activeSubtitle.id}-${match.articleId}`}
+          type="button"
+          className="research-subtitle-link"
+          onClick={() => selectArticle(match.articleId)}
+        >
+          {match.phrase}
+          <span aria-hidden="true">↗</span>
+        </button>,
+      )
+      cursor = match.index + match.phrase.length
+    })
+    parts.push(activeSubtitle.text.slice(cursor))
+    return parts
   }
 
   const renderArticleBody = () => {
@@ -211,22 +234,9 @@ export function ResearchDrawer() {
               {String(Math.max(0, filmSubtitles.length - Math.max(activeSubtitleIndex, 0))).padStart(2, '0')}
             </span>
             <div className="research-subtitle" aria-live="polite" lang={language}>
-              {activeSubtitle ? (
-                linkedArticleId && linkedPhrase && linkedPhraseIndex >= 0 ? (
-                  <p key={`film-subtitle-${activeSubtitle.id}`}>
-                    {cueText.slice(0, linkedPhraseIndex)}
-                    <button
-                      type="button"
-                      className="research-subtitle-link"
-                      onClick={() => selectArticle(linkedArticleId)}
-                    >
-                      {cueText.slice(linkedPhraseIndex, linkedPhraseIndex + linkedPhrase.length)}
-                      <span aria-hidden="true">↗</span>
-                    </button>
-                    {cueText.slice(linkedPhraseIndex + linkedPhrase.length)}
-                  </p>
-                ) : <p key={`film-subtitle-${activeSubtitle.id}`}>{activeSubtitle.text}</p>
-              ) : <p aria-hidden="true">&nbsp;</p>}
+              <p key={`film-subtitle-${activeSubtitle?.id ?? 'empty'}`} aria-hidden={!activeSubtitle}>
+                {renderFilmSubtitle()}
+              </p>
             </div>
           </div>
           <article ref={articlePanelRef} className="research-article-panel" lang={language}>
