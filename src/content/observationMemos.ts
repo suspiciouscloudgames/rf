@@ -22,16 +22,16 @@ const signal01Memos: Record<Language, ObservationMemo[]> = {
     memo('resident-e', '거주자 E', '같은 존재', '반복형에서 고정형으로 움직임과 특성이 모두 달라졌는데도 E는 같은 반려체가 남아 있을 가능성을 생각했다. 한 존재가 계속 같은 존재이기 위해서는 무엇이 변하지 않아야 할까? 그 동일성을 반려체 안에서 찾을 수 없다면, 같은 장소에서 이어진 관측과 기억이 하나의 존재를 지속시키는 것은 아닐까?'),
   ],
   ja: [
-    memo('resident-a', '居住者 A', '鉢植えと伴侶', 'Aが残した鉢植えとその周囲の伴侶体は、その後、Bがこの場所を経験するための条件となった。互いを認識することもなく、同じ時間を生きてもいない存在たちが、一つの場所を通して互いの生を変えるのなら、彼らはすでに互いにとって伴侶になっていたと言えるだろうか？'),
-    memo('resident-b', '居住者 B', '待つことの解釈', 'Bは反復型の伴侶体を、何かを待っている存在として理解した。その瞬間から、その後の動きもすべて待つことの証しとして読まれ、そうした解釈にもとづく観測が伴侶体の特性を次第に固定していくとすれば、最初の解釈が間違っていたかどうかは、依然として重要なのだろうか？　たとえ誤った認識の仕方であっても、一つの存在を実際に変化させうるのなら、その変化に対する責任は誰にあるのだろうか？'),
-    memo('resident-d', '居住者 D', '死のあと', '猫の死によって一つの生は終わりを迎えたが、猫が留まっていた場所には伴侶体が残っていた。ともに生きてきた存在がいなくなった後も、その存在によって生じた感応が別の存在や場所を変化させ続けるのなら、死とは何の終わりであり、その後も残るものは誰の生に属すると言えるのだろうか？'),
-    memo('resident-e', '居住者 E', '同じ存在', '反復型から固定型へと動きも特性もすべて変わったにもかかわらず、Eは同じ伴侶体が残っている可能性を考えた。一つの存在が同じ存在であり続けるためには、何が変わらずにいなければならないのだろうか？　その同一性を伴侶体の内側に見いだせないのなら、同じ場所で続いてきた観測と記憶が、一つの存在を持続させているのではないだろうか？'),
+    memo('resident-a', '居住者 A', '鉢植えと伴侶', 'Aが残した植木鉢と、そのまわりにいた伴侶体は、あとからここで暮らすBにも影響していた。お互いのことを知らなくても、同じ時間を過ごしていなくても、同じ場所を通して、互いの暮らしが変わるとしたら、彼らはすでに互いにとって伴侶と言えるのだろうか？'),
+    memo('resident-b', '居住者 B', '待つことの解釈', 'Bは、「反復型の伴侶体」を、”何かを待っている存在”だと考えた。それからは、伴侶体がどんな動きをしても、何かを待っているからだと思うようになった。もし、そんなふうにみ続けるうちに、伴侶体の性質そのものが少しずつ固定されていくとしたら、最初の見方が正しかったかどうかは、もう重要ではないのかもしれない。たとえ最初は見誤っていたとしても、それによってある存在が本当に変わってしまうのなら、その変化の責任は誰にあるのだろう。'),
+    memo('resident-d', '居住者 D', '死のあと', '猫が死んでも、いつもいた場所には伴侶体が残っていた。一緒に暮らした存在がいなくなっても、そこから生まれた感応が残り、ほかの存在や場所に影響を与え続けるのだとしたら、ひとつの生は、どこで終わるのだろう。そこに残ったものは、誰の生の一部になっていくのだろう。'),
+    memo('resident-e', '居住者 E', '同じ存在', '反復型から固定型へと動きも性質も変わっていたが、Eは同じ伴侶体が残っているかもしれないと考えた。ひとつの存在が、ずっと同じ存在であり続けるには、何が変わらずに残っていればいいだろうか。もし、その”同じであること”を伴侶体そのものの中に見つけられないとしたら、同じ場所で続けられてきた観測や記憶が、ひとつの存在をつなぎとめているのではないだろうか。'),
   ],
   en: [
-    memo('resident-a', 'RESIDENT A', 'The Pot and Companionship', 'The potted plant A left behind, and the companion around it, later became the conditions through which B experienced this place. If beings who never recognized one another and did not live through the same time nevertheless change one another’s lives through a shared place, could we say that they had already become companions to one another?'),
-    memo('resident-b', 'RESIDENT B', 'Interpreting Waiting', 'B understood the repetitive-type companion as a being that was waiting. From that moment on, every subsequent movement was read as evidence of waiting. If observation shaped by that interpretation gradually fixes the companion’s characteristics, does it still matter whether the first interpretation was wrong? If even a mistaken way of recognizing a being can actually change it, who bears responsibility for that change?'),
-    memo('resident-d', 'RESIDENT D', 'After Death', 'One life ended with the cat’s death, yet a companion remained in the place where the cat used to stay. If the resonance created by a being continues to change other beings and places after the being with whom we lived has disappeared, what does death bring to an end, and to whose life does what remains afterward belong?'),
-    memo('resident-e', 'RESIDENT E', 'The Same Being', 'Although both its movement and characteristics changed from the repetitive type to the fixed type, E considered the possibility that the same companion remained. What must remain unchanged for a being to continue being the same being? If that identity cannot be found within the companion itself, might the observation and memory continued in the same place be what sustains a single being?'),
+    memo('resident-a', 'RESIDENT A', 'The Pot and Companionship', 'The potted plant that A left behind and the companion entity around it affected how B later lived in this place. Even if they don’t know each other or have never spent a minute together, could we still say that their lives were affected by sharing the same space? Then by extension, can we say that they are companion entities to one another?'),
+    memo('resident-b', 'RESIDENT B', 'Interpreting Waiting', 'B understood the recurrent-type companion entity as a being that was waiting for something. From that moment on, all its subsequent movements were read as evidence of waiting. If observations shaped by that interpretation gradually shaped the companion entity’s characteristic, would it still matter whether the initial interpretation was wrong or not? If misrecognition can bring about a real change in a being, who is responsible for that change?'),
+    memo('resident-d', 'RESIDENT D', 'After Death', 'The cat died, but a companion entity remained in the spot where it used to lie. If, even after a being with whom you lived is gone, the resonances it generated continue to affect other beings and places, what does death truly bring to an end? Where does that life end, and to whom does what remains belong?'),
+    memo('resident-e', 'RESIDENT E', 'The Same Being', 'Although both its movements and characteristics changed completely from the recurring-type to the fixed-type, E still considered the possibility that the same companion entity remained. What elements or characteristics must remain the same for a being to continue to be the same being? If its identity cannot be found within the companion entity itself, could it instead be sustained by the observations and memories that continue in the same place?'),
   ],
 }
 
@@ -42,14 +42,14 @@ const signal02Memos: Record<Language, ObservationMemo[]> = {
     memo('resident-e', '거주자 E', '바라본 감정', '거의 움직이지 않는 반려체는 담담함과 체념, 피로와 감각이 무뎌진 절망처럼 서로 다른 상태와 겹칠 수 있다. 같은 움직임을 보고도 전혀 다른 감정을 떠올릴 수 있다면, E가 알아본 것은 반려체의 상태였을까, 아니면 반려체를 통해 바라본 자신의 감정이었을까?'),
   ],
   ja: [
-    memo('resident-c', '居住者 C', '痕跡と物語', 'Cが住んでいた間、この壁は収納棚に隠されており、プラカードを誰が作り、貼ったのかも確認できない。ある痕跡が一人の人間の暮らしていた場所で見つかったという理由だけで、その痕跡をその人と結びつけるなら、私たちは失われた生を復元しているのだろうか、それとも残された物の間に、存在しなかったかもしれない物語を作り出しているのだろうか？'),
-    memo('resident-d', '居住者 D', '過去を呼び込む', 'Dが収納棚を動かさなければ、壁のテープ跡とプラカードは、見えないまま残り続けていただろう。偶然、隠されていた痕跡を発見し、あらためて見つめる行為は、すでに存在していた過去を明らかにすることなのだろうか、それとも過去を現在へと呼び込み、以前とは異なる意味を持たせることなのだろうか？'),
-    memo('resident-e', '居住者 E', '見つめた感情', 'ほとんど動かない伴侶体は、静かな落ち着きや諦念、疲労、そして感覚が麻痺した絶望のような、互いに異なる状態と重なりうる。同じ動きを見てもまったく異なる感情を思い浮かべることができるのなら、Eが見いだしたのは伴侶体の状態だったのだろうか、それとも伴侶体を通して見つめた自分自身の感情だったのだろうか？'),
+    memo('resident-c', '居住者 C', '痕跡と物語', 'Cが住んでいた間、この壁はキャビネットに隠されていた。プラカードを誰が作り、誰が貼ったのかもわからない。誰かが住んでいた場所で見つかったというだけで、その痕跡をその人と結びつけて考えていいのだろうか。そうすることで、もうそこにはない誰かの生きた時間を辿っているのか。それとも残された物をつなぎ合わせて、存在しなかった物語を作り出しているのだろうか？'),
+    memo('resident-d', '居住者 D', '過去を呼び込む', 'Dがキャビネットを動かさなければ、壁のテープ跡もプラカードも、ずっと見つからないままだったはずだ。偶然、隠されていた痕跡を見つけ、もう一度そこに目を向けることは、そこにあった過去を明らかにすることなのだろうか。それとも、過去を今に引き寄せることで、新しい意味が生まれるのだろうか。'),
+    memo('resident-e', '居住者 E', '見つめた感情', 'ほとんど動かない伴侶体は、淡々と落ち着いているようにも、諦めているようにも、疲れ果てているようにも、絶望のあまり何も感じなくなっているようにも見える。同じ動きを見てもそこからまったく違う感情を思い浮かべることができるのなら、Eが見ていたのは、本当の伴侶体だったのだろうか。それとも、伴侶体を通して、自分自身の感情を見ていたのだろうか？'),
   ],
   en: [
-    memo('resident-c', 'RESIDENT C', 'Trace and Narrative', 'While C lived here, this wall was hidden behind a storage cabinet, and it is impossible to confirm who made and attached the placard. If we connect a trace to a person merely because it was found where that person once lived, are we reconstructing a vanished life, or creating among the remaining objects a story that may never have existed?'),
-    memo('resident-d', 'RESIDENT D', 'Calling the Past Forward', 'Had D not moved the storage cabinet, the tape marks and placard on the wall would have remained unseen. Does the act of discovering a trace hidden by chance and looking at it anew reveal a past that already existed, or does it summon the past into the present and give it a meaning different from before?'),
-    memo('resident-e', 'RESIDENT E', 'The Feeling Observed', 'A companion that barely moves may overlap with very different states: composure and resignation, fatigue, or a despair in which sensation has grown numb. If the same movement can evoke entirely different emotions, did E recognize the companion’s condition, or E’s own feelings viewed through the companion?'),
+    memo('resident-c', 'RESIDENT C', 'Trace and Narrative', 'During the time C lived there, this wall was hidden behind a cabinet, and it was impossible to know who made or put the protest sign. If we were to connect the traces left on a place to a person simply because they used to live there, would we be reconstructing a life that has disappeared? Or would we be inventing a story that may never have existed using the remaining objects?'),
+    memo('resident-d', 'RESIDENT D', 'Calling the Past Forward', 'If D had not moved the cabinet, the tape marks and protest sign on the wall would have remained hidden. Is the act of accidentally discovering something hidden and seeing it anew, a way of revealing the past that already existed? Or does it bring the past into the present and give it a different meaning?'),
+    memo('resident-e', 'RESIDENT E', 'The Feeling Observed', 'A companion entity that barely moves could be associated with very different states: calmness, resignation, fatigue, or the numbed sensations of despair. If the same movement can evoke different emotions, did E recognize the companion entity’s state, or is it E’s own emotions as seen through it?'),
   ],
 }
 
@@ -59,12 +59,12 @@ const signal03Memos: Record<Language, ObservationMemo[]> = {
     memo('resident-e', '거주자 E', '개체의 경계', '앱은 E가 관측한 반려체를 D가 기록한 것과 별개의 개체로 구분했다. 그러나 이전의 감응이 완전히 사라지지 않고 새로운 감응과 섞이며 다른 모습으로 변할 수 있다면, 무엇을 기준으로 하나의 반려체가 끝나고 다른 반려체가 시작되었다고 판단할 수 있을까?'),
   ],
   ja: [
-    memo('resident-d', '居住者 D', '場所に残る瞬間', 'Dはまだここに住み始める前だったが、何もない空間を見つめながら、これからの暮らしを想像していた。そのとき急速に広がっていた伴侶体は、以前の居住者が残した感応だったのだろうか、それとも新しい生活を目前にしたDの期待と不安だったのだろうか？　一人の人間の感応は、実際に暮らし始めてから初めて場所に残るのだろうか、それとも自分がそこで暮らす姿を想像した瞬間から始まるのだろうか？'),
+    memo('resident-d', '居住者 D', '場所に残る瞬間', 'Dはまだここに住んでいなかったが、何もない部屋を見ながら、これから始まる生活を思い描いていた。そのとき勢いよく広がっていた伴侶体は、前の居住者が残した感応だったのだろうか。それとも、これからここで暮らすDの期待や不安から生まれたものだっただろうか？　一人の人間の感応は、実際に暮らし始めてから初めて場所に残るのだろうか、それとも自分がそこで暮らす姿を想像した瞬間から始まるのだろうか？'),
     memo('resident-e', '居住者 E', '個体の境界', 'アプリは、Eが観測した伴侶体を、Dが記録したものとは別の個体として区別した。しかし、以前の感応が完全には消えず、新しい感応と混ざりながら別の姿へ変わりうるのなら、何を基準に一つの伴侶体が終わり、別の伴侶体が始まったと判断できるのだろうか？'),
   ],
   en: [
-    memo('resident-d', 'RESIDENT D', 'When Resonance Enters a Place', 'D did not yet live here, but while looking into the empty space, imagined the life that would unfold there. Was the companion spreading rapidly at that moment a resonance left by a previous resident, or D’s expectation and anxiety before a new life? Does a person’s resonance begin to remain in a place only after they actually start living there, or from the moment they imagine themself living there?'),
-    memo('resident-e', 'RESIDENT E', 'The Boundary of an Individual', 'The app classified the companion E observed as an individual distinct from the one D had recorded. Yet if an earlier resonance can remain, mingle with a new one, and change into another form, by what standard can we decide that one companion has ended and another has begun?'),
+    memo('resident-d', 'RESIDENT D', 'When Resonance Enters a Place', 'D had not moved in yet, but was looking at the empty space and imagining the life that lay aheada future life in it. Was the rapidly spreading companion entity the resonance left by a previous resident, or D’s anticipation and anxiety about a new life? Does a person’s resonance begin to remain in a place only once they live there, or from the moment they imagine themselves doing so?'),
+    memo('resident-e', 'RESIDENT E', 'The Boundary of an Individual', 'The app classified the companion entity observed by E as separate from the one recorded by D. But if an earlier resonance can remain, blend with a new one, and take on a different form, how can we determine where one companion entity ends and another begins?'),
   ],
 }
 
@@ -82,10 +82,10 @@ const signal04Memos: Record<Language, ObservationMemo[]> = {
     memo('resident-e', '居住者 E', '失われた条件', 'クローゼットの中の物がすべて捨てられた後、伴侶体は観測されなくなった。伴侶体は消えたのだろうか。それとも、それを認識できるようにしていた条件だけが失われ、もはや感知されない状態でそこに残っているのだろうか？'),
   ],
   en: [
-    memo('resident-b', 'RESIDENT B', 'Labor Made into Emotion', 'The merchandise B was left to carry was both goods to be sold and the cost of unresolved labor, and the companion appeared where those boxes were stacked. The impatience and helplessness that seemed to overlap with the companion were feelings B experienced, but they were produced by conditions of labor B could not resolve. The moment we understand that resonance as B’s companion, do we transform a problem of labor into a problem of emotion that one person must manage alone?'),
-    memo('resident-c', 'RESIDENT C', 'An Event Far Away', 'Through the media, C repeatedly watched violence taking place in a distant region C had never visited. Does an event occur only in the place where it happens, or does it continue to occur in the bodies and living spaces of those who watch it, remember it, and try to respond?'),
-    memo('resident-d', 'RESIDENT D', 'Mail That Never Arrived', 'While keeping mail that continued to arrive for someone who had already left, D confronted C’s unfinished affairs without ever having known C. How far can the resonance surrounding objects that failed to reach their owner remain connected to that person’s unfinished time?'),
-    memo('resident-e', 'RESIDENT E', 'The Vanished Conditions', 'After every object in the closet was discarded, the companion was no longer observed. Did the companion disappear, or did only the conditions that made it recognizable vanish, leaving it there in a state that could no longer be detected?'),
+    memo('resident-b', 'RESIDENT B', 'Labor Made into Emotion', 'The merchandise left with B consisted of objects meant to be sold, but also the unpaid cost of unresolved labor. The companion entity appeared where the boxes had accumulated. The urgency and helplessness associated with the entity were felt by B, but they arose from working conditions B could not resolve. By understanding that resonance as B’s companion entity, do we turn a labor issue into an emotional problem for one person to manage alone?'),
+    memo('resident-c', 'RESIDENT C', 'An Event Far Away', 'Through the media, C repeatedly witnessed violence taking place in a distant region C had never visited. Does an event occur only where it physically takes place, or does it continue in the bodies and living spaces of those who witness, remember, and try to respond to it?'),
+    memo('resident-d', 'RESIDENT D', 'Mail That Never Arrived', 'While keeping mail that continued to arrive for someone who had already left, D encountered C’s unfinished affairs without knowing C. How far can the resonance surrounding objects that never reach their owner remain connected to that person’s unfinished time?'),
+    memo('resident-e', 'RESIDENT E', 'The Vanished Conditions', 'After everything in the closet was discarded, the companion entity was no longer observed. Did the entity disappear, or did only the conditions that made it recognizable disappear, leaving it there in a state that could no longer be detected?'),
   ],
 }
 
@@ -99,8 +99,8 @@ const signal05Memos: Record<Language, ObservationMemo[]> = {
     memo('resident-e', '居住者 E', 'つなぎ止める観測', '餌を置いていた人も、それを待っていた猫も現れず、木も枯れつつあるなかで、誰かの観測によって伴侶体が残り続けているのなら、観測者は消えゆく存在をつなぎ止めているのだろうか。それとも、すでに消えた存在たちに代わる新たな感応を、その場所に加えているのだろうか？'),
   ],
   en: [
-    memo('resident-b', 'RESIDENT B', 'A Being Made Together', 'If a single companion is observed where the resonances of the person who leaves food, the cat that waits for it, and the tree that has long stood in the same place cannot be separated, is that companion one being made together by many beings? Or is it the result of humans gathering distinct resonances they cannot distinguish and recognizing them as a single individual?'),
-    memo('resident-e', 'RESIDENT E', 'Observation That Holds On', 'If neither the person who left the food nor the cat that waited for it appears anymore, and the tree is dying, yet someone’s observation allows the companion to remain, is the observer holding a vanishing being in place? Or are they adding to that place a new resonance that takes the place of beings already gone?'),
+    memo('resident-b', 'RESIDENT B', 'A Being Made Together', 'If a single companion entity is observed when the resonances of the person who leaves the food, the cat that waits for it, and the tree that has long stood in the same place cannot be separated, is that entity a single being created by several beings together? Or is it the result of humans recognizing different, indistinguishable resonances as one entity?'),
+    memo('resident-e', 'RESIDENT E', 'Observation That Holds On', 'If the companion entity persists through someone’s observation even after the person who left the food and the cat that waited for it have stopped appearing and the tree is dying, is the observer holding on to beings that are disappearing, or adding a new resonance to the place in place of those already gone?'),
   ],
 }
 
