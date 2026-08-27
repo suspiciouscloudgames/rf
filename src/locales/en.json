@@ -39,10 +39,11 @@
   "openResearchArchive": "Open research video",
   "closeResearchArchive": "Close research video",
   "referenceText": "REFERENCE TEXT",
-  "welcomeMessageButton": "A message for visitors",
-  "welcomeMessageTitle": "For those who visit this place",
+  "welcomeMessageButton": "A Message for Whoever Comes Here",
+  "welcomeMessageTitle": "A Message for Whoever Comes Here",
   "welcomeMessageParagraphs": [
-    "Hello. I lived here until not long ago. I made this page from the records left by former residents and from what I observed here myself. You might think of it as a small guide to things that might otherwise go unnoticed.",
-    "I do not think I will be able to come back here. If you have a detector, please look for the companion by the window. If you find it, I would be glad if you could leave a record here of how it is doing. If you do not have a detector, I simply hope you feel something good while you are there."
+    "Hello. Until recently, I lived here. I created this page by gathering records left by previous residents and notes from my own observations. You might call it a small guide to things that might otherwise go unnoticed.",
+    "I don’t think I’ll be able to return here. If you have a detector, please look for the companion entity by the window. If you find it, I would be grateful if you could leave a note here about how it is doing.",
+    "If you don’t have a detector, I hope you will simply feel something pleasant there."
   ]
 }
