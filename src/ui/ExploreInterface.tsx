@@ -74,7 +74,6 @@ export function ExploreInterface({ sequentialReveal = false }: ExploreInterfaceP
   const items = residentMemos?.map((memo) => ({
     id: memo.id,
     label: memo.resident,
-    title: memo.title,
     body: getResidentProfile(language, memo.id),
     previewBody: memo.body,
     type: 'text' as const,

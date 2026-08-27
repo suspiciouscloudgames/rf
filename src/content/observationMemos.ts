@@ -3,14 +3,12 @@ import type { Language, SignalId } from '../store/experienceStore'
 export interface ObservationMemo {
   id: string
   resident: string
-  title: string
   body: string
 }
 
-const memo = (id: string, resident: string, title: string, body: string): ObservationMemo => ({
+const memo = (id: string, resident: string, _formerTitle: string, body: string): ObservationMemo => ({
   id,
   resident,
-  title,
   body,
 })
 
