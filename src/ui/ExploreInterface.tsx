@@ -124,7 +124,7 @@ export function ExploreInterface({ sequentialReveal = false }: ExploreInterfaceP
   }, [selectedItemId, setSelectedItem])
 
   return (
-    <div className="explore-interface" lang={language}>
+    <div className={`explore-interface ${selectedItem ? 'has-open-panel' : ''}`} lang={language}>
       <div className="explore-traces">
         {items.map((item, index) => {
           const memoDelay = 0.3 + index * revealStep

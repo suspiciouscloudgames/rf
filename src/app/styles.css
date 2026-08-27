@@ -1064,6 +1064,44 @@ button:focus-visible {
   left: calc(72% - min(420px, 36vw));
   bottom: 7%;
 }
+
+/* Keep every resident selector available while a memo detail is open. */
+.explore-interface.has-open-panel .explore-traces {
+  position: absolute;
+  top: max(7%, calc(env(safe-area-inset-top) + 18px));
+  left: 50%;
+  display: flex;
+  width: min(820px, calc(100vw - 64px));
+  align-items: flex-start;
+  justify-content: center;
+  gap: clamp(10px, 1.4vw, 22px);
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.explore-interface.has-open-panel .memo-cluster,
+.explore-interface.has-open-panel .memo-cluster.memo-reveal {
+  position: relative;
+  top: auto;
+  left: auto;
+  flex: 0 1 154px;
+  width: 154px;
+}
+
+.explore-interface.has-open-panel .resident-introduction {
+  display: none;
+}
+
+.explore-interface.has-open-panel .explore-panel {
+  top: auto;
+  right: auto;
+  bottom: max(9%, calc(env(safe-area-inset-bottom) + 52px));
+  left: 50%;
+  width: min(560px, calc(100vw - 64px));
+  max-width: calc(100vw - 64px);
+  max-height: 46vh;
+  transform: translateX(-50%);
+}
 .explore-panel .narration-index {
   display: block;
   padding-right: 44px;
@@ -1597,6 +1635,20 @@ button:focus-visible {
   .explore-panel .narration-index { font-size: 26px; }
   .explore-panel h2 { font-size: 30px; }
   .explore-panel p { font-size: 25px; }
+
+  .explore-interface.has-open-panel .explore-traces {
+    width: min(1260px, calc(100vw - 180px));
+    gap: 28px;
+  }
+  .explore-interface.has-open-panel .memo-cluster,
+  .explore-interface.has-open-panel .memo-cluster.memo-reveal {
+    flex-basis: 274px;
+    width: 274px;
+  }
+  .explore-interface.has-open-panel .explore-panel {
+    width: min(900px, calc(100vw - 180px));
+    max-width: calc(100vw - 180px);
+  }
 
   .tuning-toggle { min-width: 110px; height: 62px; font-size: 17px; }
   .loader { font-size: 19px; }
