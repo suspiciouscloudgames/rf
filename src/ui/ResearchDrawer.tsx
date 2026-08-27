@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { researchArticleBodyAliases, researchArticleLinkPhrases, researchArticles, type ResearchArticleId } from '../content/researchArticles'
 import { researchArticleTranslations } from '../content/researchArticleTranslations'
-import { useExperienceStore } from '../store/experienceStore'
+import { useExperienceStore, type Language } from '../store/experienceStore'
 import { localeCopy } from '../locales'
 import { assetUrl } from '../lib/assetUrl'
 
@@ -16,8 +16,16 @@ type FilmSubtitleFile = {
   subtitles: FilmSubtitle[]
 }
 
+type FilmSubtitleTranslationFile = {
+  subtitles: Array<Pick<FilmSubtitle, 'id' | 'text'>>
+}
+
 const FILM_VIDEO_URL = assetUrl('assets/video/resonant-field-film/resonant_field_picture.mp4')
 const FILM_SUBTITLE_URL = assetUrl('assets/video/resonant-field-film/resonant_field_subtitles.json')
+const filmSubtitleTranslationUrls: Partial<Record<Language, string>> = {
+  ja: assetUrl('assets/video/resonant-field-film/resonant_field_subtitles_ja.json'),
+  en: assetUrl('assets/video/resonant-field-film/resonant_field_subtitles_en.json'),
+}
 
 const filmCueArticleMap: Partial<Record<number, ResearchArticleId>> = {
   2: 'observation-patterns',
@@ -32,17 +40,17 @@ const filmCueArticleMap: Partial<Record<number, ResearchArticleId>> = {
   28: 'end-of-solitude',
 }
 
-const filmCueArticlePhrases: Partial<Record<number, string>> = {
-  2: '패턴',
-  3: '감정',
-  5: '감응장',
-  7: '출현체',
-  10: '검출기',
-  13: '반려체',
-  14: '서비스 앱',
-  19: '반려체',
-  20: '부동산',
-  28: '고독의 종말',
+const filmCueArticlePhrases: Partial<Record<number, Record<Language, string>>> = {
+  2: { ko: '패턴', ja: 'パターン', en: 'pattern' },
+  3: { ko: '감정', ja: '感情', en: 'emotion' },
+  5: { ko: '감응장', ja: '感応場', en: 'resonant field' },
+  7: { ko: '출현체', ja: '出現体', en: 'entities' },
+  10: { ko: '검출기', ja: '検出器', en: 'detector' },
+  13: { ko: '반려체', ja: '伴侶体', en: 'companion entities' },
+  14: { ko: '서비스 앱', ja: 'サービスアプリ', en: 'service apps' },
+  19: { ko: '반려체', ja: '反侶体', en: 'companion entity' },
+  20: { ko: '부동산', ja: '不動産', en: 'real estate' },
+  28: { ko: '고독의 종말', ja: '孤独の終焉', en: 'the end of solitude' },
 }
 
 export function ResearchDrawer() {
@@ -60,7 +68,7 @@ export function ResearchDrawer() {
   ))
   const activeSubtitle = activeSubtitleIndex >= 0 ? filmSubtitles[activeSubtitleIndex] : null
   const linkedArticleId = activeSubtitle ? filmCueArticleMap[activeSubtitle.id] : undefined
-  const linkedPhrase = activeSubtitle ? filmCueArticlePhrases[activeSubtitle.id] ?? null : null
+  const linkedPhrase = activeSubtitle ? filmCueArticlePhrases[activeSubtitle.id]?.[language] ?? null : null
   const cueText = activeSubtitle?.text ?? ''
   const linkedPhraseIndex = linkedPhrase ? cueText.indexOf(linkedPhrase) : -1
   const selectedArticle = researchArticles.find((article) => article.id === selectedArticleId) ?? researchArticles[0]
@@ -114,14 +122,22 @@ export function ResearchDrawer() {
 
   useEffect(() => {
     const controller = new AbortController()
-    void fetch(FILM_SUBTITLE_URL, { signal: controller.signal })
-      .then((response) => {
-        if (!response.ok) throw new Error(`Unable to load film subtitles: ${response.status}`)
-        return response.json() as Promise<FilmSubtitleFile>
-      })
-      .then((data) => {
-        const subtitles = Array.isArray(data.subtitles)
-          ? data.subtitles.filter((subtitle) => (
+    const translationUrl = filmSubtitleTranslationUrls[language]
+    const fetchJson = async <T,>(url: string) => {
+      const response = await fetch(url, { signal: controller.signal })
+      if (!response.ok) throw new Error(`Unable to load film subtitles: ${response.status}`)
+      return response.json() as Promise<T>
+    }
+    setFilmSubtitles([])
+    void Promise.all([
+      fetchJson<FilmSubtitleFile>(FILM_SUBTITLE_URL),
+      translationUrl
+        ? fetchJson<FilmSubtitleTranslationFile>(translationUrl)
+        : Promise.resolve<FilmSubtitleTranslationFile | null>(null),
+    ])
+      .then(([timedData, translatedData]) => {
+        const timedSubtitles = Array.isArray(timedData.subtitles)
+          ? timedData.subtitles.filter((subtitle) => (
             Number.isFinite(subtitle.id)
             && Number.isFinite(subtitle.start)
             && Number.isFinite(subtitle.end)
@@ -129,14 +145,24 @@ export function ResearchDrawer() {
             && typeof subtitle.text === 'string'
           ))
           : []
-        setFilmSubtitles(subtitles)
+        const translatedText = new Map(
+          Array.isArray(translatedData?.subtitles)
+            ? translatedData.subtitles
+              .filter((subtitle) => Number.isFinite(subtitle.id) && typeof subtitle.text === 'string')
+              .map((subtitle) => [subtitle.id, subtitle.text] as const)
+            : [],
+        )
+        setFilmSubtitles(timedSubtitles.map((subtitle) => ({
+          ...subtitle,
+          text: translatedText.get(subtitle.id) ?? subtitle.text,
+        })))
       })
       .catch((error: unknown) => {
         if (error instanceof DOMException && error.name === 'AbortError') return
         setFilmSubtitles([])
-      })
+    })
     return () => controller.abort()
-  }, [])
+  }, [language])
 
   useEffect(() => {
     const video = videoRef.current
@@ -184,7 +210,7 @@ export function ResearchDrawer() {
             <span className="research-countdown" aria-label={`${Math.max(0, filmSubtitles.length - Math.max(activeSubtitleIndex, 0))}`}>
               {String(Math.max(0, filmSubtitles.length - Math.max(activeSubtitleIndex, 0))).padStart(2, '0')}
             </span>
-            <div className="research-subtitle" aria-live="polite" lang="ko">
+            <div className="research-subtitle" aria-live="polite" lang={language}>
               {activeSubtitle ? (
                 linkedArticleId && linkedPhrase && linkedPhraseIndex >= 0 ? (
                   <p key={`film-subtitle-${activeSubtitle.id}`}>
