@@ -125,7 +125,7 @@ export function PlanMorphApproachRoom() {
           ? 0
           : 1
     const furnitureSinkProgress = observationEntryActive
-      ? 1 - MathUtils.smoothstep(transitionProgress, 0.34, 0.92)
+      ? 1 - MathUtils.smoothstep(transitionProgress, 0.18, 0.72)
       : transition === 'returnToApproach'
         ? MathUtils.smoothstep(transitionProgress, 0.08, 0.82)
         : stage === 'observation'

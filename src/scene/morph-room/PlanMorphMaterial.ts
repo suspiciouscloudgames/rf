@@ -815,9 +815,11 @@ const fragmentShader = /* glsl */ `
       }
     }
 
+    float furniturePresence = furnitureSurfaceMask(firstPoint);
+    float layerReveal = mix(revealFade, max(revealFade, 0.42), furniturePresence);
     vec4 clipPosition = projectionMatrix * modelViewMatrix * vec4(firstPoint, 1.0);
     gl_FragDepth = clipPosition.z / clipPosition.w * 0.5 + 0.5;
-    fragColor = vec4(compositedColor, compositedOpacity * revealFade);
+    fragColor = vec4(compositedColor, compositedOpacity * layerReveal);
   }
 `
 

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import type { CSSProperties } from 'react'
 import { localeCopy } from '../locales'
 import { useExperienceStore } from '../store/experienceStore'
@@ -18,6 +18,7 @@ interface ExploreInterfaceProps {
 }
 
 type RevealStyle = CSSProperties & { '--memo-delay'?: string }
+type PanelPosition = { left: number; top: number }
 
 const memoCharacterDelay = (character: string) => {
   if (/[.!?。！？]/.test(character)) return 300
@@ -87,6 +88,8 @@ export function ExploreInterface({ sequentialReveal = false }: ExploreInterfaceP
     resident: null,
   }))
   const videoRef = useRef<HTMLVideoElement>(null)
+  const panelRef = useRef<HTMLElement>(null)
+  const [panelPosition, setPanelPosition] = useState<PanelPosition | null>(null)
   const selectedItem = items.find((item) => item.id === selectedItemId) ?? null
   const selectedItemNumber = selectedItem ? items.findIndex((item) => item.id === selectedItem.id) + 1 : 0
   const revealSpan = Math.max(zoomDuration - 0.65, 0.8)
@@ -122,6 +125,71 @@ export function ExploreInterface({ sequentialReveal = false }: ExploreInterfaceP
     return () => document.removeEventListener('pointerdown', closeOutsideMemo)
   }, [selectedItemId, setSelectedItem])
 
+  useLayoutEffect(() => {
+    if (!selectedItemId || !panelRef.current) {
+      setPanelPosition(null)
+      return
+    }
+
+    const placePanel = () => {
+      const panel = panelRef.current
+      if (!panel) return
+      const panelRect = panel.getBoundingClientRect()
+      const buttonRects = Array.from(document.querySelectorAll<HTMLElement>('.explore-trace[data-item-id]'))
+        .map((element) => ({ id: element.dataset.itemId, rect: element.getBoundingClientRect() }))
+      const selectedRect = buttonRects.find(({ id }) => id === selectedItemId)?.rect
+      if (!selectedRect) return
+
+      const edge = 24
+      const gap = 18
+      const maxLeft = Math.max(edge, window.innerWidth - panelRect.width - edge)
+      const maxTop = Math.max(edge, window.innerHeight - panelRect.height - edge)
+      const clampLeft = (left: number) => Math.min(Math.max(left, edge), maxLeft)
+      const clampTop = (top: number) => Math.min(Math.max(top, edge), maxTop)
+      const xCandidates = [
+        edge,
+        maxLeft,
+        selectedRect.left - panelRect.width - gap,
+        selectedRect.right + gap,
+        selectedRect.left + selectedRect.width / 2 - panelRect.width / 2,
+        ...buttonRects.flatMap(({ rect }) => [rect.left - panelRect.width - gap, rect.right + gap]),
+      ].map(clampLeft)
+      const yCandidates = [
+        edge,
+        maxTop,
+        selectedRect.top - panelRect.height - gap,
+        selectedRect.bottom + gap,
+        selectedRect.top + selectedRect.height / 2 - panelRect.height / 2,
+        ...buttonRects.flatMap(({ rect }) => [rect.top - panelRect.height - gap, rect.bottom + gap]),
+      ].map(clampTop)
+      const candidates = xCandidates.flatMap((left) => yCandidates.map((top) => ({ left, top })))
+      const selectedCenterX = selectedRect.left + selectedRect.width / 2
+      const selectedCenterY = selectedRect.top + selectedRect.height / 2
+      const score = ({ left, top }: PanelPosition) => {
+        const right = left + panelRect.width
+        const bottom = top + panelRect.height
+        const overlap = buttonRects.reduce((total, { rect }) => {
+          const obstacleLeft = rect.left - gap
+          const obstacleTop = rect.top - gap
+          const obstacleRight = rect.right + gap
+          const obstacleBottom = rect.bottom + gap
+          const width = Math.max(0, Math.min(right, obstacleRight) - Math.max(left, obstacleLeft))
+          const height = Math.max(0, Math.min(bottom, obstacleBottom) - Math.max(top, obstacleTop))
+          return total + width * height
+        }, 0)
+        const centerX = left + panelRect.width / 2
+        const centerY = top + panelRect.height / 2
+        return overlap * 10_000 + Math.hypot(centerX - selectedCenterX, centerY - selectedCenterY)
+      }
+      const best = candidates.reduce((current, candidate) => score(candidate) < score(current) ? candidate : current)
+      setPanelPosition(best)
+    }
+
+    placePanel()
+    window.addEventListener('resize', placePanel)
+    return () => window.removeEventListener('resize', placePanel)
+  }, [language, selectedItemId])
+
   return (
     <div className={`explore-interface ${selectedItem ? 'has-open-panel' : ''}`} lang={language}>
       <div className="explore-traces">
@@ -131,6 +199,7 @@ export function ExploreInterface({ sequentialReveal = false }: ExploreInterfaceP
             <button
               type="button"
               className={`explore-trace ${selectedItemId === item.id ? 'active' : ''}`}
+              data-item-id={item.id}
               onClick={() => setSelectedItem(selectedItemId === item.id ? null : item.id)}
               aria-pressed={selectedItemId === item.id}
               aria-label={`${item.label} — ${openRecordLabel}`}
@@ -139,18 +208,19 @@ export function ExploreInterface({ sequentialReveal = false }: ExploreInterfaceP
               <span className="memo-open-symbol" aria-hidden="true">↗</span>
             </button>
           )
-          if (!sequentialReveal) return <div key={item.id} className={`memo-cluster trace-${index + 1}`}>{button}</div>
+          if (!sequentialReveal) return <div key={item.id} className={`memo-cluster trace-${index + 1}`} data-item-id={item.id}>{button}</div>
           return (
             <button
               key={item.id}
               type="button"
               className={`memo-cluster memo-reveal trace-${index + 1}`}
+              data-item-id={item.id}
               style={{ '--memo-delay': `${memoDelay}s` } as RevealStyle}
               onClick={() => setSelectedItem(selectedItemId === item.id ? null : item.id)}
               aria-pressed={selectedItemId === item.id}
               aria-label={`${item.label} — ${openRecordLabel}`}
             >
-              <span className={`explore-trace ${selectedItemId === item.id ? 'active' : ''}`}>
+              <span className={`explore-trace ${selectedItemId === item.id ? 'active' : ''}`} data-item-id={item.id}>
                 {item.label}
                 <span className="memo-open-symbol" aria-hidden="true">↗</span>
               </span>
@@ -160,7 +230,13 @@ export function ExploreInterface({ sequentialReveal = false }: ExploreInterfaceP
         })}
       </div>
       {selectedItem ? (
-        <aside className={`explore-panel panel-trace-${selectedItemNumber}`}>
+        <aside
+          ref={panelRef}
+          className={`explore-panel panel-trace-${selectedItemNumber}`}
+          style={panelPosition
+            ? { left: panelPosition.left, top: panelPosition.top, right: 'auto', bottom: 'auto' }
+            : { visibility: 'hidden' }}
+        >
           <button type="button" className="explore-close" onClick={() => setSelectedItem(null)} aria-label={copy.closeTrace}>×</button>
           <span className="narration-index">{selectedItem.resident ?? `${copy.trace} / ${String(selectedItemNumber).padStart(2, '0')}`}</span>
           {selectedItem.type === 'video' ? (

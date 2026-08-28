@@ -140,7 +140,7 @@ function PhotoCard({ placement, index }: { placement: PhotoPlacement; index: num
     const exit = placement.fade == null
       ? 1
       : 1 - smoothRange(progress, placement.fade, Math.min(placement.fade + 0.2, 1))
-    const opacity = active ? entrance * exit * (stage === 'observation' ? 0.8 : 0.84) : 0
+    const opacity = active ? entrance * exit * (stage === 'observation' ? 0.76 : 0.8) : 0
     mesh.current.visible = opacity > 0.002
     material.current.opacity = opacity
     const drift = Math.sin(clock.elapsedTime * 0.42 + index * 2.1) * 0.012
