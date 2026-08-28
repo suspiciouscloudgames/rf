@@ -31,6 +31,7 @@ const filmSubtitleTranslationUrls: Partial<Record<Language, string>> = {
 type FilmCueArticleLink = {
   articleId: ResearchArticleId
   phrase: Record<Language, string>
+  matchPhrase?: Partial<Record<Language, string>>
 }
 
 const filmCueArticleLinks: Partial<Record<number, FilmCueArticleLink[]>> = {
@@ -42,7 +43,11 @@ const filmCueArticleLinks: Partial<Record<number, FilmCueArticleLink[]>> = {
     { articleId: 'emergent-entities', phrase: { ko: '출현체', ja: '出現体', en: 'entities' } },
   ],
   10: [{ articleId: 'detector', phrase: { ko: '검출기', ja: '検出器', en: 'detector' } }],
-  13: [{ articleId: 'companions', phrase: { ko: '반려체라 부르기 시작했다', ja: '伴侶体と呼び始めた', en: 'companion entities' } }],
+  13: [{
+    articleId: 'companions',
+    phrase: { ko: '반려체', ja: '伴侶体', en: 'companion entities' },
+    matchPhrase: { ko: '반려체라 부르기 시작했다', ja: '伴侶体と呼び始めた' },
+  }],
   14: [{ articleId: 'service-app', phrase: { ko: '서비스 앱', ja: 'サービスアプリ', en: 'service apps' } }],
   20: [{ articleId: 'real-estate', phrase: { ko: '부동산', ja: '不動産', en: 'real estate' } }],
   28: [{ articleId: 'end-of-solitude', phrase: { ko: '고독의 종말', ja: '孤独の終焉', en: 'the end of solitude' } }],
@@ -82,7 +87,11 @@ export function ResearchDrawer() {
     const matches = (filmCueArticleLinks[activeSubtitle.id] ?? [])
       .map((link) => {
         const phrase = link.phrase[language]
-        return { ...link, phrase, index: activeSubtitle.text.indexOf(phrase) }
+        const matchPhrase = link.matchPhrase?.[language] ?? phrase
+        const matchIndex = activeSubtitle.text.indexOf(matchPhrase)
+        const phraseOffset = matchPhrase.indexOf(phrase)
+        const index = matchIndex >= 0 && phraseOffset >= 0 ? matchIndex + phraseOffset : -1
+        return { ...link, phrase, index }
       })
       .filter((link) => link.index >= 0)
       .sort((a, b) => a.index - b.index)
