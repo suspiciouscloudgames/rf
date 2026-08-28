@@ -80,15 +80,13 @@ button:focus-visible {
 
 /* iPad Safari promotes these full-screen textures to composited layers. Moving
    those layers every few frames reads as a viewport shake, so keep the grain
-   but leave the layers stationary on touch WebKit devices. */
+   but leave the layers stationary on iOS WebKit regardless of pointer type. */
 @supports (-webkit-touch-callout: none) {
-  @media (hover: none), (pointer: coarse) {
-    .morph-film-overlay,
-    .noise {
-      animation: none;
-      transform: none;
-      filter: none;
-    }
+  .morph-film-overlay,
+  .noise {
+    animation: none;
+    transform: none;
+    filter: none;
   }
 }
 
