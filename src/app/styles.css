@@ -184,7 +184,7 @@ button:focus-visible {
   transition: filter 180ms ease;
 }
 
-.interface.effect-active {
+.interface.effect-active:not(.resident-panel-open) {
   filter: contrast(1.18) saturate(0.82);
   animation: chromatic-shiver 1.6s steps(2, end) infinite;
 }

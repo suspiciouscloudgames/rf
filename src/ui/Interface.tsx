@@ -19,6 +19,7 @@ export function Interface() {
   const effectActive = useExperienceStore((store) => store.effectActive)
   const observationMode = useExperienceStore((store) => store.observationMode)
   const selectedSignalId = useExperienceStore((store) => store.selectedSignalId)
+  const selectedExploreItemId = useExperienceStore((store) => store.selectedExploreItemId)
   const beginReturn = useExperienceStore((store) => store.beginReturn)
   const setLanguage = useExperienceStore((store) => store.setLanguage)
   const animateApproachRecord = useExperienceStore((store) => store.animateApproachRecord)
@@ -32,6 +33,7 @@ export function Interface() {
     transition === 'approachToObservation'
     || (stage === 'observation' && transition === 'none')
   )
+  const residentPanelOpen = showResidentMemos && selectedExploreItemId !== null
 
   useEffect(() => {
     document.documentElement.lang = language
@@ -47,7 +49,7 @@ export function Interface() {
   }, [isWelcomeOpen])
 
   return (
-    <div className={`interface state-${stage} transition-${transition} ${effectActive ? 'effect-active' : ''}`}>
+    <div className={`interface state-${stage} transition-${transition} ${effectActive ? 'effect-active' : ''} ${residentPanelOpen ? 'resident-panel-open' : ''}`}>
       {stage === 'hub' && transition === 'none' ? (
         <>
           <ResearchDrawer />
