@@ -101,6 +101,7 @@ export function App() {
       {tuningPanelEnabled ? <TuningPanel /> : null}
       <div className="scanlines" aria-hidden="true" />
       <div className="noise" aria-hidden="true" />
+      <div className="ipad-mask-frame" aria-hidden="true" />
       {stage === 'loading' ? (
         <div className="loader" role="status">
           <span className="loader-mark" />
