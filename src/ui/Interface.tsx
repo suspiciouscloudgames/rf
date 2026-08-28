@@ -110,9 +110,11 @@ export function Interface() {
             <TypewriterText
               text={approachRecord.body}
               className="approach-record-text"
-              characterDelay={stabilizeApproachRecord ? 30 : 52}
-              sentenceDelay={stabilizeApproachRecord ? 100 : 220}
-              charactersPerTick={stabilizeApproachRecord ? 2 : 1}
+              characterDelay={stabilizeApproachRecord
+                ? (language === 'ko' ? 60 : language === 'ja' ? 45 : 38)
+                : 52}
+              sentenceDelay={stabilizeApproachRecord ? 160 : 220}
+              charactersPerTick={1}
               autoScroll
               instant={!animateApproachRecord}
             />
