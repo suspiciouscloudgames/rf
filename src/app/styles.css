@@ -1134,8 +1134,8 @@ button:focus-visible {
   outline: 0;
   color: rgba(246,241,230,.86);
   background:
-    radial-gradient(circle at 18% 12%, rgba(74, 83, 65, .18), transparent 48%),
-    linear-gradient(135deg, rgba(24, 31, 27, .6), rgba(9, 15, 13, .52));
+    radial-gradient(circle at 18% 12%, rgba(74, 83, 65, .1), transparent 48%),
+    linear-gradient(135deg, rgba(24, 31, 27, .42), rgba(9, 15, 13, .34));
   box-shadow: 0 20px 52px rgba(0, 0, 0, .22);
   -webkit-backdrop-filter: blur(32px) saturate(.42) brightness(.46);
   backdrop-filter: blur(32px) saturate(.42) brightness(.46);
