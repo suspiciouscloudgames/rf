@@ -542,7 +542,9 @@ button:focus-visible {
   padding: 30px 31px 36px;
   border-left: 0;
   color: #beb7aa;
-  background: linear-gradient(135deg, #111413, #0d100f 72%);
+  background: linear-gradient(135deg, rgba(19, 28, 23, .78), rgba(8, 14, 11, .66) 72%);
+  -webkit-backdrop-filter: blur(16px) saturate(.72);
+  backdrop-filter: blur(16px) saturate(.72);
   scrollbar-color: rgba(76, 106, 83, .56) transparent;
   scrollbar-width: thin;
   font-family: "Nanum Myeongjo", AppleMyungjo, "Noto Serif KR", "Times New Roman", serif;
