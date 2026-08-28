@@ -777,6 +777,7 @@ button:focus-visible {
   overscroll-behavior: contain;
   touch-action: pan-y;
   -webkit-overflow-scrolling: touch;
+  scrollbar-gutter: stable;
   contain: layout paint;
   padding: 20px 22px 24px;
   scrollbar-color: rgba(76, 106, 83, .52) transparent;
@@ -812,9 +813,6 @@ button:focus-visible {
     backdrop-filter: none;
   }
 
-  .approach-record .type-cursor {
-    display: none;
-  }
 }
 
 .scene-signal-button {

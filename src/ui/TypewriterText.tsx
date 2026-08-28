@@ -5,6 +5,7 @@ interface TypewriterTextProps {
   className?: string
   characterDelay?: number
   sentenceDelay?: number
+  charactersPerTick?: number
   autoScroll?: boolean
   instant?: boolean
 }
@@ -21,6 +22,7 @@ export function TypewriterText({
   className = 'narration-text',
   characterDelay = 38,
   sentenceDelay = 220,
+  charactersPerTick = 1,
   autoScroll = false,
   instant = false,
 }: TypewriterTextProps) {
@@ -61,12 +63,16 @@ export function TypewriterText({
 
   useEffect(() => {
     if (visibleLength >= text.length) return
+    const nextLength = Math.min(text.length, visibleLength + charactersPerTick)
+    const revealedChunk = text.slice(visibleLength, nextLength)
+    const delayCharacter = [...revealedChunk].reverse().find((character) => /[.!?。！？,、\s]/.test(character))
+      ?? revealedChunk.charAt(revealedChunk.length - 1)
     const timer = window.setTimeout(
-      () => setVisibleLength((length) => length + 1),
-      delayForCharacter(text[Math.max(0, visibleLength - 1)] ?? '', characterDelay, sentenceDelay),
+      () => setVisibleLength(nextLength),
+      delayForCharacter(delayCharacter, characterDelay, sentenceDelay),
     )
     return () => window.clearTimeout(timer)
-  }, [characterDelay, sentenceDelay, text, visibleLength])
+  }, [characterDelay, charactersPerTick, sentenceDelay, text, visibleLength])
 
   useLayoutEffect(() => {
     if (!autoScroll || autoScrollStoppedRef.current || !paragraphRef.current) return
