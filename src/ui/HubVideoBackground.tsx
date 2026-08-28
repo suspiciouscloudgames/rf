@@ -10,6 +10,10 @@ type HubVideoStyle = CSSProperties & {
   '--hub-video-fade-out-seconds': string
 }
 
+const HUB_VIDEO_URL = import.meta.env.BASE_URL === '/rf/'
+  ? 'https://media.githubusercontent.com/media/suspiciouscloudgames/rf/main/public/assets/hub-background.mp4?v=d4670243'
+  : assetUrl('assets/hub-background.mp4')
+
 export function HubVideoBackground() {
   const videoRef = useRef<HTMLVideoElement>(null)
   const shouldPlay = useExperienceStore(
@@ -49,7 +53,7 @@ export function HubVideoBackground() {
     >
       <video
         ref={videoRef}
-        src={assetUrl('assets/hub-background.mp4')}
+        src={HUB_VIDEO_URL}
         muted
         loop
         playsInline

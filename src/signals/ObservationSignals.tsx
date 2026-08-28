@@ -2,16 +2,14 @@ import { Html } from '@react-three/drei'
 import { useFrame } from '@react-three/fiber'
 import { useMemo, useRef } from 'react'
 import type { CSSProperties } from 'react'
-import { Color, MeshBasicMaterial, Quaternion, Vector3, type Group, type Mesh } from 'three'
+import { Quaternion, Vector3, type Group } from 'three'
 import { localeCopy } from '../locales'
 import { useExperienceStore } from '../store/experienceStore'
 import { observationSignals, type ObservationSignalConfig } from './signalData'
 import { consumeSignalTapSuppression } from '../interaction/orbitGesture'
-import { useTuningStore } from '../store/tuningStore'
 import { useRoomVisualModeStore } from '../store/roomVisualModeStore'
 
 const forward = new Vector3(0, 0, 1)
-const HAL_RED = '#ff2418'
 
 type SignalButtonStyle = CSSProperties & { '--signal-phase'?: string }
 
@@ -22,11 +20,8 @@ function ObservationSignal({ signal }: { signal: ObservationSignalConfig }) {
   const language = useExperienceStore((store) => store.language)
   const enterApproach = useExperienceStore((store) => store.enterApproach)
   const enterObservation = useExperienceStore((store) => store.enterObservation)
-  const preserveFullHub = useTuningStore((store) => store.hubPersistenceMode === 'fullHub')
   const roomVisualMode = useRoomVisualModeStore((store) => store.mode)
   const group = useRef<Group>(null)
-  const ring = useRef<Mesh>(null)
-  const core = useRef<Mesh>(null)
   const targetScaleVector = useRef(new Vector3(1, 1, 1))
   const hubPosition = useMemo(() => new Vector3(...signal.hubAnchor), [signal.hubAnchor])
   const approachPosition = useMemo(() => new Vector3(), [])
@@ -35,7 +30,6 @@ function ObservationSignal({ signal }: { signal: ObservationSignalConfig }) {
     const normal = new Vector3(...signal.normal).normalize()
     return new Quaternion().setFromUnitVectors(forward, normal)
   }, [signal.normal])
-  const signalRed = useMemo(() => new Color(HAL_RED), [])
   const isSelected = selectedSignalId === signal.id
   const inHub = stage === 'hub'
   const inApproach = stage === 'approach'
@@ -43,15 +37,11 @@ function ObservationSignal({ signal }: { signal: ObservationSignalConfig }) {
     || transition === 'approachToObservation'
     || transition === 'returnToApproach'
   const isActionable = transition === 'none' && (inHub || inApproach)
-  const visuallyActive = !observationLayerHidden && (inHub || preserveFullHub || isSelected)
   const copy = localeCopy[language]
   const actionLabel = inApproach ? copy.approachAction : copy.hubAction
 
   useFrame(({ clock, camera, scene }, delta) => {
-    if (!group.current || !ring.current || !core.current) return
-    const pulseWave = Math.sin(clock.elapsedTime * 1.45 + signal.phase)
-    const ringPulse = 1 + pulseWave * 0.18
-    const corePulse = 1 + pulseWave * 0.045
+    if (!group.current) return
     const transitionProgress = Number(camera.userData.transitionProgress ?? 0)
     const planRoom = roomVisualMode === 'morph-plan'
       ? scene.getObjectByName('plan-morph-approach-room')
@@ -88,17 +78,6 @@ function ObservationSignal({ signal }: { signal: ObservationSignalConfig }) {
     const apertureProgress = transition === 'approachToObservation' && isSelected ? transitionProgress : 0
     const targetScale = apertureProgress > 0 ? 1.2 + apertureProgress * 5.8 : isSelected && transition !== 'none' ? 1.24 : 1
     group.current.scale.lerp(targetScaleVector.current.setScalar(targetScale), Math.min(delta * 5, 1))
-    ring.current.scale.setScalar(ringPulse)
-    ring.current.rotation.z += delta * (0.11 + signal.phase * 0.004)
-    core.current.scale.setScalar(corePulse)
-    const observationFade = apertureProgress > 0.62 ? 1 - (apertureProgress - 0.62) / 0.38 : 1
-    const targetOpacity = visuallyActive
-      ? (isSelected || selectedSignalId === null ? 0.82 * observationFade : 0.14)
-      : 0
-    const ringMaterial = ring.current.material as MeshBasicMaterial
-    const coreMaterial = core.current.material as MeshBasicMaterial
-    ringMaterial.opacity += (targetOpacity - ringMaterial.opacity) * Math.min(delta * 7, 1)
-    coreMaterial.opacity += (Math.min(1, targetOpacity + 0.16) - coreMaterial.opacity) * Math.min(delta * 7, 1)
   })
 
   const selectSignal = () => {
@@ -116,15 +95,6 @@ function ObservationSignal({ signal }: { signal: ObservationSignalConfig }) {
       quaternion={orientation}
       userData={{ signalId: signal.id, observationId: signal.observationId }}
     >
-      <mesh ref={ring}>
-        <torusGeometry args={[0.16, 0.008, 8, 48]} />
-        <meshBasicMaterial color={signalRed} transparent opacity={0.68} depthWrite={false} />
-      </mesh>
-      <mesh ref={core}>
-        <sphereGeometry args={[0.047, 24, 24]} />
-        <meshBasicMaterial color={signalRed} transparent opacity={0.98} depthWrite={false} />
-      </mesh>
-      <pointLight intensity={observationLayerHidden ? 0 : isSelected ? 4.2 : 2.1} distance={1.05} color={signalRed} />
       <Html center transform={false} zIndexRange={[8, 3]}>
         <button
           type="button"
