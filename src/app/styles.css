@@ -1204,6 +1204,14 @@ button:focus-visible {
   animation: noise-shift .32s steps(2) infinite;
 }
 
+/* Keep the same noise texture on iPad without moving its full-screen layer. */
+@supports (-webkit-touch-callout: none) {
+  .noise {
+    animation: none;
+    transform: none;
+  }
+}
+
 .loader {
   position: absolute;
   inset: 0;
