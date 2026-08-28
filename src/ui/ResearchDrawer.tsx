@@ -21,9 +21,7 @@ type FilmSubtitleTranslationFile = {
   subtitles: Array<Pick<FilmSubtitle, 'id' | 'text'>>
 }
 
-const FILM_VIDEO_URL = import.meta.env.BASE_URL === '/rf/'
-  ? 'https://media.githubusercontent.com/media/suspiciouscloudgames/rf/main/public/assets/video/resonant-field-film/resonant_field_picture.mp4?v=7b502741'
-  : assetUrl('assets/video/resonant-field-film/resonant_field_picture.mp4')
+const FILM_VIDEO_URL = assetUrl('assets/video/resonant-field-film/resonant_field_picture.mp4')
 const FILM_SUBTITLE_URL = assetUrl('assets/video/resonant-field-film/resonant_field_subtitles.json')
 const filmSubtitleTranslationUrls: Partial<Record<Language, string>> = {
   ja: assetUrl('assets/video/resonant-field-film/resonant_field_subtitles_ja.json'),
@@ -223,7 +221,6 @@ export function ResearchDrawer() {
             <video
               ref={videoRef}
               className="research-video"
-              src={FILM_VIDEO_URL}
               muted
               loop
               playsInline
@@ -231,7 +228,9 @@ export function ResearchDrawer() {
               aria-hidden="true"
               onTimeUpdate={(event) => setFilmTime(event.currentTarget.currentTime)}
               onSeeked={(event) => setFilmTime(event.currentTarget.currentTime)}
-            />
+            >
+              <source src={FILM_VIDEO_URL} type="video/mp4" />
+            </video>
             <span className="research-countdown" aria-label={`${Math.max(0, filmSubtitles.length - Math.max(activeSubtitleIndex, 0))}`}>
               {String(Math.max(0, filmSubtitles.length - Math.max(activeSubtitleIndex, 0))).padStart(2, '0')}
             </span>

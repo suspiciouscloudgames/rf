@@ -10,9 +10,7 @@ type HubVideoStyle = CSSProperties & {
   '--hub-video-fade-out-seconds': string
 }
 
-const HUB_VIDEO_URL = import.meta.env.BASE_URL === '/rf/'
-  ? 'https://media.githubusercontent.com/media/suspiciouscloudgames/rf/main/public/assets/hub-background.mp4?v=d4670243'
-  : assetUrl('assets/hub-background.mp4')
+const HUB_VIDEO_URL = assetUrl('assets/hub-background.mp4')
 
 export function HubVideoBackground() {
   const videoRef = useRef<HTMLVideoElement>(null)
@@ -53,12 +51,14 @@ export function HubVideoBackground() {
     >
       <video
         ref={videoRef}
-        src={HUB_VIDEO_URL}
+        autoPlay
         muted
         loop
         playsInline
         preload="auto"
-      />
+      >
+        <source src={HUB_VIDEO_URL} type="video/mp4" />
+      </video>
       <span className="hub-video-scrim" />
     </div>
   )

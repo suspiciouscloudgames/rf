@@ -717,7 +717,8 @@ button:focus-visible {
   padding: 20px 22px 24px;
   border-left: 0;
   color: #c9c3b8;
-  background: linear-gradient(90deg, rgba(5, 7, 8, .82), rgba(5, 7, 8, .26));
+  background: linear-gradient(90deg, rgba(5, 7, 8, .68), rgba(5, 7, 8, .14));
+  -webkit-backdrop-filter: blur(9px);
   backdrop-filter: blur(9px);
   scrollbar-color: rgba(76, 106, 83, .52) transparent;
   scrollbar-width: thin;
@@ -816,7 +817,7 @@ button:focus-visible {
   bottom: max(28px, env(safe-area-inset-bottom));
   min-width: 152px;
   min-height: 52px;
-  border: 1px solid rgba(232, 230, 221, .32);
+  border: 1px solid var(--hub-key-bright);
   color: #e7e2d7;
   background: rgba(5, 7, 8, .72);
   backdrop-filter: blur(9px);
@@ -1059,10 +1060,11 @@ button:focus-visible {
   border-left: 0;
   color: rgba(246,241,230,.86);
   background:
-    radial-gradient(circle at 18% 12%, rgba(240, 232, 203, .22), transparent 46%),
-    linear-gradient(135deg, rgba(186, 184, 162, .62), rgba(97, 109, 90, .56));
-  box-shadow: inset 0 0 0 1px rgba(246, 239, 219, .16), 0 16px 44px rgba(0, 0, 0, .22);
-  backdrop-filter: blur(22px) saturate(.48) brightness(.68) contrast(.92);
+    radial-gradient(circle at 18% 12%, rgba(74, 83, 65, .28), transparent 48%),
+    linear-gradient(135deg, rgba(24, 31, 27, .78), rgba(9, 15, 13, .72));
+  box-shadow: inset 0 0 0 1px rgba(215, 221, 201, .1), 0 18px 48px rgba(0, 0, 0, .34);
+  -webkit-backdrop-filter: blur(32px) saturate(.42) brightness(.46);
+  backdrop-filter: blur(32px) saturate(.42) brightness(.46);
   pointer-events: auto;
   overflow-y: auto;
 }

@@ -26,10 +26,36 @@ export function TypewriterText({
 }: TypewriterTextProps) {
   const [visibleLength, setVisibleLength] = useState(instant ? text.length : 0)
   const paragraphRef = useRef<HTMLParagraphElement>(null)
+  const autoScrollStoppedRef = useRef(false)
 
   useEffect(() => {
+    autoScrollStoppedRef.current = false
     setVisibleLength(instant ? text.length : 0)
   }, [instant, text])
+
+  useEffect(() => {
+    if (!autoScroll || !paragraphRef.current) return
+    const container = paragraphRef.current.parentElement
+    if (!container) return
+
+    const stopAutoScroll = () => {
+      autoScrollStoppedRef.current = true
+    }
+    const stopFromScrollbar = (event: PointerEvent) => {
+      const bounds = container.getBoundingClientRect()
+      const scrollbarWidth = Math.max(14, container.offsetWidth - container.clientWidth + 8)
+      if (event.clientX >= bounds.right - scrollbarWidth) stopAutoScroll()
+    }
+
+    container.addEventListener('wheel', stopAutoScroll, { passive: true })
+    container.addEventListener('touchmove', stopAutoScroll, { passive: true })
+    container.addEventListener('pointerdown', stopFromScrollbar)
+    return () => {
+      container.removeEventListener('wheel', stopAutoScroll)
+      container.removeEventListener('touchmove', stopAutoScroll)
+      container.removeEventListener('pointerdown', stopFromScrollbar)
+    }
+  }, [autoScroll, text])
 
   useEffect(() => {
     if (visibleLength >= text.length) return
@@ -41,7 +67,7 @@ export function TypewriterText({
   }, [characterDelay, sentenceDelay, text, visibleLength])
 
   useEffect(() => {
-    if (!autoScroll || !paragraphRef.current) return
+    if (!autoScroll || autoScrollStoppedRef.current || !paragraphRef.current) return
     const container = paragraphRef.current.parentElement
     if (container) container.scrollTop = container.scrollHeight
   }, [autoScroll, visibleLength])
