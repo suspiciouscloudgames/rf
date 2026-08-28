@@ -10,6 +10,11 @@ import { useTuningStore } from '../store/tuningStore'
 import { ResearchDrawer } from './ResearchDrawer'
 import { getApproachContent } from '../content/approachContent'
 
+const isAppleTouchDevice = () => typeof navigator !== 'undefined' && (
+  /iPad|iPhone|iPod/.test(navigator.userAgent)
+  || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+)
+
 export function Interface() {
   const [isWelcomeOpen, setIsWelcomeOpen] = useState(false)
   const stage = useExperienceStore((store) => store.stage)
@@ -26,6 +31,7 @@ export function Interface() {
   const copy = localeCopy[language]
   const focusCopy = getFocusContent(language, selectedSignalId)
   const approachRecord = getApproachContent(language, selectedSignalId)
+  const stabilizeApproachRecord = isAppleTouchDevice()
   const portalObservation = hasDepthPortal(selectedSignalId)
   const residentMemoObservation = selectedSignalId !== null
   const showResidentMemos = residentMemoObservation && (
@@ -109,8 +115,8 @@ export function Interface() {
               text={approachRecord.body}
               className="approach-record-text"
               characterDelay={52}
-              autoScroll
-              instant={!animateApproachRecord}
+              autoScroll={!stabilizeApproachRecord}
+              instant={!animateApproachRecord || stabilizeApproachRecord}
             />
           </div>
         </aside>

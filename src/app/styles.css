@@ -88,6 +88,7 @@ button:focus-visible {
     transform: none;
     filter: none;
   }
+
 }
 
 .experience-shell.state-loading .morph-film-overlay,
@@ -776,6 +777,18 @@ button:focus-visible {
   letter-spacing: .012em;
   word-break: keep-all;
   white-space: pre-line;
+}
+
+@supports (-webkit-touch-callout: none) {
+  .approach-record {
+    background: linear-gradient(90deg, rgba(5, 7, 8, .72), rgba(5, 7, 8, .28));
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+
+  .approach-record .type-cursor {
+    display: none;
+  }
 }
 
 .scene-signal-button {
