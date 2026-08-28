@@ -806,6 +806,12 @@ button:focus-visible {
   white-space: pre-line;
 }
 
+.approach-record[lang="ja"] .approach-record-text {
+  word-break: normal;
+  line-break: strict;
+  overflow-wrap: anywhere;
+}
+
 @supports (-webkit-touch-callout: none) {
   .approach-record {
     background: linear-gradient(90deg, rgba(5, 7, 8, .72), rgba(5, 7, 8, .28));
