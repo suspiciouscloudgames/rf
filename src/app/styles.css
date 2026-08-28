@@ -763,7 +763,7 @@ button:focus-visible {
   overflow: hidden;
   border-left: 0;
   color: #c9c3b8;
-  background: linear-gradient(90deg, rgba(5, 7, 8, .52), rgba(5, 7, 8, .08));
+  background: linear-gradient(90deg, rgba(5, 7, 8, .4), rgba(5, 7, 8, .04));
   -webkit-backdrop-filter: blur(14px) saturate(.72);
   backdrop-filter: blur(14px) saturate(.72);
   pointer-events: auto;
@@ -814,7 +814,7 @@ button:focus-visible {
 
 @supports (-webkit-touch-callout: none) {
   .approach-record {
-    background: linear-gradient(90deg, rgba(5, 7, 8, .72), rgba(5, 7, 8, .28));
+    background: linear-gradient(90deg, rgba(5, 7, 8, .5), rgba(5, 7, 8, .12));
     -webkit-backdrop-filter: blur(10px) saturate(.72);
     backdrop-filter: blur(10px) saturate(.72);
   }
