@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 
 interface TypewriterTextProps {
   text: string
@@ -27,9 +27,11 @@ export function TypewriterText({
   const [visibleLength, setVisibleLength] = useState(instant ? text.length : 0)
   const paragraphRef = useRef<HTMLParagraphElement>(null)
   const autoScrollStoppedRef = useRef(false)
+  const lastAutoScrollHeightRef = useRef(0)
 
   useEffect(() => {
     autoScrollStoppedRef.current = false
+    lastAutoScrollHeightRef.current = 0
     setVisibleLength(instant ? text.length : 0)
   }, [instant, text])
 
@@ -66,10 +68,14 @@ export function TypewriterText({
     return () => window.clearTimeout(timer)
   }, [characterDelay, sentenceDelay, text, visibleLength])
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!autoScroll || autoScrollStoppedRef.current || !paragraphRef.current) return
     const container = paragraphRef.current.parentElement
-    if (container) container.scrollTop = container.scrollHeight
+    if (!container) return
+    const nextScrollHeight = container.scrollHeight
+    if (nextScrollHeight <= container.clientHeight || nextScrollHeight === lastAutoScrollHeightRef.current) return
+    lastAutoScrollHeightRef.current = nextScrollHeight
+    container.scrollTop = nextScrollHeight
   }, [autoScroll, visibleLength])
 
   return (

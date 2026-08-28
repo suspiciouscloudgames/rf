@@ -39,7 +39,7 @@ export function HubOrbitController() {
       const snapshot = useExperienceStore.getState()
       if ((snapshot.stage !== 'hub' && snapshot.stage !== 'approach') || snapshot.transition !== 'none' || event.pointerType === 'mouse' && event.button !== 0) return
       const target = event.target as HTMLElement | null
-      if (target?.closest('.system-controls, .hub-controls, .welcome-modal-backdrop, .research-drawer-layer, .home-button, .orientation-warning')) return
+      if (target?.closest('.system-controls, .hub-controls, .welcome-modal-backdrop, .research-drawer-layer, .approach-record, .home-button, .orientation-warning')) return
       pointer.current = {
         pointerId: event.pointerId,
         startX: event.clientX,

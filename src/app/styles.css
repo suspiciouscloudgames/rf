@@ -714,6 +714,10 @@ button:focus-visible {
   max-height: 68vh;
   box-sizing: border-box;
   overflow: auto;
+  overscroll-behavior: contain;
+  touch-action: pan-y;
+  -webkit-overflow-scrolling: touch;
+  contain: layout paint;
   padding: 20px 22px 24px;
   border-left: 0;
   color: #c9c3b8;
@@ -724,6 +728,14 @@ button:focus-visible {
   scrollbar-width: thin;
   pointer-events: auto;
   font-family: "Nanum Myeongjo", AppleMyungjo, "Noto Serif KR", serif;
+}
+
+@supports (-webkit-touch-callout: none) {
+  .approach-record {
+    background: linear-gradient(90deg, rgba(5, 7, 8, .74), rgba(5, 7, 8, .28));
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
 }
 
 .approach-record[lang="ja"] { font-family: "Yu Mincho", "Hiragino Mincho ProN", "Noto Serif JP", serif; }
