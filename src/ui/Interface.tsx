@@ -9,7 +9,6 @@ import { ObservationSubtitles } from './ObservationSubtitles'
 import { useTuningStore } from '../store/tuningStore'
 import { ResearchDrawer } from './ResearchDrawer'
 import { getApproachContent } from '../content/approachContent'
-import { isAppleTouchDevice } from '../lib/device'
 
 export function Interface() {
   const [isWelcomeOpen, setIsWelcomeOpen] = useState(false)
@@ -27,7 +26,6 @@ export function Interface() {
   const copy = localeCopy[language]
   const focusCopy = getFocusContent(language, selectedSignalId)
   const approachRecord = getApproachContent(language, selectedSignalId)
-  const stabilizeApproachRecord = isAppleTouchDevice()
   const portalObservation = hasDepthPortal(selectedSignalId)
   const residentMemoObservation = selectedSignalId !== null
   const showResidentMemos = residentMemoObservation && (
@@ -110,10 +108,8 @@ export function Interface() {
             <TypewriterText
               text={approachRecord.body}
               className="approach-record-text"
-              characterDelay={stabilizeApproachRecord
-                ? (language === 'ko' ? 60 : language === 'ja' ? 45 : 38)
-                : 52}
-              sentenceDelay={stabilizeApproachRecord ? 160 : 220}
+              characterDelay={60}
+              sentenceDelay={220}
               charactersPerTick={1}
               autoScroll
               instant={!animateApproachRecord}
