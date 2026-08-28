@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import { isAppleTouchDevice } from '../lib/device'
 
 export type HubPersistenceMode = 'particles' | 'fullHub'
 
@@ -91,6 +92,20 @@ export const DEFAULT_EXPERIENCE_TUNING: ExperienceTuning = {
   ...DEFAULT_MORPH_VISUAL_TUNING,
 }
 
+const stabilizeAppleTouchTuning = (tuning: ExperienceTuning): ExperienceTuning => (
+  isAppleTouchDevice()
+    ? {
+        ...tuning,
+        morphWaverAmount: 0,
+        morphWaverSpeed: 0,
+        morphRippleAmount: 0,
+        morphTemporalFlickerEnabled: false,
+        morphFilmFlicker: 0,
+        morphFilmGrain: 0,
+      }
+    : tuning
+)
+
 const STORAGE_KEY = 'resonant-field:tuning:v1'
 
 const loadTuning = (): ExperienceTuning => {
@@ -112,9 +127,9 @@ const loadTuning = (): ExperienceTuning => {
     const migrated = usesLegacyMorphPalette || usesPreviousGreenPalette || usesRadarGreenPalette || usesCobaltPalette
       ? { ...saved, ...DEFAULT_MORPH_VISUAL_TUNING }
       : saved
-    return { ...DEFAULT_EXPERIENCE_TUNING, ...migrated }
+    return stabilizeAppleTouchTuning({ ...DEFAULT_EXPERIENCE_TUNING, ...migrated })
   } catch {
-    return DEFAULT_EXPERIENCE_TUNING
+    return stabilizeAppleTouchTuning(DEFAULT_EXPERIENCE_TUNING)
   }
 }
 
@@ -170,15 +185,24 @@ export const useTuningStore = create<TuningStore>((set, get) => ({
   setPanelOpen: (panelOpen) => set({ panelOpen }),
   togglePanel: () => set((store) => ({ panelOpen: !store.panelOpen })),
   setTuningValue: (key, value) => {
-    set({ [key]: value } as Pick<TuningStore, typeof key>)
-    saveTuning(selectTuning(get()))
+    const tuning = stabilizeAppleTouchTuning({
+      ...selectTuning(get()),
+      [key]: value,
+    })
+    set(tuning)
+    saveTuning(tuning)
   },
   resetTuning: () => {
-    set(DEFAULT_EXPERIENCE_TUNING)
-    saveTuning(DEFAULT_EXPERIENCE_TUNING)
+    const tuning = stabilizeAppleTouchTuning(DEFAULT_EXPERIENCE_TUNING)
+    set(tuning)
+    saveTuning(tuning)
   },
   resetMorphVisuals: () => {
-    set(DEFAULT_MORPH_VISUAL_TUNING)
-    saveTuning(selectTuning(get()))
+    const tuning = stabilizeAppleTouchTuning({
+      ...selectTuning(get()),
+      ...DEFAULT_MORPH_VISUAL_TUNING,
+    })
+    set(tuning)
+    saveTuning(tuning)
   },
 }))

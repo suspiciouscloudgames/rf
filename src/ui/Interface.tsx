@@ -9,11 +9,7 @@ import { ObservationSubtitles } from './ObservationSubtitles'
 import { useTuningStore } from '../store/tuningStore'
 import { ResearchDrawer } from './ResearchDrawer'
 import { getApproachContent } from '../content/approachContent'
-
-const isAppleTouchDevice = () => typeof navigator !== 'undefined' && (
-  /iPad|iPhone|iPod/.test(navigator.userAgent)
-  || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
-)
+import { isAppleTouchDevice } from '../lib/device'
 
 export function Interface() {
   const [isWelcomeOpen, setIsWelcomeOpen] = useState(false)
