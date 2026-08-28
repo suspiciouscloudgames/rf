@@ -1725,6 +1725,16 @@ button:focus-visible {
 .explore-panel.panel-trace-3 { top: 13%; left: calc(58% - min(480px, 39vw)); }
 .explore-panel.panel-trace-4 { bottom: 13%; left: calc(72% - min(480px, 39vw)); }
 
+/* Long question records start higher so their full typed copy remains on-screen. */
+.memo-cluster.memo-long.trace-1 { top: 18%; }
+.memo-cluster.memo-long.trace-2 { top: 24%; }
+.memo-cluster.memo-long.trace-3 { top: 16%; }
+.memo-cluster.memo-long.trace-4 { top: 22%; }
+.memo-cluster.memo-very-long.trace-1 { top: 8%; }
+.memo-cluster.memo-very-long.trace-2 { top: 14%; }
+.memo-cluster.memo-very-long.trace-3 { top: 8%; }
+.memo-cluster.memo-very-long.trace-4 { top: 14%; }
+
 /* Installed exhibition web app: hide author-only tuning controls. */
 @media (display-mode: standalone) {
   .tuning-ui { display: none !important; }

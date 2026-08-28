@@ -195,6 +195,10 @@ export function ExploreInterface({ sequentialReveal = false }: ExploreInterfaceP
       <div className="explore-traces">
         {items.map((item, index) => {
           const memoDelay = 0.3 + index * revealStep
+          const memoLength = Array.from(item.previewBody).length
+          const veryLongMemo = memoLength >= (language === 'en' ? 520 : 195)
+          const longMemo = memoLength >= (language === 'en' ? 380 : 160)
+          const memoLengthClass = veryLongMemo ? 'memo-very-long' : longMemo ? 'memo-long' : ''
           const button = (
             <button
               type="button"
@@ -208,12 +212,12 @@ export function ExploreInterface({ sequentialReveal = false }: ExploreInterfaceP
               <span className="memo-open-symbol" aria-hidden="true">↗</span>
             </button>
           )
-          if (!sequentialReveal) return <div key={item.id} className={`memo-cluster trace-${index + 1}`} data-item-id={item.id}>{button}</div>
+          if (!sequentialReveal) return <div key={item.id} className={`memo-cluster ${memoLengthClass} trace-${index + 1}`} data-item-id={item.id}>{button}</div>
           return (
             <button
               key={item.id}
               type="button"
-              className={`memo-cluster memo-reveal trace-${index + 1}`}
+              className={`memo-cluster memo-reveal ${memoLengthClass} trace-${index + 1}`}
               data-item-id={item.id}
               style={{ '--memo-delay': `${memoDelay}s` } as RevealStyle}
               onClick={() => setSelectedItem(selectedItemId === item.id ? null : item.id)}

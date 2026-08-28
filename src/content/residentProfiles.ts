@@ -9,18 +9,18 @@ const residentProfiles: Record<Language, Record<string, string>> = {
     'resident-e': '외국인 노동자로서 가장 최근에 이곳을 떠나야 했던 거주자이다. 이곳에 남아있을 반려체가 마음이 쓰여서 다음 거주자에게 관측을 부탁하는 이 웹사이트를 남겼다. 반려체들의 변화를 추적하기 위해 아는 선에서 이전 거주자들에 대한 이야기를 정리했다.',
   },
   ja: {
-    'resident-a': '記録は何も残っていない。Bが入居した当初に残っていたAの伴侶体だけが、Bの記憶の中に残っている。',
-    'resident-b': '非正規のアルバイトとして働いていたEの友人。仕事の面接を受けて回るうちに、やや気分の落ち込む時期に入った。ほとんど外出せず、家の中でゲームに没頭した。Eは当時この家を訪れた際、初めて検出器を体験した。現在は互いに連絡を取っていない。',
-    'resident-c': '生涯にわたり家事労働に従事し、老年期には一人で暮らしていた。親しい人はおらず、家で過ごす時間が長かった。インターネット配信で遠い国における封鎖と虐殺を目の当たりにして衝撃を受け、それに抗議するプラカードを手に、一人で路上に立ったことがある。',
-    'resident-d': '入居後、家に残されていたいくつかの物と郵便物から、以前の居住者Cの暮らしを推測した。この場所で一緒に暮らしていた猫が死んだ後、家賃が上がったため退去した。猫がいた場所に残っていた伴侶体の状態を確かめるため、後の居住者Eにメッセージを送った。',
-    'resident-e': '外国人労働者であり、この場所を最も最近離れなければならなかった最後の居住者である。ここに残っているはずの伴侶体が気がかりだったため、次の居住者に観測を託すこのウェブサイトを残した。伴侶体たちの変化を追跡するため、自分に分かる範囲で以前の居住者たちについての話を整理した。',
+    'resident-a': '記録は何も残っていない。入居した当初に残っていたAの伴侶体たちだけが、Bの記憶に残っている。',
+    'resident-b': 'Eの友人で、アルバイトで生計を立てていた。正社員になろうと面接を受けて回るうちに、やや抑うつ状態になった。ほとんど外出せず、家でゲームに没頭した。EはBの友達で、当時この家に遊びにきた際に初めて検出器を触った。今は連絡を取り合っていない。',
+    'resident-c': '一生をハウスキーパーとして働き、老後は一人で暮らしていた。身近に親しい人はおらず、ほとんどの時間を家で過ごした。遠い国で起きている封鎖と虐殺をネット配信を通じて目の当たりにし、衝撃を受けた。これに抗議するプラカードを手に、一人で街頭に立ったことがある。',
+    'resident-d': '入居後、家に残されていたいくつかの物と郵便物から、以前の居住者Cの暮らしを察した。ここで一緒に暮らしていたネコが死んだ後、家賃が上がったため退去した。その後、ネコがいつもいた場所に残っていた伴侶体の様子を確かめようと、居住者だったEにメッセージを送った。',
+    'resident-e': '外国人労働者で、直近でここから立ち退かなければならなかった最後の居住者。ここに残された伴侶体が気がかりで、次の入居者に観測を託す思いでこのウェブサイトを残した。伴侶体たちの変化を追跡するため、これまでの居住者たちについて自ら分かる範囲で整理した。',
   },
   en: {
     'resident-a': 'No records remain. Only the companion entities that were still present when B first moved in remain in B’s memory.',
-    'resident-b': 'Worked temporary, part-time jobs. After a period of going from one job interview to another, B fell into a somewhat depressed state. B rarely went out and immersed themselves in games at home. E was B’s friend and first encountered the detector while visiting the house during this period. They are no longer in contact.',
-    'resident-c': 'Spent a lifetime doing domestic labor and lived alone in old age. C had few close relationships and spent most of their time at home. Shocked by online broadcasts showing a blockade and massacre in a distant country, C once stood alone in the street holding a protest sign.',
-    'resident-d': 'D pieced together aspects of the previous resident C’s life from a few belongings and pieces of mail left in the house. After the cat that lived here with D died, the rent increased and D moved out. D later messaged E, the next resident, asking them to check the state of the companion entity that had remained in the cat’s spot.',
-    'resident-e': 'A migrant worker and the last resident to leave this place. Concerned about the companion entities that might remain here, E left this website to ask the next resident to observe them. To trace the changes in the entities, E compiled what they knew about the previous residents.',
+    'resident-b': 'Worked temporary, part-time jobs. After a period of going from one job interview to another, B had depression. B rarely went out and got hooked on playing games at home. E was B’s friend and first encountered the detector while visiting the house during this time. They are no longer in touch.',
+    'resident-c': 'Spent a lifetime doing domestic labor and lived alone in old age. C had very few close friends and spent most of the time at home. C was deeply disturbed by seeing the lockdowns and massacres in a distant countries online, and once stood alone in the street holding a sign in protest.',
+    'resident-d': 'After moving in, D pieced together aspects of C, the  previous resident, and C’s life from the few belongings and pieces of mail left behind in the house. After the cat that lived here with D died, the rent increased and D moved out. Wanting to check on the condition of the companion entity that remained the place where the cat used to lie, D later messaged E, the subsequent resident.',
+    'resident-e': 'As a migrant worker, E was the most recent resident who was evicted. Concerned about the companion entities that might remain, E created this website to ask the next resident to observe them. To track changes in the companion entities, E compiled what they knew about the previous residents.',
   },
 }
 
