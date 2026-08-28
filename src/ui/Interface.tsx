@@ -103,14 +103,16 @@ export function Interface() {
 
       {stage === 'approach' && transition === 'none' ? (
         <aside className="approach-record" lang={language}>
-          <h1>{approachRecord.title}</h1>
-          <TypewriterText
-            text={approachRecord.body}
-            className="approach-record-text"
-            characterDelay={52}
-            autoScroll
-            instant={!animateApproachRecord}
-          />
+          <div className="approach-record-scroll">
+            <h1>{approachRecord.title}</h1>
+            <TypewriterText
+              text={approachRecord.body}
+              className="approach-record-text"
+              characterDelay={52}
+              autoScroll
+              instant={!animateApproachRecord}
+            />
+          </div>
         </aside>
       ) : null}
 

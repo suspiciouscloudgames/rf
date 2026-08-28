@@ -78,6 +78,20 @@ button:focus-visible {
   filter: none;
 }
 
+/* iPad Safari promotes these full-screen textures to composited layers. Moving
+   those layers every few frames reads as a viewport shake, so keep the grain
+   but leave the layers stationary on touch WebKit devices. */
+@supports (-webkit-touch-callout: none) {
+  @media (hover: none), (pointer: coarse) {
+    .morph-film-overlay,
+    .noise {
+      animation: none;
+      transform: none;
+      filter: none;
+    }
+  }
+}
+
 .experience-shell.state-loading .morph-film-overlay,
 .experience-shell.state-hub.transition-none .morph-film-overlay {
   opacity: 0;
@@ -471,6 +485,11 @@ button:focus-visible {
 .research-subtitle[lang="ja"] { font-family: "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif; }
 .research-subtitle[lang="en"] { font-family: "Helvetica Neue", Arial, sans-serif; }
 
+.research-subtitle.is-dark {
+  color: rgba(43, 47, 45, .94);
+  text-shadow: 0 1px 10px rgba(255, 255, 255, .28);
+}
+
 .research-countdown {
   position: absolute;
   bottom: 12px;
@@ -659,8 +678,9 @@ button:focus-visible {
   padding: 18px 0;
   border: 0;
   color: rgba(224, 235, 227, .96);
-  background: linear-gradient(90deg, rgba(25, 44, 32, .98), rgba(7, 18, 12, .97));
-  backdrop-filter: blur(9px);
+  background: linear-gradient(90deg, rgba(25, 44, 32, .72), rgba(7, 18, 12, .62));
+  -webkit-backdrop-filter: blur(12px) saturate(.72);
+  backdrop-filter: blur(12px) saturate(.72);
   cursor: pointer;
   box-shadow: 8px 0 24px rgba(0, 0, 0, .28), inset 1px 0 rgba(120, 148, 129, .2);
   text-shadow: 0 1px 8px rgba(0, 0, 0, .72);
@@ -715,29 +735,27 @@ button:focus-visible {
   width: min(390px, 31vw);
   max-height: 68vh;
   box-sizing: border-box;
+  overflow: hidden;
+  border-left: 0;
+  color: #c9c3b8;
+  background: linear-gradient(90deg, rgba(5, 7, 8, .52), rgba(5, 7, 8, .08));
+  -webkit-backdrop-filter: blur(14px) saturate(.72);
+  backdrop-filter: blur(14px) saturate(.72);
+  pointer-events: auto;
+  font-family: "Nanum Myeongjo", AppleMyungjo, "Noto Serif KR", serif;
+}
+
+.approach-record-scroll {
+  max-height: 68vh;
+  box-sizing: border-box;
   overflow: auto;
   overscroll-behavior: contain;
   touch-action: pan-y;
   -webkit-overflow-scrolling: touch;
   contain: layout paint;
   padding: 20px 22px 24px;
-  border-left: 0;
-  color: #c9c3b8;
-  background: linear-gradient(90deg, rgba(5, 7, 8, .68), rgba(5, 7, 8, .14));
-  -webkit-backdrop-filter: blur(9px);
-  backdrop-filter: blur(9px);
   scrollbar-color: rgba(76, 106, 83, .52) transparent;
   scrollbar-width: thin;
-  pointer-events: auto;
-  font-family: "Nanum Myeongjo", AppleMyungjo, "Noto Serif KR", serif;
-}
-
-@supports (-webkit-touch-callout: none) {
-  .approach-record {
-    background: linear-gradient(90deg, rgba(5, 7, 8, .74), rgba(5, 7, 8, .28));
-    -webkit-backdrop-filter: none;
-    backdrop-filter: none;
-  }
 }
 
 .approach-record[lang="ja"] { font-family: "Yu Mincho", "Hiragino Mincho ProN", "Noto Serif JP", serif; }
@@ -831,7 +849,7 @@ button:focus-visible {
   bottom: max(28px, env(safe-area-inset-bottom));
   min-width: 152px;
   min-height: 52px;
-  border: 1px solid var(--hub-key-bright);
+  border: 1px solid rgba(120, 148, 129, .4);
   color: #e7e2d7;
   background: rgba(5, 7, 8, .72);
   backdrop-filter: blur(9px);
@@ -1071,12 +1089,13 @@ button:focus-visible {
   width: min(390px, 32vw);
   max-height: 50vh;
   padding: 22px;
-  border-left: 0;
+  border: 0;
+  outline: 0;
   color: rgba(246,241,230,.86);
   background:
-    radial-gradient(circle at 18% 12%, rgba(74, 83, 65, .28), transparent 48%),
-    linear-gradient(135deg, rgba(24, 31, 27, .78), rgba(9, 15, 13, .72));
-  box-shadow: inset 0 0 0 1px rgba(215, 221, 201, .1), 0 18px 48px rgba(0, 0, 0, .34);
+    radial-gradient(circle at 18% 12%, rgba(74, 83, 65, .18), transparent 48%),
+    linear-gradient(135deg, rgba(24, 31, 27, .6), rgba(9, 15, 13, .52));
+  box-shadow: 0 20px 52px rgba(0, 0, 0, .22);
   -webkit-backdrop-filter: blur(32px) saturate(.42) brightness(.46);
   backdrop-filter: blur(32px) saturate(.42) brightness(.46);
   pointer-events: auto;
@@ -1535,8 +1554,8 @@ button:focus-visible {
 
   .approach-record {
     width: min(440px, 34vw);
-    padding: 25px 27px 29px;
   }
+  .approach-record-scroll { padding: 25px 27px 29px; }
   .approach-record h1 { font-size: 23px; }
   .approach-record-text { font-size: 17px; line-height: 1.9; }
 
@@ -1618,8 +1637,8 @@ button:focus-visible {
 
   .approach-record {
     width: min(760px, 35vw);
-    padding: 42px 46px 50px;
   }
+  .approach-record-scroll { padding: 42px 46px 50px; }
   .approach-record h1 { font-size: 39px; }
   .approach-record-text { font-size: 28px; line-height: 1.82; }
   .scene-signal-label { font-size: 25px; }

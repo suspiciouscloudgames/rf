@@ -131,7 +131,8 @@ function PhotoCard({ placement, index }: { placement: PhotoPlacement; index: num
     const transitionProgress = Number(camera.userData.transitionProgress ?? 0)
     const stage = useExperienceStore.getState().stage
     const transition = useExperienceStore.getState().transition
-    const active = transition === 'approachToObservation' || stage === 'observation'
+    const active = transition === 'approachToObservation'
+      || (stage === 'observation' && transition === 'none')
     const observationProgress = Number(camera.userData.photoDollyProgress ?? 0)
     const progress = stage === 'observation' && transition === 'none'
       ? ENTRY_SHARE + observationProgress * (1 - ENTRY_SHARE)

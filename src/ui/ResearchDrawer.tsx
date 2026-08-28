@@ -67,6 +67,7 @@ export function ResearchDrawer() {
     filmTime >= subtitle.start && filmTime < subtitle.end
   ))
   const activeSubtitle = activeSubtitleIndex >= 0 ? filmSubtitles[activeSubtitleIndex] : null
+  const useDarkSubtitle = activeSubtitle?.id === 22 || activeSubtitle?.id === 23
   const selectedArticle = researchArticles.find((article) => article.id === selectedArticleId) ?? researchArticles[0]
   const selectedArticleBody = language === 'ko'
     ? selectedArticle.body
@@ -243,7 +244,11 @@ export function ResearchDrawer() {
             <span className="research-countdown" aria-label={`${Math.max(0, filmSubtitles.length - Math.max(activeSubtitleIndex, 0))}`}>
               {String(Math.max(0, filmSubtitles.length - Math.max(activeSubtitleIndex, 0))).padStart(2, '0')}
             </span>
-            <div className="research-subtitle" aria-live="polite" lang={language}>
+            <div
+              className={`research-subtitle${useDarkSubtitle ? ' is-dark' : ''}`}
+              aria-live="polite"
+              lang={language}
+            >
               <p key={`film-subtitle-${activeSubtitle?.id ?? 'empty'}`} aria-hidden={!activeSubtitle}>
                 {renderFilmSubtitle()}
               </p>
